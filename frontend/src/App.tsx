@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar";
+import InputField from "./components/InputField";
+import InputSelect from "./components/InputSelect";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -7,7 +9,13 @@ function App() {
   return (
     <div className="flex flex-col  justify-center ">
       <Navbar />
-      <h1 className="h-screen bg-base-100 text-base-content">Hello</h1>
+      <InputField legend="Nom :" placeholder="Ton nom" />
+      <InputField legend="Prénom :" placeholder="Ton prénom" />
+      <InputSelect
+        legend="Navigateur :"
+        placeholder="Choisis ton navigateur"
+        options={["3 tenders", "4 tenders", "6 tenders"]}
+      />
     </div>
   );
 }
