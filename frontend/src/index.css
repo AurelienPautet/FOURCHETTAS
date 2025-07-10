@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Shrikhand&display=swap");
 @import "tailwindcss";
+@import "tailwindcss-animated";
 @plugin "daisyui" {
   themes: all;
 }

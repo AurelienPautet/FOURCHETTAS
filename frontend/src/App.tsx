@@ -1,22 +1,21 @@
 import { useState } from "react";
 import Navbar from "./components/Navbar";
-import InputField from "./components/InputField";
-import InputSelect from "./components/InputSelect";
+import UserForm from "./pages/UserForm";
+import UpcomingEvents from "./pages/UpcomingEvent";
+import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <div className="flex flex-col  justify-center ">
-      <Navbar />
-      <InputField legend="Nom :" placeholder="Ton nom" />
-      <InputField legend="Prénom :" placeholder="Ton prénom" />
-      <InputSelect
-        legend="Navigateur :"
-        placeholder="Choisis ton navigateur"
-        options={["3 tenders", "4 tenders", "6 tenders"]}
-      />
-    </div>
+    <Router>
+      <div className="flex flex-col  justify-center ">
+        <Navbar />
+
+        <Routes>
+          <Route path="/" element={<UpcomingEvents />} />
+          <Route path="/event/:id/order" element={<UserForm />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

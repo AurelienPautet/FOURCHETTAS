@@ -2,7 +2,8 @@ interface InputFieldProps {
   legend: string;
   placeholder: string;
   optional?: boolean;
-  options: string[];
+  options: { id: number; name: string }[];
+  set: (value: number) => void;
 }
 
 function InputSelect({
@@ -10,16 +11,21 @@ function InputSelect({
   placeholder,
   optional,
   options,
+  set,
 }: InputFieldProps) {
   return (
     <fieldset className="fieldset">
-      <legend className="fieldset-legend">{legend}</legend>
-      <select defaultValue={placeholder} className="select">
+      <legend className="fieldset-legend text-xl">{legend}</legend>
+      <select
+        defaultValue={placeholder}
+        className="select"
+        onChange={(e) => set(Number(e.target.value))}
+      >
         <option disabled={true}>{placeholder}</option>
         {options.map((option, index) => {
           return (
-            <option key={index} value={option}>
-              {option}
+            <option key={index} value={option.id}>
+              {option.name}
             </option>
           );
         })}
