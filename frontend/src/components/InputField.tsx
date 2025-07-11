@@ -1,8 +1,11 @@
+import type { Ref } from "react";
+
 interface InputFieldProps {
   legend: string;
   placeholder: string;
   value: string;
   optional?: boolean;
+  ref: Ref<HTMLInputElement>;
   set: (value: string) => void;
 }
 
@@ -12,19 +15,24 @@ function InputField({
   value,
   optional,
   set,
+  ref,
 }: InputFieldProps) {
   return (
     <fieldset className="fieldset">
       <legend className="fieldset-legend text-xl">{legend}</legend>
       <input
         type="text"
+        ref={ref}
         className="input validator text-2xl rounded-md"
         required
         minLength={3}
         maxLength={30}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => set(e.target.value)}
+        onChange={(e) => {
+          set(e.target.value);
+          e.target?.setCustomValidity("");
+        }}
       />
       <p className="validator-hint">Entre 3 et 30 caractères</p>
 

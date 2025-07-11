@@ -42,7 +42,7 @@ function UpcomingEvents() {
   }, []);
 
   return (
-    <div className="text-3xl font-bold p-4 flex flex-col items-center gap-5">
+    <div className="h-full text-3xl font-bold p-4 flex flex-col items-center gap-5">
       <h1> Prochains Evenements </h1>
 
       {events.length > 0 ? (
