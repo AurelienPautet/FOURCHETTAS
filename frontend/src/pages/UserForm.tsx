@@ -11,6 +11,7 @@ import type Event from "../types/EventType";
 import correctDate from "../utils/DateCorrector";
 import NavbarSpacer from "../components/NavbarSpacer";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
+import TextDate from "../components/TextDate";
 
 function UserForm() {
   const maxTabs = 4;
@@ -74,6 +75,7 @@ function UserForm() {
   useEffect(() => {
     getEventFromId(eventId, setEventData);
   }, []);
+  console.log("Event data fetched:", eventData?.date);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -232,9 +234,6 @@ function UserForm() {
   /*   console.log("Name:", name);
   console.log("First Name:", firstName);
   console.log("Dish ID:", dishID); */
-  let correctedDate = correctDate(eventData?.date || "2025-02-09");
-  let splitDate = correctedDate.split("-") || ["", "", ""];
-  let time = eventData?.time || "00:00";
 
   if (orderSuccess) {
     return (
@@ -243,13 +242,7 @@ function UserForm() {
 
         <div className="flex flex-col items-center gap-4 h-full w-full">
           <h2 className="text-2xl font-bold">Merci pour ta commande !</h2>
-          <p>
-            On se revoit le{" "}
-            <span className="font-bold">
-              {splitDate[2]}/{splitDate[1]}/{splitDate[0]}
-            </span>{" "}
-            à <span className="font-bold">{time}</span>
-          </p>
+          <p>On se revoit le {TextDate(eventData?.date, eventData?.time)}</p>
         </div>
         <p className="text-success mb-auto h-20">
           Votre commande a été passée avec succès.

@@ -3,6 +3,7 @@ import NavbarSpacer from "../components/NavbarSpacer";
 import { useParams } from "react-router-dom";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import type Event from "../types/EventType.tsx";
+import TextDate from "../components/TextDate.tsx";
 function AdminOrders() {
   const { id } = useParams();
 
@@ -18,7 +19,8 @@ function AdminOrders() {
       <div className="flex flex-col items-center gap-4">
         <h1 className="text-3xl font-bold">
           Les commandes pour l'événement{" "}
-          <span className="font-extrabold">{eventData?.title}</span>
+          <span className="font-extrabold">{eventData?.title}</span> du{" "}
+          {TextDate(eventData?.date, eventData?.time)}
         </h1>
       </div>
     </div>
