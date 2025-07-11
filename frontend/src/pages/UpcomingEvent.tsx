@@ -74,7 +74,7 @@ function UpcomingEvents() {
                 )}
 
                 <button
-                  className={`btn btn-primary md:ml-auto ${
+                  className={`btn btn-accent md:ml-auto ${
                     secondsLeft <= 0 ? "btn-disabled" : ""
                   }`}
                   onClick={() => navigate("/event/" + event.id + "/order")}

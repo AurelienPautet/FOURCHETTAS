@@ -3,7 +3,7 @@ function ThemeController() {
     <>
       <input
         type="checkbox"
-        value="pastel"
+        value="fantasy"
         className="toggle theme-controller"
       />
     </>

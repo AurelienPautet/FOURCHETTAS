@@ -29,9 +29,20 @@ function UserForm() {
     3: "idle",
   });
 
-  const [name, setName] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [noMealError, setNoMealError] = useState(false);
+
+  const [name, setName] = useState(() => {
+    const storedName = localStorage.getItem("name");
+    return storedName ? storedName : "";
+  });
+  const [firstName, setFirstName] = useState(() => {
+    const storedFirstName = localStorage.getItem("firstName");
+    return storedFirstName ? storedFirstName : "";
+  });
+  const [phone, setPhone] = useState(() => {
+    const storedPhone = localStorage.getItem("phone");
+    return storedPhone ? storedPhone : "";
+  });
   const [dishID, setDishID] = useState(0);
   const [sideID, setSideID] = useState(0);
   const [drinkID, setDrinkID] = useState(0);
@@ -44,6 +55,16 @@ function UserForm() {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const firstNameInputRef = useRef<HTMLInputElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem("name", name);
+  }, [name]);
+  useEffect(() => {
+    localStorage.setItem("firstName", firstName);
+  }, [firstName]);
+  useEffect(() => {
+    localStorage.setItem("phone", phone);
+  }, [phone]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,27 +91,37 @@ function UserForm() {
 
   function nextTab() {
     let isValid = true;
-    if (!nameInputRef.current?.reportValidity()) {
-      console.log("Name input is invalid.");
-      nameInputRef.current?.setCustomValidity("Dois être de 3 à 30 caractères");
-      isValid = false;
+    if (currentTab === 0) {
+      if (!nameInputRef.current?.reportValidity()) {
+        console.log("Name input is invalid.");
+        nameInputRef.current?.setCustomValidity(
+          "Dois être de 3 à 30 caractères"
+        );
+        isValid = false;
+      }
+
+      if (!firstNameInputRef.current?.reportValidity()) {
+        console.log("First name input is invalid.");
+        firstNameInputRef.current?.setCustomValidity(
+          "Dois être de 3 à 30 caractères"
+        );
+        isValid = false;
+      }
+
+      if (!phoneInputRef.current?.reportValidity()) {
+        phoneInputRef.current?.setCustomValidity("Dois être de 10 chiffres");
+        isValid = false;
+      }
+    } else if (currentTab === 1) {
+      isValid = dishID > 0;
+      if (!isValid) {
+        setNoMealError(true);
+      }
     }
 
-    if (!firstNameInputRef.current?.reportValidity()) {
-      console.log("First name input is invalid.");
-      firstNameInputRef.current?.setCustomValidity(
-        "Dois être de 3 à 30 caractères"
-      );
-      isValid = false;
-    }
-
-    if (!phoneInputRef.current?.reportValidity()) {
-      phoneInputRef.current?.setCustomValidity("Dois être de 10 chiffres");
-      isValid = false;
-    }
     if (!isValid) {
       console.log("Form is invalid, cannot proceed to next tab.");
-      //return;
+      return;
     }
 
     if (currentTab < maxTabs) {
@@ -192,7 +223,7 @@ function UserForm() {
         <h1 className="mb-3 w-full text-center text-3xl font-bold">
           Que souhaites-tu commander ?
         </h1>
-        <div className="flex flex-row md:flex-row gap-4 flex-wrap justify-center">
+        <div className="flex flex-row flex-wrap justify-center gap-4">
           {dishes.map((dish: Item) => (
             <CardItem
               key={dish.id}
@@ -201,7 +232,10 @@ function UserForm() {
               price={dish.price}
               quantity={dish.quantity}
               img_url={dish.img_url}
-              onclick={() => setDishID(dish.id)}
+              onclick={() => {
+                setDishID(dish.id);
+                setNoMealError(false);
+              }}
               selected={dishID === dish.id}
             />
           ))}
@@ -216,10 +250,10 @@ function UserForm() {
         <h1 className="mb-3 w-full text-center text-3xl font-bold">
           Un accompagnement ?
         </h1>
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-row flex-wrap justify-center gap-4">
           <CardItem
             title="Non merci"
-            description="J'ai un petit appétit aujourd'hui, pas de frites pour moi."
+            description="J'ai un petit appétit aujourd'hui, rien pour moi."
             price={0}
             quantity={0}
             img_url="https://cdn.pixabay.com/photo/2013/07/13/12/32/cross-159808_960_720.png"
@@ -249,7 +283,7 @@ function UserForm() {
         <h1 className="mb-3 w-full text-center text-3xl font-bold">
           Une boisson ?
         </h1>
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-row flex-wrap justify-center gap-4">
           <CardItem
             title="Non merci"
             description="Je préfère boire de l'eau."
@@ -279,6 +313,16 @@ function UserForm() {
           Commander !!!
         </button>
       )}
+
+      <p
+        key={"meal-error"}
+        className={`text-error invisible ${
+          noMealError && "visible"
+        } w-full text-center`}
+      >
+        Selectionne un plat
+      </p>
+
       <div className="flex flex-col items-center gap-4 w-full z-20">
         <div className="flex gap-4">
           <button
