@@ -6,14 +6,14 @@ import correctDate from "../utils/DateCorrector";
 function StatusEvent({ event }: { event: Event | null }) {
   const [status, setStatus] = useState({
     message: "Statut en chargement",
-    color: "error",
+    color: "primary",
   });
 
   useEffect(() => {
     if (!event) {
       setStatus({
         message: "Statut en chargement",
-        color: "error",
+        color: "primary",
       });
       return;
     }
@@ -58,7 +58,7 @@ function StatusEvent({ event }: { event: Event | null }) {
   }, [event]);
 
   return (
-    <div className={`flex items-center gap-2 text-color text-${status.color}`}>
+    <div className={`flex items-center gap-2 text-${status.color}`}>
       <div className="inline-grid *:[grid-area:1/1]">
         <div className={`status  status-${status.color} animate-ping`}></div>
         <div className={`status  status-${status.color}`}></div>
@@ -68,7 +68,7 @@ function StatusEvent({ event }: { event: Event | null }) {
       ) : (
         <span className="loading loading-dots loading-sm"></span>
       )}
-      <div className="hidden status-error text-warning text-info status-warning status-success status-neutral status-info"></div>
+      <div className="hidden status-error text-warning text-neutral text-info status-warning status-success status-neutral status-info"></div>
     </div>
   );
 }
