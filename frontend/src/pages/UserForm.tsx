@@ -7,17 +7,20 @@ import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import api_url from "../api_url";
 import type Item from "../types/ItemType";
+import type Event from "../types/EventType";
 
 function UserForm() {
   const maxTabs = 4;
   let { id } = useParams();
-  const [currentTab, setCurrentTab] = useState(0);
+  let eventId = parseInt(id || "0");
+  const [currentTab, setCurrentTab] = useState(4);
 
   const [transitionState, setTransitionState] = useState({
     0: "idle",
     1: "idle",
     2: "idle",
     3: "idle",
+    4: "idle",
   });
 
   const [noMealError, setNoMealError] = useState(false);
@@ -38,9 +41,11 @@ function UserForm() {
   const [sideID, setSideID] = useState(0);
   const [drinkID, setDrinkID] = useState(0);
 
-  const [dishes, setDishes] = useState([]);
-  const [sides, setSides] = useState([]);
-  const [drinks, setDrinks] = useState([]);
+  const [dishes, setDishes] = useState<Item[]>([]);
+  const [sides, setSides] = useState<Item[]>([]);
+  const [drinks, setDrinks] = useState<Item[]>([]);
+
+  const [eventData, setEventData] = useState<Event>();
 
   const mainDivRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -56,6 +61,23 @@ function UserForm() {
   useEffect(() => {
     localStorage.setItem("phone", phone);
   }, [phone]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${api_url}/api/events/${id}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setEventData(data);
+      } catch (error) {
+        console.error("Error fetching upcoming events:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -156,7 +178,7 @@ function UserForm() {
   return (
     <div
       ref={mainDivRef}
-      className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-between overflow-scroll"
+      className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-between overflow-x-hidden  overflow-y-scroll"
     >
       <TransitionDiv
         state={transitionState[0]}
@@ -299,11 +321,29 @@ function UserForm() {
         </div>
       </TransitionDiv>
 
-      {currentTab === 4 && (
-        <button className="btn btn-accent btn-outline font-bold">
-          Commander !!!
-        </button>
-      )}
+      <TransitionDiv
+        state={transitionState[4]}
+        show={currentTab === 4}
+        classes={`flex-grow flex flex-col gap-6 w-full items-center justify-center`}
+      >
+        {eventData ? (
+          <ReciepeEvent
+            event={eventData}
+            name={name}
+            firstName={firstName}
+            phone={phone}
+            dish={dishes.find((d) => d.id === dishID) || null}
+            side={sides.find((s) => s.id === sideID) || null}
+            drink={drinks.find((d) => d.id === drinkID) || null}
+            onClick={() => {
+              console.log("Submitting order...");
+              // Handle order submission logic here
+            }}
+          />
+        ) : (
+          <span className="loading loading-spinner loading-lg"></span>
+        )}
+      </TransitionDiv>
 
       <p
         key={"meal-error"}
@@ -322,7 +362,12 @@ function UserForm() {
           >
             Precedent
           </button>
-          <button className="btn btn-accent" onClick={nextTab}>
+          <button
+            className={`btn btn-accent ${
+              currentTab === maxTabs ? "btn-disabled" : ""
+            }`}
+            onClick={nextTab}
+          >
             Suivant
           </button>
         </div>

@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import client from "./config/db.js";
 
 import eventRoutes from "./routes/eventRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -21,6 +22,7 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.use("/api/events", eventRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
