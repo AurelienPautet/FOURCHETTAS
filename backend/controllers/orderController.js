@@ -8,6 +8,10 @@ export const createOrder = (req, res) => {
     !req.body.event_id ||
     !req.body.dish_id
   ) {
+    console.log(
+      req.body,
+      "Request body for order creation is missing required fields"
+    );
     return res.status(400).json({ error: "Missing required fields" });
   }
   client

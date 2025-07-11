@@ -10,6 +10,7 @@ interface ReciepeEventProps {
   side: Item | null;
   drink: Item | null;
   onClick: () => void;
+  ordering: boolean;
 }
 
 function ReciepeEvent({
@@ -21,8 +22,8 @@ function ReciepeEvent({
   side,
   drink,
   onClick,
+  ordering,
 }: ReciepeEventProps) {
-  console.log(dish, side, drink);
   let drinkPrice = parseFloat(drink ? drink.price.toString() : "0");
   let sidePrice = parseFloat(side ? side.price.toString() : "0");
   let dishPrice = parseFloat(dish ? dish.price.toString() : "0");
@@ -83,10 +84,14 @@ function ReciepeEvent({
 
       <button
         onClick={onClick}
-        className="btn btn-accent font-extrabold text-accent-content hover:bg-accent-focus"
+        className={`btn btn-accent ${
+          ordering ? "btn-disabled" : ""
+        } font-extrabold text-accent-content hover:bg-accent-focus`}
       >
         Confirmer la commande
       </button>
+
+      {ordering && <span className="loading loading-spinner loading-lg"></span>}
     </div>
   );
 }

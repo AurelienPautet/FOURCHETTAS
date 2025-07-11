@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import correctDate from "../utils/DateCorrector";
 import { useNavigate } from "react-router-dom";
 import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
+import NavbarSpacer from "../components/NavbarSpacer";
 
 function UpcomingEvents() {
   const navigate = useNavigate();
@@ -42,7 +43,9 @@ function UpcomingEvents() {
   }, []);
 
   return (
-    <div className="h-full text-3xl font-bold p-4 flex flex-col items-center gap-5">
+    <div className="flex-grow overflow-y-scroll text-3xl font-bold p-4 flex flex-col items-center gap-5">
+      <NavbarSpacer />
+
       <h1> Prochains Evenements </h1>
 
       {events.length > 0 ? (

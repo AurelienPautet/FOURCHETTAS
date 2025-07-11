@@ -8,12 +8,14 @@ import { useParams } from "react-router-dom";
 import api_url from "../api_url";
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
+import correctDate from "../utils/DateCorrector";
+import NavbarSpacer from "../components/NavbarSpacer";
 
 function UserForm() {
   const maxTabs = 4;
   let { id } = useParams();
   let eventId = parseInt(id || "0");
-  const [currentTab, setCurrentTab] = useState(4);
+  const [currentTab, setCurrentTab] = useState(0);
 
   const [transitionState, setTransitionState] = useState({
     0: "idle",
@@ -23,7 +25,13 @@ function UserForm() {
     4: "idle",
   });
 
-  const [noMealError, setNoMealError] = useState(false);
+  const [ErrorIndicator, setErrorIndicator] = useState({
+    has: false,
+    message: "",
+  });
+
+  const [ordering, setOrdering] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
   const [name, setName] = useState(() => {
     const storedName = localStorage.getItem("name");
@@ -98,46 +106,104 @@ function UserForm() {
 
     fetchData();
   }, []);
-  /*   console.log("Fetched dishes:", dishes);
-  console.log("Fetched sides:", sides);
-  console.log("Fetched drinks:", drinks); */
+
+  function orderJson() {
+    let res_json = {
+      event_id: eventId,
+      name: name,
+      firstname: firstName,
+      phone: phone,
+      dish_id: dishID,
+      side_id: sideID > 0 ? sideID : null,
+      drink_id: drinkID > 0 ? drinkID : null,
+    };
+
+    return res_json;
+  }
+
+  function postOrder() {
+    setErrorIndicator({
+      has: false,
+      message: "",
+    });
+    setOrdering(true);
+    fetch(`${api_url}/api/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(orderJson()),
+    })
+      .then((response) => {
+        setOrdering(false);
+        if (!response.ok) {
+          setErrorIndicator({
+            has: true,
+            message:
+              "Une erreur est survenue lors de la soumission de la commande.",
+          });
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Order submitted successfully:", data);
+        setOrderSuccess(true);
+      })
+      .catch((error) => {
+        setErrorIndicator({
+          has: true,
+          message:
+            "Une erreur réseau est survenue lors de la soumission de la commande.",
+        });
+        console.error("Error submitting order:", error);
+      });
+  }
 
   function nextTab() {
-    let isValid = true;
-    if (currentTab === 0) {
-      if (!nameInputRef.current?.reportValidity()) {
-        console.log("Name input is invalid.");
-        nameInputRef.current?.setCustomValidity(
-          "Dois être de 3 à 30 caractères"
-        );
-        isValid = false;
-      }
-
-      if (!firstNameInputRef.current?.reportValidity()) {
-        console.log("First name input is invalid.");
-        firstNameInputRef.current?.setCustomValidity(
-          "Dois être de 3 à 30 caractères"
-        );
-        isValid = false;
-      }
-
-      if (!phoneInputRef.current?.reportValidity()) {
-        phoneInputRef.current?.setCustomValidity("Dois être de 10 chiffres");
-        isValid = false;
-      }
-    } else if (currentTab === 1) {
-      isValid = dishID > 0;
-      if (!isValid) {
-        setNoMealError(true);
-      }
-    }
-
-    if (!isValid) {
-      console.log("Form is invalid, cannot proceed to next tab.");
-      return;
-    }
-
     if (currentTab < maxTabs) {
+      setErrorIndicator({
+        has: false,
+        message: "",
+      });
+
+      let isValid = true;
+      if (currentTab === 0) {
+        if (!nameInputRef.current?.reportValidity()) {
+          console.log("Name input is invalid.");
+          nameInputRef.current?.setCustomValidity(
+            "Dois être de 3 à 30 caractères"
+          );
+          isValid = false;
+        }
+
+        if (!firstNameInputRef.current?.reportValidity()) {
+          console.log("First name input is invalid.");
+          firstNameInputRef.current?.setCustomValidity(
+            "Dois être de 3 à 30 caractères"
+          );
+          isValid = false;
+        }
+
+        if (!phoneInputRef.current?.reportValidity()) {
+          phoneInputRef.current?.setCustomValidity("Dois être de 10 chiffres");
+          isValid = false;
+        }
+      } else if (currentTab === 1) {
+        isValid = dishID > 0;
+        if (!isValid) {
+          setErrorIndicator({
+            has: true,
+            message: "Veuillez sélectionner un plat.",
+          });
+        }
+      }
+
+      if (!isValid) {
+        console.log("Form is invalid, cannot proceed to next tab.");
+        return;
+      }
+
       let nextTab = currentTab + 1;
       setTransitionState((prev) => ({ ...prev, [currentTab]: "exiting" }));
       //setCurrentTab(-1);
@@ -156,6 +222,10 @@ function UserForm() {
 
   function previousTab() {
     if (currentTab > 0) {
+      setErrorIndicator({
+        has: false,
+        message: "",
+      });
       let nextTab = currentTab - 1;
       setTransitionState((prev) => ({ ...prev, [currentTab]: "entering" }));
       //setCurrentTab(-1);
@@ -174,12 +244,38 @@ function UserForm() {
   /*   console.log("Name:", name);
   console.log("First Name:", firstName);
   console.log("Dish ID:", dishID); */
+  let correctedDate = correctDate(eventData?.date || "2025-02-09");
+  let splitDate = correctedDate.split("-") || ["", "", ""];
+  let time = eventData?.time || "00:00";
+
+  if (orderSuccess) {
+    return (
+      <div className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-center items-center">
+        <div className="h-1/3"></div>
+
+        <div className="flex flex-col items-center gap-4 h-full w-full">
+          <h2 className="text-2xl font-bold">Merci pour ta commande !</h2>
+          <p>
+            On se revoit le{" "}
+            <span className="font-bold">
+              {splitDate[2]}/{splitDate[1]}/{splitDate[0]}
+            </span>{" "}
+            à <span className="font-bold">{time}</span>
+          </p>
+        </div>
+        <p className="text-success mb-auto h-20">
+          Votre commande a été passée avec succès.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
       ref={mainDivRef}
-      className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-between overflow-x-hidden  overflow-y-scroll"
+      className="flex-grow h-full w-full flex flex-col gap-4 pr-4 pl-4 pb-4 justify-between overflow-x-hidden  overflow-y-scroll"
     >
+      <NavbarSpacer />
       <TransitionDiv
         state={transitionState[0]}
         show={currentTab === 0}
@@ -247,7 +343,10 @@ function UserForm() {
               img_url={dish.img_url}
               onclick={() => {
                 setDishID(dish.id);
-                setNoMealError(false);
+                setErrorIndicator({
+                  has: false,
+                  message: "",
+                });
               }}
               selected={dishID === dish.id}
             />
@@ -335,10 +434,8 @@ function UserForm() {
             dish={dishes.find((d) => d.id === dishID) || null}
             side={sides.find((s) => s.id === sideID) || null}
             drink={drinks.find((d) => d.id === drinkID) || null}
-            onClick={() => {
-              console.log("Submitting order...");
-              // Handle order submission logic here
-            }}
+            onClick={() => postOrder()}
+            ordering={ordering}
           />
         ) : (
           <span className="loading loading-spinner loading-lg"></span>
@@ -346,12 +443,12 @@ function UserForm() {
       </TransitionDiv>
 
       <p
-        key={"meal-error"}
+        key={"error-indicator"}
         className={`text-error invisible ${
-          noMealError && "visible"
+          ErrorIndicator.has && "visible"
         } w-full text-center`}
       >
-        Selectionne un plat
+        {ErrorIndicator.message}
       </p>
 
       <div className="flex flex-col items-center gap-4 w-full z-20">

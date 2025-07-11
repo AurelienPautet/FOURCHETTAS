@@ -7,9 +7,9 @@ import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 function App() {
   return (
     <Router>
-      <div className="flex flex-col h-screen  justify-start overflow-hidden">
+      <div className="flex flex-col h-screen  justify-start ">
         <Navbar />
-        <div className="flex-grow flex flex-col overflow-hidden ">
+        <div className="absolute top-0 h-[100vh] w-full flex flex-col overflow-hidden  ">
           <Routes>
             <Route path="/" element={<UpcomingEvents />} />
             <Route path="/event/:id/order" element={<UserForm />} />
