@@ -8,7 +8,7 @@ interface CardEventProps {
   time: string;
   form_closing_date: string;
   form_closing_time: string;
-  imgSrc: string;
+  img_url: string;
   loading: boolean;
   children?: ReactNode;
 }
@@ -20,7 +20,7 @@ function CardEvent({
   time,
   form_closing_date,
   form_closing_time,
-  imgSrc,
+  img_url,
   loading,
   children,
 }: CardEventProps) {
@@ -32,7 +32,7 @@ function CardEvent({
         {loading ? (
           <div className="skeleton  h-48 w-24 md:h-1/2 md:w-2/3"></div>
         ) : (
-          <img className="object-contain h-full w-full" src={imgSrc} />
+          <img className="object-contain h-full w-full" src={img_url} />
         )}
       </div>
       <div className="h-full w-full flex flex-col justify-between items-start p-4 gap-2 text-lg font-normal">

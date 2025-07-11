@@ -3,17 +3,17 @@ interface InputFieldProps {
   description: string;
   price: number;
   quantity: number;
-  imgSrc: string;
+  img_url: string;
   selected: boolean;
   onclick?: () => void;
 }
 
-function CardMeal({
+function CardItem({
   title,
   description,
   price,
   quantity,
-  imgSrc,
+  img_url,
   selected = false,
   onclick,
 }: InputFieldProps) {
@@ -32,7 +32,7 @@ function CardMeal({
             </span>
           )}
           <img
-            src={imgSrc}
+            src={img_url}
             alt={title}
             className="rounded-xl object-contain h-32 w-32 animate-wiggle animate-infinite animate-duration-[5000ms] animate-ease-in-out animate-alternate"
           />
@@ -48,4 +48,4 @@ function CardMeal({
   );
 }
 
-export default CardMeal;
+export default CardItem;

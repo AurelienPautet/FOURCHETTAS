@@ -64,7 +64,7 @@ function UpcomingEvents() {
               form_closing_date={correctDate(event.form_closing_date)}
               form_closing_time={event.form_closing_time}
               loading={loading}
-              imgSrc={event.img_url}
+              img_url={event.img_url}
             >
               <div className="indicator">
                 {secondsLeft < 60 * 60 * 12 && (

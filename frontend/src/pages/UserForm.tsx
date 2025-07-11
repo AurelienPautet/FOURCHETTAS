@@ -1,11 +1,25 @@
 import InputField from "../components/InputField";
 import InputSelect from "../components/InputSelect";
 import TransitionDiv from "../components/TransitionDiv";
-import CardMeal from "../components/CardMeal";
-import { useState, useRef } from "react";
+import CardItem from "../components/CardItem";
+import { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import api_url from "../api_url";
+
+interface Item {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  type: string;
+  quantity: number;
+  img_url: string;
+  event_id: number;
+}
 
 function UserForm() {
   const maxTabs = 4;
+  let { id } = useParams();
   const [currentTab, setCurrentTab] = useState(0);
 
   const [transitionState, setTransitionState] = useState({
@@ -19,11 +33,40 @@ function UserForm() {
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
   const [dishID, setDishID] = useState(0);
+  const [sideID, setSideID] = useState(0);
+  const [drinkID, setDrinkID] = useState(0);
+
+  const [dishes, setDishes] = useState([]);
+  const [sides, setSides] = useState([]);
+  const [drinks, setDrinks] = useState([]);
 
   const mainDivRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const firstNameInputRef = useRef<HTMLInputElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${api_url}/api/events/${id}/items`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setDishes(data.filter((item: Item) => item.type === "dish"));
+        setSides(data.filter((item: Item) => item.type === "side"));
+        setDrinks(data.filter((item: Item) => item.type === "drink"));
+        //console.log(" ca va marcher maintenant a la inshalah", data);
+      } catch (error) {
+        console.error("Error fetching upcoming events:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  /*   console.log("Fetched dishes:", dishes);
+  console.log("Fetched sides:", sides);
+  console.log("Fetched drinks:", drinks); */
 
   function nextTab() {
     let isValid = true;
@@ -58,8 +101,9 @@ function UserForm() {
         setTransitionState((prev) => ({ ...prev, [currentTab]: "idle" }));
         setTransitionState((prev) => ({ ...prev, [nextTab]: "entering" }));
         setCurrentTab(nextTab);
-        mainDivRef.current?.scrollTo({ top: 0, behavior: "smooth" });
         setTimeout(() => {
+          mainDivRef.current?.scrollTo({ top: 0, behavior: "instant" });
+
           setTransitionState((prev) => ({ ...prev, [nextTab]: "idle" }));
         }, 100);
       }, 100);
@@ -83,19 +127,19 @@ function UserForm() {
     }
   }
 
-  console.log("Name:", name);
+  /*   console.log("Name:", name);
   console.log("First Name:", firstName);
-  console.log("Dish ID:", dishID);
+  console.log("Dish ID:", dishID); */
 
   return (
     <div
       ref={mainDivRef}
-      className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-between"
+      className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-between overflow-scroll"
     >
       <TransitionDiv
         state={transitionState[0]}
         show={currentTab === 0}
-        classes="flex-grow flex flex-col gap-6 h-full w-full items-center justify-center"
+        classes="flex-grow flex flex-col gap-6 w-full items-center justify-center"
       >
         <h1 className="mb-1 w-full text-center text-3xl font-bold">
           Qui es-tu ?
@@ -143,64 +187,90 @@ function UserForm() {
       <TransitionDiv
         state={transitionState[1]}
         show={currentTab === 1}
-        classes={`flex-grow  flex flex-col gap-6  h-full w-full items-center justify-center`}
+        classes={`flex-grow  flex flex-col gap-6  w-full items-center justify-center`}
       >
         <h1 className="mb-3 w-full text-center text-3xl font-bold">
           Que souhaites-tu commander ?
         </h1>
         <div className="flex flex-row md:flex-row gap-4 flex-wrap justify-center">
-          <CardMeal
-            title="Poulet Crispy"
-            description="Du bon poulet croustillant, servi avec des sauces maisons au choix."
-            price={5.5}
-            quantity={3}
-            imgSrc="https://www.seekpng.com/png/full/75-757824_emoji-chicken-leg-png-fried-chicken-emoji-png.png"
-            selected={true}
-          />
-          <CardMeal
-            title="Burger Classique"
-            description="Un burger juteux avec du fromage, de la laitue et une sauce spéciale."
-            price={8.0}
-            quantity={1}
-            imgSrc="https://www.seekpng.com/png/full/75-757824_emoji-chicken-leg-png-fried-chicken-emoji-png.png"
-            selected={false}
-          />
-          <CardMeal
-            title="Salade César"
-            description="Une salade fraîche avec du poulet grillé, des croûtons et une sauce César."
-            price={6.0}
-            quantity={1}
-            imgSrc="https://www.seekpng.com/png/full/75-757824_emoji-chicken-leg-png-fried-chicken-emoji-png.png"
-            selected={false}
-          />
+          {dishes.map((dish: Item) => (
+            <CardItem
+              key={dish.id}
+              title={dish.name}
+              description={dish.description}
+              price={dish.price}
+              quantity={dish.quantity}
+              img_url={dish.img_url}
+              onclick={() => setDishID(dish.id)}
+              selected={dishID === dish.id}
+            />
+          ))}
         </div>
       </TransitionDiv>
 
       <TransitionDiv
         state={transitionState[2]}
         show={currentTab === 2}
-        classes={`flex-grow flex flex-col gap-6 h-full w-full items-center justify-center`}
+        classes={`flex-grow flex flex-col gap-6  w-full items-center justify-center`}
       >
         <h1 className="mb-3 w-full text-center text-3xl font-bold">
           Un accompagnement ?
         </h1>
         <div className="flex flex-col md:flex-row gap-4">
-          <CardMeal
+          <CardItem
             title="Non merci"
             description="J'ai un petit appétit aujourd'hui, pas de frites pour moi."
             price={0}
             quantity={0}
-            imgSrc="https://cdn.pixabay.com/photo/2013/07/13/12/32/cross-159808_960_720.png"
-            selected={true}
+            img_url="https://cdn.pixabay.com/photo/2013/07/13/12/32/cross-159808_960_720.png"
+            onclick={() => setSideID(0)}
+            selected={sideID === 0}
           />
-          <CardMeal
-            title="Frites"
-            description="Des frites croustillantes, parfaites pour accompagner ton repas."
-            price={0.5}
-            quantity={1}
-            imgSrc="https://images.emojiterra.com/google/android-12l/512px/1f35f.png"
-            selected={false}
+          {sides.map((side: Item) => (
+            <CardItem
+              key={side.id}
+              title={side.name}
+              description={side.description}
+              price={side.price}
+              quantity={side.quantity}
+              img_url={side.img_url}
+              onclick={() => setSideID(side.id)}
+              selected={sideID === side.id}
+            />
+          ))}
+        </div>
+      </TransitionDiv>
+
+      <TransitionDiv
+        state={transitionState[3]}
+        show={currentTab === 3}
+        classes={` flex-grow flex flex-col gap-6 w-full items-center justify-center`}
+      >
+        <h1 className="mb-3 w-full text-center text-3xl font-bold">
+          Une boisson ?
+        </h1>
+        <div className="flex flex-col md:flex-row gap-4">
+          <CardItem
+            title="Non merci"
+            description="Je préfère boire de l'eau."
+            price={0}
+            quantity={0}
+            img_url="https://cdn.pixabay.com/photo/2013/07/13/12/32/cross-159808_960_720.png"
+            onclick={() => setDrinkID(0)}
+            selected={drinkID === 0}
           />
+          {drinks.map((drink: Item) => (
+            <CardItem
+              key={drink.id}
+              title={drink.name}
+              description={drink.description}
+              price={drink.price}
+              quantity={drink.quantity}
+              img_url={drink.img_url}
+              onclick={() => setDrinkID(drink.id)}
+              selected={drinkID === drink.id}
+            />
+          ))}
         </div>
       </TransitionDiv>
 

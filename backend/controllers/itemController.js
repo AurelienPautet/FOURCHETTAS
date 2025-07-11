@@ -28,7 +28,7 @@ export const createItem = async (req, res) => {
 
     for (const item of body.items) {
       const result = await client.query(
-        "INSERT INTO items (name, description, price, event_id,img_url,type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+        "INSERT INTO items (name, description, price, event_id,img_url,type,quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
         [
           item.name,
           item.description,
@@ -36,6 +36,7 @@ export const createItem = async (req, res) => {
           body.event_id,
           item.img_url,
           item.type,
+          item.quantity,
         ]
       );
       insertedItems.push(result.rows[0]);
