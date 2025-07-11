@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import type Event from "../types/EventType.tsx";
 import TextDate from "../components/TextDate.tsx";
+import StatusEvent from "../components/StatusEvent.tsx";
 function AdminOrders() {
   const { id } = useParams();
 
@@ -22,6 +23,7 @@ function AdminOrders() {
           <span className="font-extrabold">{eventData?.title}</span> du{" "}
           {TextDate(eventData?.date, eventData?.time)}
         </h1>
+        <StatusEvent event={eventData} />
       </div>
     </div>
   );
