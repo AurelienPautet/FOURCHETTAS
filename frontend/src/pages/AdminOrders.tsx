@@ -1,0 +1,28 @@
+import { useEffect, useState } from "react";
+import NavbarSpacer from "../components/NavbarSpacer";
+import { useParams } from "react-router-dom";
+import getEventFromId from "../utils/dbFetch/getEventFromId";
+import type Event from "../types/EventType.tsx";
+function AdminOrders() {
+  const { id } = useParams();
+
+  const [eventData, setEventData] = useState<Event | null>(null);
+
+  useEffect(() => {
+    getEventFromId(Number(id), setEventData);
+  }, []);
+
+  return (
+    <div className="flex-grow h-full w-full flex flex-col gap-4 pr-4 pl-4 pb-4  overflow-x-hidden  overflow-y-scroll">
+      <NavbarSpacer />
+      <div className="flex flex-col items-center gap-4">
+        <h1 className="text-3xl font-bold">
+          Les commandes pour l'événement{" "}
+          <span className="font-extrabold">{eventData?.title}</span>
+        </h1>
+      </div>
+    </div>
+  );
+}
+
+export default AdminOrders;

@@ -10,6 +10,7 @@ import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
 import correctDate from "../utils/DateCorrector";
 import NavbarSpacer from "../components/NavbarSpacer";
+import getEventFromId from "../utils/dbFetch/getEventFromId";
 
 function UserForm() {
   const maxTabs = 4;
@@ -71,20 +72,7 @@ function UserForm() {
   }, [phone]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${api_url}/api/events/${id}`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setEventData(data);
-      } catch (error) {
-        console.error("Error fetching upcoming events:", error);
-      }
-    };
-
-    fetchData();
+    getEventFromId(eventId, setEventData);
   }, []);
 
   useEffect(() => {

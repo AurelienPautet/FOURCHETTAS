@@ -35,3 +35,21 @@ export const createOrder = (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 };
+
+export const getOrdersByEventId = (req, res) => {
+  const eventId = req.params.id;
+  client
+    .query("SELECT * FROM orders WHERE event_id = $1", [eventId])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "No orders found for this event" });
+      }
+      res.status(200).json(result.rows);
+    })
+    .catch((err) => {
+      console.error("Error fetching orders by event ID", err.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};

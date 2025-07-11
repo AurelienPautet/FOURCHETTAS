@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "./components/Navbar";
 import UserForm from "./pages/UserForm";
 import UpcomingEvents from "./pages/UpcomingEvent";
+import AdminOrders from "./pages/AdminOrders";
 import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Routes>
             <Route path="/" element={<UpcomingEvents />} />
             <Route path="/event/:id/order" element={<UserForm />} />
+            <Route path="/admin/event/:id/orders" element={<AdminOrders />} />
           </Routes>
         </div>
       </div>
