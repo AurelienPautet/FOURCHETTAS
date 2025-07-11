@@ -1,21 +1,12 @@
 import InputField from "../components/InputField";
 import InputSelect from "../components/InputSelect";
 import TransitionDiv from "../components/TransitionDiv";
+import ReciepeEvent from "../components/ReciepeEvent";
 import CardItem from "../components/CardItem";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import api_url from "../api_url";
-
-interface Item {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  type: string;
-  quantity: number;
-  img_url: string;
-  event_id: number;
-}
+import type Item from "../types/ItemType";
 
 function UserForm() {
   const maxTabs = 4;
