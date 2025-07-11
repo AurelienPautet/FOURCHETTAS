@@ -46,7 +46,7 @@ function StatusEvent({ event }: { event: Event | null }) {
       });
     } else if (secondsLeftBeforeEvent > -60 * 60 * 24) {
       setStatus({
-        message: "a lieu",
+        message: "à lieu",
         color: "info",
       });
     } else {
