@@ -3,7 +3,7 @@ import type Order from "../../types/OrderType.ts";
 
 export default async function getOrdersFromEventId(
   id: string,
-  setOrders: (orders: any[]) => void,
+  setOrders: (orders: Order[]) => void,
   onError: () => void = () => {},
   onSuccess: () => void = () => {}
 ) {
