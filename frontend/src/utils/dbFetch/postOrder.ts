@@ -1,32 +1,32 @@
 import api_url from "../../api_url.ts";
 
 interface orderData {
-  eventId: number;
+  event_id: number;
   name: string;
   firstName: string;
   phone: string;
-  dishId: number;
-  sideId: number;
-  drinkId: number;
+  dish_id: number;
+  side_id: number;
+  drink_id: number;
 }
 
 function orderJson({
-  eventId,
+  event_id,
   name,
   firstName,
   phone,
-  dishId,
-  sideId,
-  drinkId,
+  dish_id,
+  side_id,
+  drink_id,
 }: orderData) {
   let res_json = {
-    event_id: eventId,
+    event_id: event_id,
     name: name,
     firstname: firstName,
     phone: phone,
-    dish_id: dishId,
-    side_id: sideId > 0 ? sideId : null,
-    drink_id: drinkId > 0 ? drinkId : null,
+    dish_id: dish_id,
+    side_id: side_id > 0 ? side_id : null,
+    drink_id: drink_id > 0 ? drink_id : null,
   };
 
   return res_json;
@@ -40,13 +40,13 @@ interface postOrderProps extends orderData {
 }
 
 export default async function postOrder({
-  eventId,
+  event_id,
   name,
   firstName,
   phone,
-  dishId,
-  sideId,
-  drinkId,
+  dish_id,
+  side_id,
+  drink_id,
   onRequestStart = () => {},
   onRequestEnd = () => {},
   onSuccess = () => {},
@@ -59,7 +59,15 @@ export default async function postOrder({
       "Content-Type": "application/json",
     },
     body: JSON.stringify(
-      orderJson({ eventId, name, firstName, phone, dishId, sideId, drinkId })
+      orderJson({
+        event_id,
+        name,
+        firstName,
+        phone,
+        dish_id,
+        side_id,
+        drink_id,
+      })
     ),
   })
     .then((response) => {

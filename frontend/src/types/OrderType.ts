@@ -3,9 +3,9 @@ export default interface Order {
   name: string;
   firstname: string;
   phone: string;
-  eventId: number;
-  dishId: number;
-  sideId: number;
-  drinkId: number;
+  event_id: number;
+  dish_id: number;
+  side_id: number;
+  drink_id: number;
   createdAt: string;
 }

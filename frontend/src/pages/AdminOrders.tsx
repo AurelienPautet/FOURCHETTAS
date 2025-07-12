@@ -6,9 +6,9 @@ import TextDate from "../components/TextDate.tsx";
 import StatusEvent from "../components/StatusEvent.tsx";
 import OverviewOrder from "../components/OverviewOrder.tsx";
 
-import type Event from "../types/EventType.ts";
-import type Item from "../types/ItemType.ts";
-import type Order from "../types/OrderType.ts";
+import type Event from "../types/EventType";
+import type Item from "../types/ItemType";
+import type Order from "../types/OrderType";
 
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
@@ -25,12 +25,27 @@ function AdminOrders() {
   const [dishes, setDishes] = useState<Item[]>([]);
   const [sides, setSides] = useState<Item[]>([]);
   const [drinks, setDrinks] = useState<Item[]>([]);
-
   const [orders, setOrders] = useState<Order[]>([]);
+
+  const [itemsMap, setItemsMap] = useState<Map<number, Item>>(new Map());
 
   useEffect(() => {
     getEventFromId(Number(id), setEventData);
   }, []);
+
+  useEffect(() => {
+    if (eventData) {
+      setItemsInMap();
+    }
+  }, [dishes, sides, drinks]);
+
+  function setItemsInMap() {
+    const map = new Map<number, Item>();
+    [...dishes, ...sides, ...drinks].forEach((item) => {
+      map.set(item.id, item);
+    });
+    setItemsMap(map);
+  }
 
   useEffect(() => {
     getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
@@ -50,7 +65,14 @@ function AdminOrders() {
           {TextDate(eventData?.date, eventData?.time)}
         </h1>
         <StatusEvent event={eventData} />
-        <OverviewOrder />
+        <OverviewOrder
+          event={eventData}
+          dishes={dishes}
+          sides={sides}
+          drinks={drinks}
+          orders={orders}
+          itemsMap={itemsMap}
+        />
       </div>
     </div>
   );

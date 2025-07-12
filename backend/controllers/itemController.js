@@ -1,11 +1,11 @@
 import client from "../config/db.js";
 
 export const getItemByEventId = async (req, res) => {
-  const eventId = req.params.id;
+  const event_id = req.params.id;
   try {
     const result = await client.query(
       "SELECT * FROM items WHERE event_id = $1",
-      [eventId]
+      [event_id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "No items found for this event" });

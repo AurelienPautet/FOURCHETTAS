@@ -4,7 +4,7 @@ function TextDate(date: string | undefined, time: string | undefined) {
   if (!date || !time) {
     return <span className="font-bold">Date indisponible</span>;
   }
-  console.log("TextDate called with date:", date, "and time:", time);
+  //console.log("TextDate called with date:", date, "and time:", time);
   let correctedDate = correctDate(date || "2025-02-09");
   let splitDate = correctedDate.split("-") || ["", "", ""];
   return (

@@ -16,9 +16,9 @@ export const getUpcomingEvents = (req, res) => {
 };
 
 export const getEventById = (req, res) => {
-  const eventId = req.params.id;
+  const event_id = req.params.id;
   client
-    .query("SELECT * FROM events WHERE events.id = $1", [eventId])
+    .query("SELECT * FROM events WHERE events.id = $1", [event_id])
     .then((result) => {
       if (result.rows.length === 0) {
         return res.status(404).json({ error: "Event not found" });

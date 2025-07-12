@@ -19,7 +19,7 @@ import Logo from "../components/Logo";
 function UserForm() {
   const maxTabs = 4;
   let { id } = useParams();
-  let eventId = parseInt(id || "0");
+  let event_id = parseInt(id || "0");
   const [currentTab, setCurrentTab] = useState(0);
 
   const [transitionState, setTransitionState] = useState({
@@ -76,22 +76,22 @@ function UserForm() {
   }, [phone]);
 
   useEffect(() => {
-    getEventFromId(eventId, setEventData);
+    getEventFromId(event_id, setEventData);
   }, []);
 
   useEffect(() => {
-    getItemsFromEventId(eventId, setDishes, setSides, setDrinks);
+    getItemsFromEventId(event_id, setDishes, setSides, setDrinks);
   }, []);
 
   function densePostOrder() {
     postOrder({
-      eventId: eventId,
+      event_id: event_id,
       name: name,
       firstName: firstName,
       phone: phone,
-      dishId: dishID,
-      sideId: sideID,
-      drinkId: drinkID,
+      dish_id: dishID,
+      side_id: sideID,
+      drink_id: drinkID,
       onRequestStart: () => {
         setOrdering(true);
         setErrorIndicator({
