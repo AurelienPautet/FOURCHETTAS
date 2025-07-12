@@ -1,8 +1,11 @@
+import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
+
 import UserForm from "./pages/UserForm";
 import UpcomingEvents from "./pages/UpcomingEvent";
 import AdminOrders from "./pages/AdminOrders";
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import NotFound404 from "./pages/NotFound404.tsx";
 
 function App() {
   return (
@@ -14,6 +17,7 @@ function App() {
             <Route path="/" element={<UpcomingEvents />} />
             <Route path="/event/:id/order" element={<UserForm />} />
             <Route path="/admin/event/:id/orders" element={<AdminOrders />} />
+            <Route path="*" element={<NotFound404 />} />
           </Routes>
         </div>
       </div>
