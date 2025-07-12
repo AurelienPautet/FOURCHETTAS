@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import NavbarSpacer from "../components/NavbarSpacer";
 import { useParams } from "react-router-dom";
-import getEventFromId from "../utils/dbFetch/getEventFromId";
-import type Event from "../types/EventType.ts";
+
+import NavbarSpacer from "../components/NavbarSpacer";
 import TextDate from "../components/TextDate.tsx";
 import StatusEvent from "../components/StatusEvent.tsx";
+
+import type Event from "../types/EventType.ts";
+
+import getEventFromId from "../utils/dbFetch/getEventFromId";
+
 function AdminOrders() {
   const { id } = useParams();
 

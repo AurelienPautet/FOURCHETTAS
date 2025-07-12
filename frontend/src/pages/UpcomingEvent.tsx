@@ -1,10 +1,14 @@
-import CardEvent from "../components/CardEvent";
-import api_url from "../api_url";
 import { useEffect, useState } from "react";
-import correctDate from "../utils/DateCorrector";
 import { useNavigate } from "react-router-dom";
-import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
+
+import CardEvent from "../components/CardEvent";
 import NavbarSpacer from "../components/NavbarSpacer";
+
+import correctDate from "../utils/DateCorrector";
+import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
+
+import api_url from "../api_url";
+import getEventsUpcoming from "../utils/dbFetch/getEventsUpcoming";
 
 function UpcomingEvents() {
   const navigate = useNavigate();
@@ -24,22 +28,17 @@ function UpcomingEvents() {
   ]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${api_url}/api/events/upcoming`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
+    getEventsUpcoming(
+      () => setLoading(true),
+      () => setLoading(false),
+      () => {
+        setEvents([]);
+      },
+      (data) => {
         setEvents(data);
-        setLoading(false);
-        //console.log(" ca va marcher maintenant a la inshalah", data);
-      } catch (error) {
-        console.error("Error fetching upcoming events:", error);
+        console.log("Successfully fetched upcoming events");
       }
-    };
-
-    fetchData();
+    );
   }, []);
 
   return (
