@@ -68,47 +68,19 @@ function OverviewOrder({
   return (
     <>
       <div className="flex flex-col gap-4"></div>
-      <div className="h-64 w-full flex-row md:flex-row justify-center items-center ">
-        <PieItems />
-        <PieChart width={250} height={250}>
-          <Pie
-            dataKey="value"
-            isAnimationActive={false}
-            data={generatePieDataForItems(dishes, "dish_id")}
-            cx="50%"
-            cy="50%"
-            outerRadius={80}
-            fill="var(--color-accent)"
-            label
-          />
-          <Tooltip />
-        </PieChart>
-        <PieChart width={250} height={250}>
-          <Pie
-            dataKey="value"
-            isAnimationActive={false}
-            data={generatePieDataForItems(sides, "side_id")}
-            cx="50%"
-            cy="50%"
-            outerRadius={80}
-            fill="var(--color-accent)"
-            label
-          />
-          <Tooltip />
-        </PieChart>
-        <PieChart width={250} height={250}>
-          <Pie
-            dataKey="value"
-            isAnimationActive={false}
-            data={generatePieDataForItems(drinks, "drink_id")}
-            cx="50%"
-            cy="50%"
-            outerRadius={80}
-            fill="var(--color-accent)"
-            label
-          />
-          <Tooltip />
-        </PieChart>
+      <div className="flex w-full h-full flex-row flex-wrap  justify-center items-start ">
+        <PieItems
+          data={generatePieDataForItems(dishes, "dish_id")}
+          labelString="Plats"
+        />
+        <PieItems
+          data={generatePieDataForItems(sides, "side_id")}
+          labelString="Extras"
+        />
+        <PieItems
+          data={generatePieDataForItems(drinks, "drink_id")}
+          labelString="Boissons"
+        />
       </div>
     </>
   );

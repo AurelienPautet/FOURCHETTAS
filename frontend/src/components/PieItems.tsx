@@ -1,7 +1,7 @@
 //FROM : https://recharts.org/en-US/examples/PieChartWithCustomizedLabel
 // mais bien modifié poru mes besoins
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Pie, PieChart, ResponsiveContainer, Sector, Cell } from "recharts";
 
 import type { SectorProps } from "recharts";
@@ -27,14 +27,43 @@ type PieSectorDataItem = React.SVGProps<SVGPathElement> &
   Partial<SectorProps> &
   PieSectorData;
 
-const data = [
-  { name: "3xTenders", value: 40 },
-  { name: "6*Tenders", value: 25 },
-  { name: "Dodu", value: 12 },
-  { name: "Rien", value: 11 },
-];
+function generateAccentColors(count: number): string[] {
+  // merci GPT mdrrrrrrr
 
-const COLORS = ["var(--color-accent)", "#00C49F", "#FFBB28", "#FF0200"];
+  const base = getComputedStyle(document.documentElement)
+    .getPropertyValue("--color-accent")
+    .trim();
+  const baseColor = base || "oklch(60% 0.15 200)";
+
+  function parseOklch(oklch: string): [number, number, number] {
+    const match = oklch.match(
+      /oklch\(\s*([\d.]+)%?\s+([\d.]+)\s+([\d.]+)\s*\)/i
+    );
+    if (!match) {
+      return [60, 0.15, 200];
+    }
+    const [, l, c, h] = match;
+    return [parseFloat(l), parseFloat(c), parseFloat(h)];
+  }
+
+  function oklchToCss([l, c, h]: [number, number, number]) {
+    return `oklch(${l}${l > 1 ? "%" : ""} ${c} ${h})`;
+  }
+
+  let lch: [number, number, number];
+  if (/oklch\(/i.test(baseColor)) {
+    lch = parseOklch(baseColor);
+  } else {
+    lch = [60, 0.15, 200];
+  }
+
+  return Array.from({ length: count }, (_, i) => {
+    const hue = (lch[2] + (i * 180) / count) % 360;
+    return oklchToCss([lch[0], lch[1], hue]);
+  });
+}
+
+//const COLORS = ["var(--color-accent)", "#00C49F", "#FFBB28", "#FF0200"];
 
 const renderActiveShape = ({
   cx,
@@ -66,10 +95,10 @@ const renderActiveShape = ({
         cx={cx}
         cy={cy}
         innerRadius={0}
-        outerRadius={innerRadius ? innerRadius + 2 : 0}
+        outerRadius={innerRadius ? innerRadius - 2 : 0}
         startAngle={0}
         endAngle={360}
-        fill="var(--color-accent-content)"
+        fill="var(--color-base-200)"
       />
       <text
         className="font-bold"
@@ -100,8 +129,8 @@ const renderActiveShape = ({
         outerRadius={outerRadius ? outerRadius + 2 : 0}
         startAngle={startAngle}
         endAngle={endAngle}
-        stroke="var(--color-accent-content)"
-        strokeWidth={2}
+        stroke="var(--color-shadow)"
+        strokeWidth={1}
         fill={fill}
       />
       <Sector
@@ -117,10 +146,49 @@ const renderActiveShape = ({
   );
 };
 
-export default function PieItems() {
+export default function PieItems({
+  data,
+  labelString = "name",
+}: {
+  data: { name: string; value: number }[];
+  labelString?: string;
+}) {
+  const [COLORS, setColors] = useState<string[]>(
+    generateAccentColors(data.length)
+  );
+
+  // Observe changes to the `data-theme` attribute
+  useEffect(() => {
+    const updateColors = () => {
+      setColors(generateAccentColors(data.length));
+    };
+
+    // Initial color generation
+    updateColors();
+
+    // Observe changes to the `data-theme` attribute
+    const observer = new MutationObserver(() => {
+      updateColors();
+      console.log("Theme changed, colors updated:", COLORS);
+    });
+
+    const htmlElement = document.documentElement;
+    observer.observe(htmlElement, {
+      attributes: true,
+      attributeFilter: ["theme_change"],
+    });
+
+    // Cleanup observer on unmount
+    return () => {
+      observer.disconnect();
+    };
+  }, [data.length]);
+
+  //const COLORS = generateAccentColors(data.length);
+
   return (
-    <div className="flex flex-col w-[200px] md:w-[400px] md:flex-row items-center justify-center">
-      <div className="relative flex h-[200px] w-[200px] flex-col items-center justify-center">
+    <div className="flex flex-col w-[200px] items-center justify-center">
+      <div className="shrink-0 relative flex h-[200px] w-[200px] flex-col items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart className="relative" width={500} height={500}>
             <Pie
@@ -130,9 +198,9 @@ export default function PieItems() {
               cy="50%"
               innerRadius={0}
               outerRadius={60}
-              fill="var(--color-accent-content)"
+              fill="var(--color-base-200)"
               strokeWidth={1}
-              stroke="var(--color-accent-content)"
+              stroke="var(--color-base-200)"
               dataKey="value"
             />
             <g className=" absolute top-1/2 left-1/2  z-40">
@@ -144,7 +212,7 @@ export default function PieItems() {
                 textAnchor="middle"
                 fill={"var(--color-accent)"}
               >
-                Plats
+                {labelString}
               </text>
             </g>
             <Pie
@@ -156,8 +224,8 @@ export default function PieItems() {
               innerRadius={60}
               outerRadius={80}
               fill="var(--color-accent)"
-              stroke="var(--color-accent-content)"
-              strokeWidth={2}
+              stroke="var(--color-shadow)"
+              strokeWidth={1}
               dataKey="value"
             >
               {data.map((entry, index) => (
@@ -174,7 +242,7 @@ export default function PieItems() {
         {data.map((entry, index) => (
           <li
             key={`legend-${index}`}
-            className="flex items-center gap-2 font-bold"
+            className="flex flex-grow items-center gap-2  animate duration-150 ease-in-out hover:translate-x-2 "
           >
             <span
               className="w-4 h-4 rounded-full"

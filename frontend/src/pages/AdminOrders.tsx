@@ -64,6 +64,13 @@ function AdminOrders() {
           <span className="font-extrabold">{eventData?.title}</span> du{" "}
           {TextDate(eventData?.date, eventData?.time)}
         </h1>
+        <div className="stats shadow h-full ">
+          <div className="stat">
+            <div className="stat-title">Total Page Views</div>
+            <div className="stat-value">89,400</div>
+            <div className="stat-desc">21% more than last month</div>
+          </div>
+        </div>
         <StatusEvent event={eventData} />
         <OverviewOrder
           event={eventData}
