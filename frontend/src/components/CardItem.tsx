@@ -21,10 +21,10 @@ function CardItem({
     <div
       className={`card bg-base-200 ${
         selected ? "border-accent border-2" : ""
-      } w-96 shadow-sm`}
+      } w-80 h-80 shadow-sm`}
       onClick={onclick}
     >
-      <figure className="px-10 pt-10 h-48 w-full flex justify-center items-center">
+      <figure className="px-10 pt-10 h-40 w-full flex justify-center items-center">
         <div className="indicator ">
           {quantity > 0 && (
             <span className="indicator-item badge badge-secondary indicator-bottom ">
@@ -34,7 +34,7 @@ function CardItem({
           <img
             src={img_url}
             alt={title}
-            className="rounded-xl object-contain h-32 w-32 animate-wiggle animate-infinite animate-duration-[5000ms] animate-ease-in-out animate-alternate"
+            className="rounded-xl object-contain h-24 w-24 animate-wiggle animate-infinite animate-duration-[5000ms] animate-ease-in-out animate-alternate"
           />
         </div>
       </figure>

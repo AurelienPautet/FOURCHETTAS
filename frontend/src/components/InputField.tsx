@@ -18,7 +18,7 @@ function InputField({
   ref,
 }: InputFieldProps) {
   return (
-    <fieldset className="fieldset">
+    <fieldset className="fieldset md:gap-0">
       <legend className="fieldset-legend text-xl">{legend}</legend>
       <input
         type="text"
@@ -34,7 +34,7 @@ function InputField({
           e.target?.setCustomValidity("");
         }}
       />
-      <p className="validator-hint">Entre 3 et 30 caractères</p>
+      <p className="validator-hint mt-[2px]">Entre 3 et 30 caractères</p>
 
       {optional && <p className="label">Optionnel</p>}
     </fieldset>

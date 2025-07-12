@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import NavbarSpacer from "../components/NavbarSpacer";
 import TextDate from "../components/TextDate.tsx";
 import StatusEvent from "../components/StatusEvent.tsx";
+import OverviewOrder from "../components/OverviewOrder.tsx";
 
 import type Event from "../types/EventType.ts";
 import type Item from "../types/ItemType.ts";
@@ -49,6 +50,7 @@ function AdminOrders() {
           {TextDate(eventData?.date, eventData?.time)}
         </h1>
         <StatusEvent event={eventData} />
+        <OverviewOrder />
       </div>
     </div>
   );
