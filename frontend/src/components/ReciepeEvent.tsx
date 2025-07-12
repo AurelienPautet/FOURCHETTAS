@@ -29,7 +29,7 @@ function ReciepeEvent({
   let dishPrice = parseFloat(dish ? dish.price.toString() : "0");
   const floatTotalPrice = (drinkPrice + sidePrice + dishPrice).toFixed(2);
   return (
-    <div className="flex w-full justify-center items-center flex-col gap-4">
+    <div className="flex w-full justify-center items-center flex-col gap-4 md:gap-1">
       <h1 className="mb-3 w-full text-center text-3xl font-bold">
         Résumé de ta commande pour{" "}
         <span className="font-extrabold animate-bounce animate-infinite animate-duration-1000 animate-ease-linear animate-normal">

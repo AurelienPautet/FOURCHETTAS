@@ -405,7 +405,7 @@ function UserForm() {
           {ErrorIndicator.message}
         </p>
 
-        <div className="flex flex-col items-center gap-4 w-full z-20">
+        <div className="flex flex-col items-center  w-full z-20">
           <div className="flex gap-4">
             <button
               className={`btn ${currentTab === 0 ? "btn-disabled" : ""}`}
@@ -414,7 +414,7 @@ function UserForm() {
               Precedent
             </button>
             <button
-              className={`btn btn-accent ${
+              className={`btn mr-4 btn-accent ${
                 currentTab === maxTabs ? "btn-disabled" : ""
               }`}
               onClick={nextTab}
