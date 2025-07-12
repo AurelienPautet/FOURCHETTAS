@@ -14,6 +14,7 @@ import type Event from "../types/EventType";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
 import postOrder from "../utils/dbFetch/postOrder";
+import Logo from "../components/Logo";
 
 function UserForm() {
   const maxTabs = 4;
@@ -211,7 +212,9 @@ function UserForm() {
         <div className="flex flex-col items-center gap-4 h-full w-full">
           <h2 className="text-2xl font-bold">Merci pour ta commande !</h2>
           <p>On se revoit le {TextDate(eventData?.date, eventData?.time)}</p>
+          <Logo className=" h-40 w-40 animate-spin-slow" />
         </div>
+        <div className="hidden animate-spin-slow"></div>
         <p className="text-success mb-auto h-20">
           Votre commande a été passée avec succès.
         </p>

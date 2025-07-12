@@ -3,14 +3,15 @@ import { useState } from "react";
 interface LogoProps {
   width?: string;
   height?: string;
+  className?: string;
 }
 
-function Logo({ width = "w-15", height = "h-15" }: LogoProps) {
+function Logo({ width = "w-15", height = "h-15", className = "" }: LogoProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <svg
-      className={`fill-base-content ${width} ${height}`}
+      className={`fill-base-content ${width} ${height} ${className}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       viewBox="0 0 200.17072 201.04523"

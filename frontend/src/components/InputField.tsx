@@ -18,7 +18,7 @@ function InputField({
   ref,
 }: InputFieldProps) {
   return (
-    <fieldset className="fieldset md:gap-0">
+    <fieldset className="fieldset gi">
       <legend className="fieldset-legend text-xl">{legend}</legend>
       <input
         type="text"
