@@ -75,7 +75,7 @@ function AdminOrders() {
   }, []);
 
   return (
-    <div className="flex-grow h-full w-full flex flex-col gap-4 pr-4 pl-4 pb-4  overflow-x-hidden  overflow-y-scroll">
+    <div className="flex-grow h-full w-full flex flex-col gap-4 pr-4 pl-4 pb-10 overflow-x-hidden  overflow-y-scroll">
       <NavbarSpacer />
       <div className="flex flex-col items-center gap-4">
         <h1 className="text-3xl font-bold text-center">
@@ -85,7 +85,7 @@ function AdminOrders() {
         </h1>
         <StatusEvent event={eventData} />
         <h1 className="text-2xl font-bold">Les statistiques</h1>
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
           <div className="stats shadow h-full w-50 bg-base-200 ">
             <div className="stat">
               <div className="stat-title">Nombre de commandes</div>
@@ -95,7 +95,7 @@ function AdminOrders() {
           </div>
           <div className="stats shadow h-full w-50 bg-base-200">
             <div className="stat">
-              <div className="stat-title">Ca estimé</div>
+              <div className="stat-title">CA estimé</div>
               <div className="stat-value">{CA} €</div>
               <div className="stat-desc">la moula</div>
             </div>
