@@ -7,9 +7,11 @@ import StatusEvent from "../components/StatusEvent.tsx";
 
 import type Event from "../types/EventType.ts";
 import type Item from "../types/ItemType.ts";
+import type Order from "../types/OrderType.ts";
 
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
+import getOrdersFromEventId from "../utils/dbFetch/getOrdersFromEventId.ts";
 
 function AdminOrders() {
   let { id } = useParams();
@@ -23,12 +25,18 @@ function AdminOrders() {
   const [sides, setSides] = useState<Item[]>([]);
   const [drinks, setDrinks] = useState<Item[]>([]);
 
+  const [orders, setOrders] = useState<Order[]>([]);
+
   useEffect(() => {
     getEventFromId(Number(id), setEventData);
   }, []);
 
   useEffect(() => {
-    getItemsFromEventId(id, setDishes, setSides, setDrinks);
+    getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
+  }, []);
+
+  useEffect(() => {
+    getOrdersFromEventId(Number(id), setOrders);
   }, []);
 
   return (

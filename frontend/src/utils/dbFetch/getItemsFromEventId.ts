@@ -2,7 +2,7 @@ import api_url from "../../api_url.ts";
 import type Item from "../../types/ItemType.ts";
 
 export default async function getItemsFromEventId(
-  id: string,
+  id: number,
   setDishes: (items: Item[]) => void,
   setSides: (items: Item[]) => void,
   setDrinks: (items: Item[]) => void,
@@ -10,7 +10,9 @@ export default async function getItemsFromEventId(
   onSuccess: () => void = () => {}
 ) {
   try {
-    const response = await fetch(`${api_url}/api/events/${id}/items`);
+    const response = await fetch(
+      `${api_url}/api/events/${id.toString()}/items`
+    );
     if (!response.ok) {
       onError();
 

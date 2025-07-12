@@ -2,7 +2,7 @@ import api_url from "../../api_url";
 import type Order from "../../types/OrderType.ts";
 
 export default async function getOrdersFromEventId(
-  id: string,
+  id: number,
   setOrders: (orders: Order[]) => void,
   onRequestStart: () => void = () => {},
   onRequestEnd: () => void = () => {},
@@ -11,7 +11,9 @@ export default async function getOrdersFromEventId(
 ) {
   onRequestStart();
   try {
-    const response = await fetch(`${api_url}/api/events/${id}/orders`);
+    const response = await fetch(
+      `${api_url}/api/events/${id.toString()}/orders`
+    );
     onRequestEnd();
     if (!response.ok) {
       onError();
