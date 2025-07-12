@@ -1,17 +1,21 @@
+import { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
+
 import InputField from "../components/InputField";
-import InputSelect from "../components/InputSelect";
 import TransitionDiv from "../components/TransitionDiv";
 import ReciepeEvent from "../components/ReciepeEvent";
 import CardItem from "../components/CardItem";
-import { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import api_url from "../api_url";
+import NavbarSpacer from "../components/NavbarSpacer";
+import TextDate from "../components/TextDate";
+
+import correctDate from "../utils/DateCorrector";
+
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
-import correctDate from "../utils/DateCorrector";
-import NavbarSpacer from "../components/NavbarSpacer";
+
+import api_url from "../api_url";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
-import TextDate from "../components/TextDate";
+import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
 
 function UserForm() {
   const maxTabs = 4;
@@ -75,26 +79,9 @@ function UserForm() {
   useEffect(() => {
     getEventFromId(eventId, setEventData);
   }, []);
-  console.log("Event data fetched:", eventData?.date);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${api_url}/api/events/${id}/items`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setDishes(data.filter((item: Item) => item.type === "dish"));
-        setSides(data.filter((item: Item) => item.type === "side"));
-        setDrinks(data.filter((item: Item) => item.type === "drink"));
-        //console.log(" ca va marcher maintenant a la inshalah", data);
-      } catch (error) {
-        console.error("Error fetching upcoming events:", error);
-      }
-    };
-
-    fetchData();
+    getItemsFromEventId(eventId.toString(), setDishes, setSides, setDrinks);
   }, []);
 
   function orderJson() {
