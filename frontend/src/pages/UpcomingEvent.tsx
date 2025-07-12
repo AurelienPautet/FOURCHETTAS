@@ -7,7 +7,6 @@ import NavbarSpacer from "../components/NavbarSpacer";
 import correctDate from "../utils/DateCorrector";
 import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
 
-import api_url from "../api_url";
 import getEventsUpcoming from "../utils/dbFetch/getEventsUpcoming";
 
 function UpcomingEvents() {

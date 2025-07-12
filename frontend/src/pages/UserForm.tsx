@@ -8,12 +8,9 @@ import CardItem from "../components/CardItem";
 import NavbarSpacer from "../components/NavbarSpacer";
 import TextDate from "../components/TextDate";
 
-import correctDate from "../utils/DateCorrector";
-
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
 
-import api_url from "../api_url";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
 import postOrder from "../utils/dbFetch/postOrder";

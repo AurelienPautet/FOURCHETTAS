@@ -6,16 +6,29 @@ import TextDate from "../components/TextDate.tsx";
 import StatusEvent from "../components/StatusEvent.tsx";
 
 import type Event from "../types/EventType.ts";
+import type Item from "../types/ItemType.ts";
 
 import getEventFromId from "../utils/dbFetch/getEventFromId";
+import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
 
 function AdminOrders() {
-  const { id } = useParams();
+  let { id } = useParams();
+  if (!id) {
+    id = "0";
+  }
 
   const [eventData, setEventData] = useState<Event | null>(null);
 
+  const [dishes, setDishes] = useState<Item[]>([]);
+  const [sides, setSides] = useState<Item[]>([]);
+  const [drinks, setDrinks] = useState<Item[]>([]);
+
   useEffect(() => {
     getEventFromId(Number(id), setEventData);
+  }, []);
+
+  useEffect(() => {
+    getItemsFromEventId(id, setDishes, setSides, setDrinks);
   }, []);
 
   return (
