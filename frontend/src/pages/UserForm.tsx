@@ -16,6 +16,7 @@ import type Event from "../types/EventType";
 import api_url from "../api_url";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
+import postOrder from "../utils/dbFetch/postOrder";
 
 function UserForm() {
   const maxTabs = 4;
@@ -84,57 +85,40 @@ function UserForm() {
     getItemsFromEventId(eventId.toString(), setDishes, setSides, setDrinks);
   }, []);
 
-  function orderJson() {
-    let res_json = {
-      event_id: eventId,
+  function densePostOrder() {
+    postOrder({
+      eventId: eventId,
       name: name,
-      firstname: firstName,
+      firstName: firstName,
       phone: phone,
-      dish_id: dishID,
-      side_id: sideID > 0 ? sideID : null,
-      drink_id: drinkID > 0 ? drinkID : null,
-    };
-
-    return res_json;
-  }
-
-  function postOrder() {
-    setErrorIndicator({
-      has: false,
-      message: "",
-    });
-    setOrdering(true);
-    fetch(`${api_url}/api/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+      dishId: dishID,
+      sideId: sideID,
+      drinkId: drinkID,
+      onRequestStart: () => {
+        setOrdering(true);
+        setErrorIndicator({
+          has: false,
+          message: "",
+        });
       },
-      body: JSON.stringify(orderJson()),
-    })
-      .then((response) => {
+      onRequestEnd: () => {
         setOrdering(false);
-        if (!response.ok) {
-          setErrorIndicator({
-            has: true,
-            message:
-              "Une erreur est survenue lors de la soumission de la commande.",
-          });
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Order submitted successfully:", data);
+      },
+      onSuccess: () => {
         setOrderSuccess(true);
-      })
-      .catch((error) => {
+        setErrorIndicator({
+          has: false,
+          message: "",
+        });
+      },
+      onError: () => {
         setErrorIndicator({
           has: true,
           message:
             "Une erreur réseau est survenue lors de la soumission de la commande.",
         });
-        console.error("Error submitting order:", error);
-      });
+      },
+    });
   }
 
   function nextTab() {
@@ -402,7 +386,7 @@ function UserForm() {
             dish={dishes.find((d) => d.id === dishID) || null}
             side={sides.find((s) => s.id === sideID) || null}
             drink={drinks.find((d) => d.id === drinkID) || null}
-            onClick={() => postOrder()}
+            onClick={() => densePostOrder()}
             ordering={ordering}
           />
         ) : (
