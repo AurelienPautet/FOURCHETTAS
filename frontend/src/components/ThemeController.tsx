@@ -8,16 +8,15 @@ function ThemeController() {
       "theme_change",
       theme_change.toString()
     );
-    const theme = event.target.checked ? "dim" : "retro"; // Replace "light" with your default theme
+    const theme = event.target.checked ? "dim" : "retro";
     document.documentElement.setAttribute("data-theme", theme);
   };
 
   useEffect(() => {
-    // Set initial theme based on system preference
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)"
     ).matches;
-    const initialTheme = prefersDark ? "dim" : "retro"; // Replace "light" with your default theme
+    const initialTheme = prefersDark ? "dim" : "retro";
     document.documentElement.setAttribute("data-theme", initialTheme);
     if (prefersDark) {
       themeControllerRef.current!.checked = true;
