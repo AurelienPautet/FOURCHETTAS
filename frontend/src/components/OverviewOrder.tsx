@@ -4,6 +4,9 @@ import type Order from "../types/OrderType";
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
 import PieItems from "./PieItems";
+import { useState, useEffect } from "react";
+
+import calculateCA from "../utils/calculateCa";
 
 const data01 = [
   { name: "Group A", value: 400 },
@@ -64,9 +67,31 @@ function OverviewOrder({
 
     return pieData;
   }
+  const [CA, setCA] = useState<number>(0);
 
+  useEffect(() => {
+    calculateCA({ orders, itemsMap, setCA });
+  }, [orders, itemsMap]);
   return (
     <>
+      <h1 className="text-2xl font-bold">Les statistiques</h1>
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="stats shadow h-full w-50 bg-base-200 ">
+          <div className="stat">
+            <div className="stat-title">Nombre de commandes</div>
+            <div className="stat-value">{orders.length}</div>
+            <div className="stat-desc">c'est pas mal</div>
+          </div>
+        </div>
+        <div className="stats shadow h-full w-50 bg-base-200">
+          <div className="stat">
+            <div className="stat-title">CA estimé</div>
+            <div className="stat-value">{CA} €</div>
+            <div className="stat-desc">la moula</div>
+          </div>
+        </div>
+      </div>
+      <h1 className="text-2xl font-bold">Résumé des commandes</h1>
       <div className="flex flex-col gap-4"></div>
       <div className="flex w-full h-full flex-row flex-wrap  justify-center items-start ">
         <PieItems
