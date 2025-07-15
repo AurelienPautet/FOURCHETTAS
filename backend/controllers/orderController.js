@@ -43,10 +43,32 @@ export const updateOrder = (req, res) => {
     return res.status(400).json({ error: "No fields to update provided" });
   }
 
+  let nb_of_change = 0;
+  let values = [];
+  let set_string = "";
+  console.log(prepared, delivered);
+  if (prepared != null) {
+    set_string += "prepared = $" + (nb_of_change + 1);
+    values.push(prepared);
+    nb_of_change++;
+  }
+
+  if (delivered != null) {
+    set_string +=
+      (nb_of_change > 0 ? "," : "") + "delivered = $" + (nb_of_change + 1);
+    values.push(delivered);
+    nb_of_change++;
+  }
+  console.log(set_string, [...values, parseInt(orderId)]);
+
   client
     .query(
-      "update orders set prepared = $1, delivered = $2 where id = $3 returning *",
-      [prepared, delivered, orderId]
+      "update orders set " +
+        set_string +
+        " where id = $" +
+        (nb_of_change + 1) +
+        " returning *",
+      [...values, parseInt(orderId)]
     )
     .then((result) => {
       if (result.rows.length === 0) {

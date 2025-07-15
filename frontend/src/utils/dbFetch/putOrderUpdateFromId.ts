@@ -2,8 +2,8 @@ import api_url from "../../api_url.ts";
 
 interface putOrderUpdateFromIdProps {
   orderId: number;
-  prepared?: boolean;
-  delivered?: boolean;
+  prepared?: boolean | null;
+  delivered?: boolean | null;
   onRequestStart?: () => void;
   onRequestEnd?: () => void;
   onSuccess?: () => void;
@@ -12,8 +12,8 @@ interface putOrderUpdateFromIdProps {
 
 export default async function putOrderUpdateFromId({
   orderId,
-  prepared,
-  delivered,
+  prepared = null,
+  delivered = null,
   onRequestStart = () => {},
   onRequestEnd = () => {},
   onSuccess = () => {},

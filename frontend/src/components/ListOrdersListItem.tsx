@@ -17,13 +17,6 @@ function ListOrdersListItem({
   const dish = itemsMap.get(order.dish_id);
   const side = itemsMap.get(order.side_id);
   const drink = itemsMap.get(order.drink_id);
-  function UpdateOrderStatus(order: Order) {
-    putOrderUpdateFromId({
-      orderId: order.id,
-      prepared: order.prepared,
-      delivered: order.delivered,
-    });
-  }
 
   const [localPrepared, setLocalPrepared] = useState(order.prepared);
   const [localDelivered, setLocalDelivered] = useState(order.delivered);
@@ -59,7 +52,10 @@ function ListOrdersListItem({
             className="checkbox checked:bg-success/40"
             checked={localPrepared}
             onChange={() => {
-              UpdateOrderStatus({ ...order, prepared: !localPrepared });
+              putOrderUpdateFromId({
+                orderId: order.id,
+                prepared: !localPrepared,
+              });
               setLocalPrepared(!localPrepared);
             }}
           />
@@ -72,7 +68,10 @@ function ListOrdersListItem({
             className="checkbox checked:bg-success/40"
             checked={localDelivered}
             onChange={() => {
-              UpdateOrderStatus({ ...order, delivered: !localDelivered });
+              putOrderUpdateFromId({
+                orderId: order.id,
+                delivered: !localDelivered,
+              });
               setLocalDelivered(!localDelivered);
             }}
           />
