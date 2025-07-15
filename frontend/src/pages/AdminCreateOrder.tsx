@@ -3,11 +3,14 @@ import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
 import { CalendarDate } from "cally";
 import Calendar from "../components/Calendar";
+import CardImageGen from "../components/CardImageGen";
 
 function AdminCreateOrder() {
   const [eventName, setEventName] = useState<string>("");
   const [eventDate, setEventDate] = useState<string>("");
-
+  const [eventImgUrl, setEventImgUrl] = useState<string>(
+    "https://storage.imagerouter.io/b920e2a2-b8c0-4220-933b-042c7f9ea7f2.png"
+  );
   const [eventOrdersClosingDate, setEventOrdersClosingDate] =
     useState<string>("");
 
@@ -55,6 +58,7 @@ function AdminCreateOrder() {
               placeholder="Description de l'événement"
             ></textarea>
           </fieldset>
+          <CardImageGen ImgUrl={eventImgUrl} setImgUrl={setEventImgUrl} />
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Date de l'événement</legend>
 
