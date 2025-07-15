@@ -4,6 +4,8 @@ import type Item from "../types/ItemType";
 
 import putOrderUpdateFromId from "../utils/dbFetch/putOrderUpdateFromId.ts";
 import timestampToStrings from "../utils/timestampToStrings.ts";
+import DeleteModal from "./DeleteModal.tsx";
+import deleteOrder from "../utils/dbFetch/deleteOrder.ts";
 
 function ListOrdersListItem({
   order,
@@ -15,7 +17,6 @@ function ListOrdersListItem({
   const dish = itemsMap.get(order.dish_id);
   const side = itemsMap.get(order.side_id);
   const drink = itemsMap.get(order.drink_id);
-  console.log(order.created_at);
   function UpdateOrderStatus(order: Order) {
     putOrderUpdateFromId({
       orderId: order.id,
@@ -32,6 +33,22 @@ function ListOrdersListItem({
   }, [order.prepared, order.delivered]);
 
   const { date, time } = timestampToStrings(order.created_at);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  function handleDelete() {
+    setIsDeleting(true);
+    deleteOrder(order.id);
+  }
+
+  if (isDeleting) {
+    return (
+      <tr>
+        <td colSpan={6} className="text-center">
+          Suppression en cours...
+        </td>
+      </tr>
+    );
+  }
 
   return (
     <tr>
@@ -39,7 +56,7 @@ function ListOrdersListItem({
         <label>
           <input
             type="checkbox"
-            className="checkbox"
+            className="checkbox checked:bg-success/40"
             checked={localPrepared}
             onChange={() => {
               UpdateOrderStatus({ ...order, prepared: !localPrepared });
@@ -52,7 +69,7 @@ function ListOrdersListItem({
         <label>
           <input
             type="checkbox"
-            className="checkbox"
+            className="checkbox checked:bg-success/40"
             checked={localDelivered}
             onChange={() => {
               UpdateOrderStatus({ ...order, delivered: !localDelivered });
@@ -104,6 +121,14 @@ function ListOrdersListItem({
           width="800px"
           height="800px"
           viewBox="0 0 408.483 408.483"
+          onClick={() => {
+            const modal = document.getElementById(
+              `my_modal_delete_order`
+            ) as HTMLDialogElement | null;
+            if (modal) {
+              modal.showModal();
+            }
+          }}
           className="fill-base-content w-5 h-5 hover:fill-error cursor-pointer"
         >
           <g>
@@ -123,6 +148,12 @@ function ListOrdersListItem({
             </g>
           </g>
         </svg>{" "}
+        <DeleteModal
+          id={"delete_order"}
+          title="Supprimer la commande ?"
+          description={`Vous êtes sur le point de supprimer la commande de ${order.firstname} ${order.name}`}
+          onDelete={() => handleDelete()}
+        />
       </th>
     </tr>
   );
