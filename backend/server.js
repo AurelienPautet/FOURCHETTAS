@@ -8,6 +8,7 @@ import client from "./config/db.js";
 
 import eventRoutes from "./routes/eventRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import imageGenRoutes from "./routes/imageGenRoutes.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -23,6 +24,7 @@ app.use(morgan("dev"));
 
 app.use("/api/events", eventRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/image-gen", imageGenRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");

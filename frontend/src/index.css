@@ -4,6 +4,7 @@
 @import "tailwindcss-animated";
 @plugin "daisyui" {
   themes: retro --default, dim --prefersdark;
+  exclude: rootscrollgutter;
 }
 
 @theme {
