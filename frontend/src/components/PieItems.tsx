@@ -138,15 +138,20 @@ const renderActiveShape = ({
 export default function PieItems({
   data,
   labelString = "name",
+  colors = [],
 }: {
   data: { name: string; value: number }[];
   labelString?: string;
+  colors?: string[];
 }) {
   const [COLORS, setColors] = useState<string[]>(
-    generateAccentColors(data.length)
+    colors.length > 0 ? colors : generateAccentColors(data.length)
   );
 
   useEffect(() => {
+    if (colors.length !== 0) {
+      return;
+    }
     const updateColors = () => {
       setColors(generateAccentColors(data.length));
     };

@@ -5,6 +5,8 @@ import NavbarSpacer from "../components/NavbarSpacer";
 import TextDate from "../components/TextDate.tsx";
 import StatusEvent from "../components/StatusEvent.tsx";
 import OverviewOrder from "../components/OverviewOrder.tsx";
+import ListOrders from "../components/ListOrders.tsx";
+import PieItems from "../components/PieItems.tsx";
 
 import type Event from "../types/EventType";
 import type Item from "../types/ItemType";
@@ -52,7 +54,16 @@ function AdminOrders() {
 
   useEffect(() => {
     getOrdersFromEventId(Number(id), setOrders);
+    const interval = setInterval(async () => {
+      await getOrdersFromEventId(Number(id), setOrders);
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
+
+  const ordersCount = orders.length;
+  const preparedCount = orders.filter((order) => order.prepared).length;
+  const deliveredCount = orders.filter((order) => order.delivered).length;
 
   return (
     <div className="flex-grow h-full w-full flex flex-col gap-4 pr-4 pl-4 pb-10 overflow-x-hidden  overflow-y-scroll">
@@ -64,15 +75,68 @@ function AdminOrders() {
           {TextDate(eventData?.date, eventData?.time)}
         </h1>
         <StatusEvent event={eventData} />
+        <div className="tabs tabs-lift w-[calc(100vw-2rem)] md:w-[calc(100vw-20rem)] ">
+          <input
+            type="radio"
+            name="my_tabs_1"
+            className="tab w-1/2"
+            aria-label="Résumé"
+            defaultChecked
+          />
+          <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
+            <OverviewOrder
+              event={eventData}
+              dishes={dishes}
+              sides={sides}
+              drinks={drinks}
+              orders={orders}
+              itemsMap={itemsMap}
+            />
+          </div>
 
-        <OverviewOrder
-          event={eventData}
-          dishes={dishes}
-          sides={sides}
-          drinks={drinks}
-          orders={orders}
-          itemsMap={itemsMap}
-        />
+          <input
+            type="radio"
+            name="my_tabs_1"
+            className="tab w-1/2 "
+            aria-label="Commandes"
+          />
+          <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
+            <div className="flex flex-col w-full h-full">
+              <div className="grow-0 flex w-full h-full flex-row flex-wrap  justify-center items-start ">
+                <PieItems
+                  data={[
+                    { name: "Non Préparé", value: ordersCount - preparedCount },
+                    {
+                      name: "Préparé",
+                      value: preparedCount,
+                    },
+                  ]}
+                  labelString="Préparé"
+                  colors={["var(--color-error)", "var(--color-success)"]}
+                />
+                <PieItems
+                  data={[
+                    { name: "Non Livré", value: ordersCount - deliveredCount },
+                    {
+                      name: "Livré",
+                      value: deliveredCount,
+                    },
+                  ]}
+                  labelString="Livré"
+                  colors={["var(--color-error)", "var(--color-success)"]}
+                />
+              </div>
+              <ListOrders
+                event={eventData}
+                dishes={dishes}
+                sides={sides}
+                drinks={drinks}
+                orders={orders}
+                itemsMap={itemsMap}
+              />{" "}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -36,10 +36,36 @@ export const createOrder = (req, res) => {
     });
 };
 
+export const updateOrder = (req, res) => {
+  const orderId = req.params.id;
+  const { prepared, delivered } = req.body;
+  if (prepared === undefined && delivered === undefined) {
+    return res.status(400).json({ error: "No fields to update provided" });
+  }
+
+  client
+    .query(
+      "update orders set prepared = $1, delivered = $2 where id = $3 returning *",
+      [prepared, delivered, orderId]
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      res.status(200).json(result.rows[0]);
+    })
+    .catch((err) => {
+      console.error("Error updating order", err.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};
+
 export const getOrdersByEventId = (req, res) => {
   const event_id = req.params.id;
   client
-    .query("SELECT * FROM orders WHERE event_id = $1", [event_id])
+    .query("SELECT * FROM orders WHERE event_id = $1 order by created_at", [
+      event_id,
+    ])
     .then((result) => {
       if (result.rows.length === 0) {
         return res

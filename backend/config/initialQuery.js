@@ -33,6 +33,8 @@ function initialQuery() {
             side_id INT ,
             drink_id INT ,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            prepared BOOLEAN DEFAULT FALSE,
+            delivered BOOLEAN DEFAULT FALSE,
             FOREIGN KEY (event_id) REFERENCES events(id),
             FOREIGN KEY (dish_id) REFERENCES items(id),
             FOREIGN KEY (side_id) REFERENCES items(id),

@@ -7,5 +7,8 @@ export default interface Order {
   dish_id: number;
   side_id: number;
   drink_id: number;
-  createdAt: string;
+  created_at: string;
+  prepared: boolean;
+  delivered: boolean;
+  price?: number;
 }

@@ -3,28 +3,11 @@ import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type Order from "../types/OrderType";
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
+import type AdminOrdersChildProps from "../types/AdminOrdersChild";
 import PieItems from "./PieItems";
 import { useState, useEffect } from "react";
 
 import calculateCA from "../utils/calculateCa";
-
-const data01 = [
-  { name: "Group A", value: 400 },
-  { name: "Group B", value: 300 },
-  { name: "Group C", value: 300 },
-  { name: "Group D", value: 200 },
-  { name: "Group E", value: 278 },
-  { name: "Group F", value: 189 },
-];
-
-interface OverviewOrderProps {
-  event: Event | null;
-  dishes: Item[];
-  sides: Item[];
-  drinks: Item[];
-  orders: Order[];
-  itemsMap: Map<number, Item>;
-}
 
 function OverviewOrder({
   event,
@@ -33,7 +16,7 @@ function OverviewOrder({
   drinks,
   orders,
   itemsMap,
-}: OverviewOrderProps) {
+}: AdminOrdersChildProps) {
   const emptyItem = {
     id: 0,
     name: "Rien",
@@ -42,7 +25,7 @@ function OverviewOrder({
     description: "Rien n'a été commandé",
     image: "",
     event_id: 0,
-    createdAt: "",
+    created_at: "",
   };
 
   console.log("Items Map:", itemsMap);
@@ -73,7 +56,7 @@ function OverviewOrder({
     calculateCA({ orders, itemsMap, setCA });
   }, [orders, itemsMap]);
   return (
-    <>
+    <div className="flex flex-col gap-0 w-full h-full justify-center items-center">
       <h1 className="text-2xl font-bold">Les statistiques</h1>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="stats shadow h-full w-50 bg-base-200 ">
@@ -107,7 +90,7 @@ function OverviewOrder({
           labelString="Boissons"
         />
       </div>
-    </>
+    </div>
   );
 }
 
