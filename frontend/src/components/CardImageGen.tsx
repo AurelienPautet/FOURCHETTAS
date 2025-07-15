@@ -4,9 +4,14 @@ import postImageGen from "../utils/dbFetch/postImageGen";
 type CardImageGenProps = {
   ImgUrl: string;
   setImgUrl: (url: string) => void;
+  children?: React.ReactNode;
 };
 
-function CardImageGen({ ImgUrl, setImgUrl }: CardImageGenProps) {
+function CardImageGen({
+  ImgUrl,
+  setImgUrl,
+  children = <></>,
+}: CardImageGenProps) {
   const [prompt, setPrompt] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   function handleImageGen() {
@@ -31,8 +36,8 @@ function CardImageGen({ ImgUrl, setImgUrl }: CardImageGenProps) {
 
   return (
     <>
-      <div className="card bg-base-100 w-64 shadow-sm flex flex-col  md:flex-row md:w-2/3 items-center p-2">
-        <div className="flex flex-col  w-50 items-center justify-center ">
+      <div className="card bg-base-200 shadow-sm flex flex-col  md:flex-row md:w-2/3 items-center p-4">
+        <div className="flex flex-col shrink-0  w-44 items-center justify-center ">
           <figure className="">
             {isLoading ? (
               <div className=" w-40 h-40 skeleton flex items-center justify-center">
@@ -46,7 +51,7 @@ function CardImageGen({ ImgUrl, setImgUrl }: CardImageGenProps) {
             Le fond noir sera retiré
           </p>
         </div>
-        <div className="card-body gap-1 text-center p-2 grow flex flex-col justify-center items-center">
+        <div className="card-body w-44 md:w-full gap-1 text-center p-2 grow flex flex-col justify-center items-center">
           <h2 className="card-title">Coller l'URL</h2>
           <input
             type="url"
@@ -69,11 +74,15 @@ function CardImageGen({ ImgUrl, setImgUrl }: CardImageGenProps) {
             onChange={(e) => setPrompt(e.target.value)}
           />
           <div className="card-actions">
-            <button className="btn btn-primary" onClick={handleImageGen}>
+            <button
+              className={`btn btn-primary ${isLoading ? "btn-disabled" : ""}`}
+              onClick={handleImageGen}
+            >
               Générer
             </button>
           </div>
         </div>
+        {children}
       </div>
     </>
   );

@@ -16,7 +16,7 @@ export default async function postImageGen(req, res) {
       prompt:
         "Genere un emoji (semi-réaliste) dans le style ios (PAS de visage NI d'yeux), avec un fond totalement noir et une bordure blanche autour de l'emoji seulement d'épaisseur moyenne d'un : " +
         body.prompt,
-      model: "stabilityai/sdxl-turbo:free",
+      model: "google/gemini-2.0-flash-exp:free",
     }),
   };
   const response = await fetch(url, options);
