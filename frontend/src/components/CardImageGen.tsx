@@ -36,15 +36,25 @@ function CardImageGen({
 
   return (
     <>
-      <div className="card bg-base-200 shadow-sm flex flex-col  md:flex-row md:w-2/3 items-center p-4">
+      <div className="card bg-base-200 shadow-sm flex flex-col  md:flex-row md:w-3/4 items-center p-4">
         <div className="flex flex-col shrink-0  w-44 items-center justify-center ">
           <figure className="">
             {isLoading ? (
               <div className=" w-40 h-40 skeleton flex items-center justify-center">
                 <div className="loading loading-spinner loading-lg"></div>
               </div>
+            ) : ImgUrl && ImgUrl.length > 0 ? (
+              <img
+                src={ImgUrl}
+                alt="ItemImage"
+                className="rounded-xl h-40 w-40"
+              />
             ) : (
-              <img src={ImgUrl} alt="Shoes" className="rounded-xl h-40 w-40" />
+              <div className="w-40 h-40 bg-base-300 rounded-box flex items-center justify-center">
+                <h1 className="text-center  text-base-content/60">
+                  Pas d'image
+                </h1>
+              </div>
             )}
           </figure>
           <p className="w-2/3 text-center text-base-content/60">
