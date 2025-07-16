@@ -6,7 +6,7 @@ import UserForm from "./pages/UserForm";
 import UpcomingEvents from "./pages/UpcomingEvent";
 import AdminOrders from "./pages/AdminOrders";
 import NotFound404 from "./pages/NotFound404.tsx";
-import AdminCreateOrder from "./pages/AdminCreateOrder.tsx";
+import AdminCreateEvent from "./pages/AdminCreateEvent.tsx";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
             <Route path="/" element={<UpcomingEvents />} />
             <Route path="/event/:id/order" element={<UserForm />} />
             <Route path="/admin/event/:id/orders" element={<AdminOrders />} />
-            <Route path="/admin/event/create" element={<AdminCreateOrder />} />
+            <Route path="/admin/event/create" element={<AdminCreateEvent />} />
 
             <Route path="*" element={<NotFound404 />} />
           </Routes>
