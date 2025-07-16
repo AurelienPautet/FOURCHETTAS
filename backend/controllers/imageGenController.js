@@ -14,7 +14,7 @@ export default async function postImageGen(req, res) {
     },
     body: JSON.stringify({
       prompt:
-        "Genere un emoji (semi-réaliste) dans le style ios (PAS de visage NI d'yeux), avec un fond totalement noir et une bordure blanche autour de l'emoji seulement d'épaisseur moyenne d'un : " +
+        "Genere un dessin dans le style cartoon, avec un fond totalement noir d'un : " +
         body.prompt,
       model: "google/gemini-2.0-flash-exp:free",
     }),
