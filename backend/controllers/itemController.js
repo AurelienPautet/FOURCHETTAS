@@ -42,7 +42,7 @@ export const createItem = async (req, res) => {
       insertedItems.push(result.rows[0]);
     }
 
-    res.status(201).json(insertedItems);
+    res.status(201).json(body.event_id);
   } catch (err) {
     console.error("Error creating item", err.stack);
     res.status(500).json({ error: "Internal server error" });
