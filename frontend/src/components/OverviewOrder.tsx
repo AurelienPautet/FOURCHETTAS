@@ -7,7 +7,7 @@ import type AdminOrdersChildProps from "../types/AdminOrdersChild";
 import PieItems from "./PieItems";
 import { useState, useEffect } from "react";
 
-import calculateCA from "../utils/calculateCa";
+import calculateCA from "../utils/calculateCA";
 
 function OverviewOrder({
   event,
