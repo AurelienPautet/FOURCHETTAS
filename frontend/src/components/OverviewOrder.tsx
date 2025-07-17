@@ -70,22 +70,22 @@ function OverviewOrder({
   return (
     <div className="flex flex-col gap-0 w-full h-full justify-center items-center">
       <h1 className="text-2xl font-bold">Les statistiques</h1>
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="stats shadow h-full w-50 bg-base-200 ">
+      <div className="flex flex-col md:flex-row gap-4 flex-wrap">
+        <div className="stats shadow h-30 w-50 bg-base-200 ">
           <div className="stat">
             <div className="stat-title">Nombre de commandes</div>
             <div className="stat-value">{orders.length}</div>
             <div className="stat-desc">c'est pas mal</div>
           </div>
         </div>
-        <div className="stats shadow h-full w-50 bg-base-200">
+        <div className="stats shadow h-30 w-50 bg-base-200">
           <div className="stat">
             <div className="stat-title">CA estimé</div>
             <div className="stat-value">{CA.toFixed(2)} €</div>
             <div className="stat-desc">la moula</div>
           </div>
         </div>
-        <div className="stats shadow h-full w-50 bg-base-200">
+        <div className="stats shadow h-30 w-50 bg-base-200">
           <div className="stat">
             <div className="stat-title">CA réel</div>
             <div className="stat-value">{CAreal.toFixed(2)} €</div>
