@@ -39,17 +39,18 @@ function StatusEvent({ event }: { event: Event | null }) {
         message: "est ouvert pour les commandes",
         color: "success",
       });
-    } else if (secondsLeftBeforeClosing > 0) {
+    } else if (secondsLeftBeforeClosing < 0) {
       setStatus({
-        message: "est fermé pour les commandes",
+        message: "est fermé pour les commandes mais n'as pas encore lieu",
         color: "error",
       });
-    } else if (secondsLeftBeforeEvent > -60 * 60 * 24) {
+    }
+    if (secondsLeftBeforeEvent > -60 * 60 * 24 && secondsLeftBeforeEvent <= 0) {
       setStatus({
         message: "à lieu",
         color: "info",
       });
-    } else {
+    } else if (secondsLeftBeforeEvent < -60 * 60 * 24) {
       setStatus({
         message: "est terminé",
         color: "warning",
