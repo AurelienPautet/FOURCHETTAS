@@ -297,7 +297,7 @@ function AdminCreateEvent() {
         <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
           <div
             onClick={() => createEmptyItem("dish")}
-            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6"
+            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6 hover:bg-base-300/80  hover:cursor-pointer"
           >
             <div className="bg-base-300 rounded-box flex items-center justify-center w-20 h-20">
               <SvgPlus className="w-40 h-40" />
@@ -355,7 +355,7 @@ function AdminCreateEvent() {
         <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
           <div
             onClick={() => createEmptyItem("side")}
-            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6"
+            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6 hover:bg-base-300/80  hover:cursor-pointer"
           >
             <div className="bg-base-300 rounded-box flex items-center justify-center w-20 h-20">
               <SvgPlus className="w-40 h-40" />
@@ -413,7 +413,7 @@ function AdminCreateEvent() {
         <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
           <div
             onClick={() => createEmptyItem("drink")}
-            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6"
+            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6 hover:bg-base-300/80  hover:cursor-pointer"
           >
             <div className="bg-base-300 rounded-box flex items-center justify-center w-20 h-20">
               <SvgPlus className="w-40 h-40" />
@@ -477,7 +477,7 @@ function AdminCreateEvent() {
             Créer l'événement
           </button>
           <div
-            className={`flex flex-col md:flex-row w-full items-center gap-2 ${
+            className={`flex flex-col md:flex-row w-full items-center justify-center gap-2 ${
               removingBackground ? "" : "invisible"
             }`}
           >
