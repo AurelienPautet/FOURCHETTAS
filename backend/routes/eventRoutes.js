@@ -1,11 +1,11 @@
 import express from "express";
 import {
-  getAllEvents,
   getEventById,
   getUpcomingEvents,
   createEvent,
   updateEvent,
   deleteEvent,
+  getOldEvents,
 } from "../controllers/eventController.js";
 
 import { getItemByEventId } from "../controllers/itemController.js";
@@ -13,9 +13,9 @@ import { getOrdersByEventId } from "../controllers/orderController.js";
 
 const router = express.Router();
 
-router.get("/", getAllEvents);
-
 router.get("/upcoming", getUpcomingEvents);
+
+router.get("/old", getOldEvents);
 
 router.get("/:id", getEventById);
 

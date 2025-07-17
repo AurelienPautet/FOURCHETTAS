@@ -117,3 +117,26 @@ export const deleteOrder = (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 };
+
+export const deleteOrderByEventId = (req, res = false) => {
+  const orderId = req.params.id;
+  client
+    .query("DELETE FROM orders WHERE event_id = $1 RETURNING *", [orderId])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        if (res !== false) {
+          return res.status(404).json({ error: "Order not found" });
+        }
+        return;
+      }
+      if (res !== false) {
+        res.status(200).json({ message: "Order deleted successfully" });
+      }
+    })
+    .catch((err) => {
+      console.error("Error deleting order", err.stack);
+      if (res !== false) {
+        res.status(500).json({ error: "Internal server error" });
+      }
+    });
+};

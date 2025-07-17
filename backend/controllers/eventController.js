@@ -1,11 +1,50 @@
 import client from "../config/db.js";
-import { createItem } from "./itemController.js";
+import { createItem, deleteItemByEventId } from "./itemController.js";
+import { deleteOrderByEventId } from "./orderController.js";
 
-export const getAllEvents = (req, res) => {};
+export const deleteEvent = async (req, res) => {
+  try {
+    await deleteOrderByEventId(req);
+    try {
+      await deleteItemByEventId(req);
+    } catch (error) {
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  const event_id = req.params.id;
+  client
+    .query("DELETE FROM events WHERE id = $1 RETURNING *", [event_id])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+      res.status(200).json({ message: "Event deleted successfully" });
+    })
+    .catch((err) => {
+      console.error("Error deleting event", err.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};
+
+export const updateEvent = (req, res) => {};
 
 export const getUpcomingEvents = (req, res) => {
   client
     .query("SELECT * FROM events WHERE date >= CURRENT_DATE ORDER BY date ASC")
+    .then((result) => {
+      res.status(200).json(result.rows);
+    })
+    .catch((err) => {
+      console.error("Error fetching upcoming events", err.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};
+
+export const getOldEvents = (req, res) => {
+  client
+    .query("SELECT * FROM events WHERE date < CURRENT_DATE ORDER BY date ASC")
     .then((result) => {
       res.status(200).json(result.rows);
     })
@@ -67,7 +106,3 @@ export const createEvent = (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 };
-
-export const updateEvent = (req, res) => {};
-
-export const deleteEvent = (req, res) => {};

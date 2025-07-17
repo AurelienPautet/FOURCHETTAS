@@ -17,6 +17,29 @@ export const getItemByEventId = async (req, res) => {
   }
 };
 
+export const deleteItemByEventId = async (req, res = false) => {
+  const event_id = req.params.id;
+  await client
+    .query("DELETE FROM items WHERE event_id =$1 RETURNING *", [event_id])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        if (res !== false) {
+          return res.status(404).json({ error: "Item(s) not found" });
+        }
+      }
+      if (res !== false) {
+        res.status(200).json({ message: "Item(s) deleted successfully" });
+      }
+      return;
+    })
+    .catch((err) => {
+      console.error("Error deleting Item(s)", err.stack);
+      if (res !== false) {
+        res.status(500).json({ error: "Internal server error" });
+      }
+    });
+};
+
 export const createItem = async (req, res) => {
   const body = req.body;
   if (!body.items) {
