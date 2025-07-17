@@ -51,10 +51,22 @@ function OverviewOrder({
     return pieData;
   }
   const [CA, setCA] = useState<number>(0);
-
+  const [CAreal, setCAreal] = useState<number>(0);
   useEffect(() => {
     calculateCA({ orders, itemsMap, setCA });
+    let filteredOrders: Order[];
+    filteredOrders = [];
+    orders.map((order: Order, index) => {
+      if (order.prepared) {
+        filteredOrders.push(order);
+      } else {
+      }
+    });
+    calculateCA({ orders: filteredOrders, itemsMap, setCA: setCAreal });
   }, [orders, itemsMap]);
+
+  console.log(orders);
+
   return (
     <div className="flex flex-col gap-0 w-full h-full justify-center items-center">
       <h1 className="text-2xl font-bold">Les statistiques</h1>
@@ -69,8 +81,15 @@ function OverviewOrder({
         <div className="stats shadow h-full w-50 bg-base-200">
           <div className="stat">
             <div className="stat-title">CA estimé</div>
-            <div className="stat-value">{CA} €</div>
+            <div className="stat-value">{CA.toFixed(2)} €</div>
             <div className="stat-desc">la moula</div>
+          </div>
+        </div>
+        <div className="stats shadow h-full w-50 bg-base-200">
+          <div className="stat">
+            <div className="stat-title">CA réel</div>
+            <div className="stat-value">{CAreal.toFixed(2)} €</div>
+            <div className="stat-desc">shallah pareil que le CA</div>
           </div>
         </div>
       </div>
