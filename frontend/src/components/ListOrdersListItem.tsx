@@ -45,7 +45,7 @@ function ListOrdersListItem({
   }
 
   return (
-    <tr>
+    <tr className={localPrepared && localDelivered ? "opacity-70" : ""}>
       <th>
         <label>
           <input
