@@ -124,7 +124,7 @@ function CardImageGen({
               ImgUrl.startsWith("data:image/png;base64,") ? "invisible" : ""
             }`}
           >
-            Le fond noir sera retiré
+            Le fond sera retiré
           </p>
         </div>
         <div className="card-body w-44 md:w-full gap-1 text-center p-2 grow flex flex-col justify-center items-center">
