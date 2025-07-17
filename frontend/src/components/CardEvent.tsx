@@ -35,7 +35,7 @@ function CardEvent({
           <img className="object-contain h-full w-full" src={img_url} />
         )}
       </div>
-      <div className="h-full w-full flex flex-col justify-between items-start p-4 gap-2 text-lg font-normal">
+      <div className="h-full w-full flex flex-col justify-between items-center md:items-start  p-4 gap-2 text-lg font-normal">
         <>
           {loading ? (
             <>
