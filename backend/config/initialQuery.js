@@ -9,7 +9,7 @@ function initialQuery() {
             time TIME NOT NULL,
             form_closing_date DATE NOT NULL,
             form_closing_time TIME NOT NULL,
-            img_url VARCHAR(500) NOT NULL
+            img_url TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS items (
             id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -18,7 +18,7 @@ function initialQuery() {
             price NUMERIC(10, 2) NOT NULL,
             type VARCHAR(20) NOT NULL,
             quantity INT NOT NULL,
-            img_url VARCHAR(500) NOT NULL,
+            img_url TEXT NOT NULL,
             event_id INT NOT NULL,
             FOREIGN KEY (event_id) REFERENCES events(id) 
         );

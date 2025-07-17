@@ -1,19 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import postImageGen from "../utils/dbFetch/postImageGen";
+import { removeBackground } from "@imgly/background-removal";
 
 type CardImageGenProps = {
   ImgUrl: string;
   setImgUrl: (url: string) => void;
   children?: React.ReactNode;
+  rmBg: boolean;
+  onBgRemovalStart: () => void;
+  onBgRemovalEnd: () => void;
 };
 
 function CardImageGen({
   ImgUrl,
   setImgUrl,
   children = <></>,
+  rmBg,
+  onBgRemovalStart,
+  onBgRemovalEnd,
 }: CardImageGenProps) {
   const [prompt, setPrompt] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRemovingBg, setIsRemovingBg] = useState<boolean>(false);
+
   function handleImageGen() {
     postImageGen({
       prompt,
@@ -25,8 +34,8 @@ function CardImageGen({
         console.log("Request ended");
         setIsLoading(false);
       },
-      onSuccess: (url) => {
-        setImgUrl(url);
+      onSuccess: (Dataurl: string) => {
+        setImgUrl(Dataurl);
       },
       onError: () => {
         console.error("Error generating image");
@@ -34,13 +43,59 @@ function CardImageGen({
     });
   }
 
+  useEffect(() => {
+    console.log("Background removal triggered:", rmBg);
+    onBgRemovalStart();
+    if (!rmBg || !ImgUrl) {
+      setTimeout(() => {
+        onBgRemovalEnd();
+      }, 1000);
+      return;
+    }
+    if (ImgUrl.startsWith("data:image/png;base64,")) {
+      setTimeout(() => {
+        onBgRemovalEnd();
+      }, 1000);
+      return;
+    }
+    setIsRemovingBg(true);
+
+    removeBackground(ImgUrl)
+      .then((blob: Blob) => {
+        return blob.arrayBuffer();
+      })
+      .then((arrayBuffer) => {
+        const base64 = btoa(
+          new Uint8Array(arrayBuffer).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            ""
+          )
+        );
+        const dataUrl = `data:image/png;base64,${base64}`;
+        console.log("Background removed, new URL:");
+        setImgUrl(dataUrl);
+      })
+      .catch((error) => {
+        console.error("Error removing background:", error);
+      })
+      .finally(() => {
+        console.log("Background removal finished");
+        onBgRemovalEnd();
+        setIsRemovingBg(false);
+      });
+  }, [rmBg]);
+
   return (
     <>
       <div className="card bg-base-200 shadow-sm flex flex-col  md:flex-row md:w-3/4 items-center p-4">
         <div className="flex flex-col shrink-0  w-44 items-center justify-center ">
           <figure className="">
-            {isLoading ? (
-              <div className=" w-40 h-40 skeleton flex items-center justify-center">
+            {isLoading || isRemovingBg ? (
+              <div
+                className={` w-40 h-40 ${
+                  isLoading && "skeleton"
+                } flex items-center justify-center`}
+              >
                 <div className="loading loading-spinner loading-lg"></div>
               </div>
             ) : ImgUrl && ImgUrl.length > 0 ? (

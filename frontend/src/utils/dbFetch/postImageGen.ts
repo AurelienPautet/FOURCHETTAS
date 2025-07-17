@@ -23,14 +23,16 @@ export default async function postImageGen({
     },
     body: JSON.stringify({ prompt }),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      onRequestEnd();
-      if (data.error) {
-        throw new Error(data.error);
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
       }
-      onSuccess(data.data.data[0].url);
-      return data.data.data[0].url;
+      //return response.arrayBuffer();
+      return response.json();
+    })
+    .then((json) => {
+      onRequestEnd();
+      onSuccess(json.imageUrl);
     })
     .catch((error) => {
       onRequestEnd();

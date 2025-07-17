@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
 import { CalendarDate } from "cally";
@@ -30,9 +30,10 @@ function AdminCreateEvent() {
     "https://storage.imagerouter.io/b920e2a2-b8c0-4220-933b-042c7f9ea7f2.png"
   );
 
+  const [removingBackground, setRemovingBackground] = useState<boolean>(false);
+  const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
   const [eventId, setEventId] = useState<string>("");
   const [itemsList, setItemsList] = useState<CreateItem[]>([]);
-
   function createPostRequestBody(): object {
     let jsonBody = {
       title: eventName,
@@ -48,16 +49,29 @@ function AdminCreateEvent() {
   }
 
   function handleCreateOrder() {
+    setLoading(true);
+    setRemovingBackground(true);
+    setActiveBgRemovals(itemsList.length + 1);
+  }
+
+  function checkForBgRMFinished() {
+    console.log("Checking for background removal finished");
+  }
+
+  useEffect(() => {
+    if (!removingBackground || !loading || activeBgRemovals !== 0) return;
+    console.log("backgrounds removed");
     const postBody = createPostRequestBody();
+    setRemovingBackground(false);
     postEvent({
       eventData: postBody,
       onRequestStart: () => {
         console.log("Request started");
-        setLoading(true);
       },
       onRequestEnd: () => {
         console.log("Request ended");
         setLoading(false);
+        setActiveBgRemovals(0);
       },
       onSuccess: (data) => {
         setEventId(data);
@@ -68,7 +82,7 @@ function AdminCreateEvent() {
         setError(true);
       },
     });
-  }
+  }, [activeBgRemovals]);
 
   function createEmptyItem(type: string) {
     const newItem: CreateItem = {
@@ -147,7 +161,16 @@ function AdminCreateEvent() {
 
         <h1 className=" text-2xl">Information Générales sur l'événement</h1>
 
-        <CardImageGen ImgUrl={eventImgUrl} setImgUrl={setEventImgUrl}>
+        <CardImageGen
+          ImgUrl={eventImgUrl}
+          setImgUrl={setEventImgUrl}
+          rmBg={removingBackground}
+          onBgRemovalStart={() => {}}
+          onBgRemovalEnd={() => {
+            setActiveBgRemovals((prev) => prev - 1);
+            checkForBgRMFinished();
+          }}
+        >
           <div className="divider divider-horizontal"></div>
           <div className="divider "></div>
 
@@ -281,43 +304,50 @@ function AdminCreateEvent() {
             </div>
             <h1 className="text-center font-bold text-2xl">Ajouter un plat</h1>
           </div>
-          {itemsList
-            .filter((item) => item.type === "dish")
-            .map((item, index) => (
-              <CardImageGen
-                ImgUrl={item.img_url}
-                setImgUrl={(url) => setItemValue(index, "img_url", url)}
-              >
-                <ContentCreateItem
-                  key={"dish-" + index}
-                  name={item.name}
-                  description={item.description}
-                  quantity={item.quantity}
-                  price={item.price}
-                  img_url={item.img_url}
-                  type={item.type}
-                  setName={(name) => setItemValue(index, "name", name)}
-                  setDescription={(description) =>
-                    setItemValue(index, "description", description)
-                  }
-                  setQuantity={(quantity) =>
-                    setItemValue(index, "quantity", quantity)
-                  }
-                  setPrice={(price) => setItemValue(index, "price", price)}
-                />
-                <BinWithModal
-                  id={"delete_item_" + index}
-                  className="w-10 h-10 md:w-20 md:h-20 mt-2 md:ml-2"
-                />
-                <DeleteModal
-                  id={"delete_item_" + index}
-                  title="Supprimer l'élément ?"
-                  description={`Vous êtes sur le point de supprimer 
+          {itemsList.map(
+            (item, index) =>
+              item.type === "dish" && (
+                <CardImageGen
+                  ImgUrl={item.img_url}
+                  setImgUrl={(url) => setItemValue(index, "img_url", url)}
+                  rmBg={removingBackground}
+                  onBgRemovalStart={() => {}}
+                  onBgRemovalEnd={() => {
+                    setActiveBgRemovals((prev) => prev - 1);
+                    checkForBgRMFinished();
+                  }}
+                >
+                  <ContentCreateItem
+                    key={"dish-" + index}
+                    name={item.name}
+                    description={item.description}
+                    quantity={item.quantity}
+                    price={item.price}
+                    img_url={item.img_url}
+                    type={item.type}
+                    setName={(name) => setItemValue(index, "name", name)}
+                    setDescription={(description) =>
+                      setItemValue(index, "description", description)
+                    }
+                    setQuantity={(quantity) =>
+                      setItemValue(index, "quantity", quantity)
+                    }
+                    setPrice={(price) => setItemValue(index, "price", price)}
+                  />
+                  <BinWithModal
+                    id={"delete_item_" + index}
+                    className="w-10 h-10 md:w-20 md:h-20 mt-2 md:ml-2"
+                  />
+                  <DeleteModal
+                    id={"delete_item_" + index}
+                    title="Supprimer l'élément ?"
+                    description={`Vous êtes sur le point de supprimer 
                 l'élément ${item.quantity}x${item.name}. Cette action est irréversible.`}
-                  onDelete={() => deleteItem(index)}
-                />
-              </CardImageGen>
-            ))}
+                    onDelete={() => deleteItem(index)}
+                  />
+                </CardImageGen>
+              )
+          )}
         </div>
 
         <h1 className=" text-2xl">Les Extras</h1>
@@ -337,6 +367,12 @@ function AdminCreateEvent() {
               <CardImageGen
                 ImgUrl={item.img_url}
                 setImgUrl={(url) => setItemValue(index, "img_url", url)}
+                rmBg={removingBackground}
+                onBgRemovalStart={() => {}}
+                onBgRemovalEnd={() => {
+                  setActiveBgRemovals((prev) => prev - 1);
+                  checkForBgRMFinished();
+                }}
               >
                 <ContentCreateItem
                   key={"dish-" + index}
@@ -389,6 +425,12 @@ function AdminCreateEvent() {
               <CardImageGen
                 ImgUrl={item.img_url}
                 setImgUrl={(url) => setItemValue(index, "img_url", url)}
+                rmBg={removingBackground}
+                onBgRemovalStart={() => {}}
+                onBgRemovalEnd={() => {
+                  setActiveBgRemovals((prev) => prev - 1);
+                  checkForBgRMFinished();
+                }}
               >
                 <ContentCreateItem
                   key={"dish-" + index}
