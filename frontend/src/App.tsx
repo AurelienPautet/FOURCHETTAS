@@ -7,6 +7,7 @@ import UpcomingEvents from "./pages/UpcomingEvent";
 import AdminOrders from "./pages/AdminOrders";
 import NotFound404 from "./pages/NotFound404.tsx";
 import AdminCreateEvent from "./pages/AdminCreateEvent.tsx";
+import AdminEvents from "./pages/AdminEvents.tsx";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<UpcomingEvents />} />
             <Route path="/event/:id/order" element={<UserForm />} />
+            <Route path="admin/" element={<AdminEvents />} />
             <Route path="/admin/event/:id/orders" element={<AdminOrders />} />
             <Route path="/admin/event/create" element={<AdminCreateEvent />} />
 
