@@ -128,7 +128,9 @@ function AdminEvents() {
                   id={"delete_item_" + event.id}
                   title="Supprimer l'élément ?"
                   description={`Vous êtes sur le point de supprimer 
-                l'evenement ${event.title} du ${event.date}. Cette action est irréversible.`}
+                l'evenement ${event.title} du ${correctDate(event.date)} à ${
+                    event.time
+                  }. Cette action est irréversible.`}
                   onDelete={() => {
                     handleDeleteEvent(event.id);
                   }}
@@ -173,6 +175,29 @@ function AdminEvents() {
                 >
                   Statistique
                 </button>
+                <button
+                  className={`btn btn-accent md:ml-auto `}
+                  onClick={() =>
+                    navigate("/admin/event/" + event.id + "/modify")
+                  }
+                >
+                  Modifier
+                </button>
+                <BinWithModal
+                  id={"delete_item_" + event.id}
+                  className="w-10 h-10"
+                />
+                <DeleteModal
+                  id={"delete_item_" + event.id}
+                  title="Supprimer l'élément ?"
+                  description={`Vous êtes sur le point de supprimer 
+                l'evenement ${event.title} du ${correctDate(event.date)} à ${
+                    event.time
+                  }. Cette action est irréversible.`}
+                  onDelete={() => {
+                    handleDeleteEvent(event.id);
+                  }}
+                />
               </div>
             </CardEvent>
           );
