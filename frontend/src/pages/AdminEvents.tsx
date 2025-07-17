@@ -8,14 +8,18 @@ import correctDate from "../utils/DateCorrector";
 import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
 
 import getEventsUpcoming from "../utils/dbFetch/getEventsUpcoming";
+import getEventsOld from "../utils/dbFetch/getEventsOld";
+import deleteEvent from "../utils/dbFetch/deleteEvent";
 
 import type Event from "../types/EventType";
+import BinWithModal from "../components/BinWithModal";
+import DeleteModal from "../components/DeleteModal";
 
 function AdminEvents() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [events, setEvents] = useState<Event[]>([
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([
     {
       id: 0,
       title: "",
@@ -28,20 +32,48 @@ function AdminEvents() {
     },
   ]);
   const [oldEvents, setOldEvents] = useState<Event[]>([]);
-  const [currentEvents, setCurrentEvents] = useState<Event[]>([]);
 
-  useEffect(() => {
+  function handleDeleteEvent(id: number) {
+    deleteEvent(
+      id,
+      () => {},
+      () => {},
+      () => {
+        console.log("error deleting event");
+      },
+      () => {
+        fetchNeededData();
+      }
+    );
+  }
+
+  function fetchNeededData() {
     getEventsUpcoming(
       () => setLoading(true),
       () => setLoading(false),
       () => {
-        setEvents([]);
+        setUpcomingEvents([]);
       },
       (data) => {
-        setEvents(data);
+        setUpcomingEvents(data);
         console.log("Successfully fetched upcoming events");
       }
     );
+    getEventsOld(
+      () => setLoading(true),
+      () => setLoading(false),
+      () => {
+        setOldEvents([]);
+      },
+      (data) => {
+        setOldEvents(data);
+        console.log("Successfully fetched upcoming events");
+      }
+    );
+  }
+
+  useEffect(() => {
+    fetchNeededData();
   }, []);
 
   return (
@@ -50,8 +82,69 @@ function AdminEvents() {
 
       <h1> Prochains Evenements </h1>
 
-      {events.length > 0 ? (
-        events.map((event) => {
+      {upcomingEvents.length > 0 ? (
+        upcomingEvents.map((event) => {
+          let secondsLeft = SecondsBetweenNowAndDates(
+            new Date(
+              correctDate(event.form_closing_date) +
+                "T" +
+                event.form_closing_time
+            )
+          );
+          return (
+            <CardEvent
+              key={event.id}
+              title={event.title}
+              description={event.description}
+              date={correctDate(event.date)}
+              time={event.time}
+              form_closing_date={correctDate(event.form_closing_date)}
+              form_closing_time={event.form_closing_time}
+              loading={loading}
+              img_url={event.img_url}
+            >
+              <div>
+                <button
+                  className={`btn btn-accent md:ml-auto `}
+                  onClick={() =>
+                    navigate("/admin/event/" + event.id + "/orders")
+                  }
+                >
+                  Statistique
+                </button>
+                <button
+                  className={`btn btn-accent md:ml-auto `}
+                  onClick={() =>
+                    navigate("/admin/event/" + event.id + "/modify")
+                  }
+                >
+                  Modifier
+                </button>
+                <BinWithModal
+                  id={"delete_item_" + event.id}
+                  className="w-10 h-10"
+                />
+                <DeleteModal
+                  id={"delete_item_" + event.id}
+                  title="Supprimer l'élément ?"
+                  description={`Vous êtes sur le point de supprimer 
+                l'evenement ${event.title} du ${event.date}. Cette action est irréversible.`}
+                  onDelete={() => {
+                    handleDeleteEvent(event.id);
+                  }}
+                />
+              </div>
+            </CardEvent>
+          );
+        })
+      ) : (
+        <p>Aucun événement à venir</p>
+      )}
+
+      <h1> Anciens Evenements </h1>
+
+      {oldEvents.length > 0 ? (
+        oldEvents.map((event) => {
           let secondsLeft = SecondsBetweenNowAndDates(
             new Date(
               correctDate(event.form_closing_date) +
@@ -85,7 +178,7 @@ function AdminEvents() {
           );
         })
       ) : (
-        <p>Aucun événement à venir</p>
+        <p>Aucun événement passé</p>
       )}
     </div>
   );
