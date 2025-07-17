@@ -54,10 +54,6 @@ function AdminCreateEvent() {
     setActiveBgRemovals(itemsList.length + 1);
   }
 
-  function checkForBgRMFinished() {
-    console.log("Checking for background removal finished");
-  }
-
   useEffect(() => {
     if (!removingBackground || !loading || activeBgRemovals !== 0) return;
     console.log("backgrounds removed");
@@ -168,7 +164,6 @@ function AdminCreateEvent() {
           onBgRemovalStart={() => {}}
           onBgRemovalEnd={() => {
             setActiveBgRemovals((prev) => prev - 1);
-            checkForBgRMFinished();
           }}
         >
           <div className="divider divider-horizontal"></div>
@@ -314,7 +309,6 @@ function AdminCreateEvent() {
                   onBgRemovalStart={() => {}}
                   onBgRemovalEnd={() => {
                     setActiveBgRemovals((prev) => prev - 1);
-                    checkForBgRMFinished();
                   }}
                 >
                   <ContentCreateItem
@@ -372,7 +366,6 @@ function AdminCreateEvent() {
                 onBgRemovalStart={() => {}}
                 onBgRemovalEnd={() => {
                   setActiveBgRemovals((prev) => prev - 1);
-                  checkForBgRMFinished();
                 }}
               >
                 <ContentCreateItem
@@ -432,7 +425,6 @@ function AdminCreateEvent() {
                 onBgRemovalStart={() => {}}
                 onBgRemovalEnd={() => {
                   setActiveBgRemovals((prev) => prev - 1);
-                  checkForBgRMFinished();
                 }}
               >
                 <ContentCreateItem
