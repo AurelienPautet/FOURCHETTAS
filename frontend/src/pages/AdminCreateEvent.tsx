@@ -294,7 +294,7 @@ function AdminCreateEvent() {
           </div>
         </CardImageGen>
         <h1 className=" text-2xl">Les Plats</h1>
-        <div className="flex flex-col w-full h-full items-center justify-center gap-4">
+        <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
           <div
             onClick={() => createEmptyItem("dish")}
             className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6"
@@ -351,7 +351,8 @@ function AdminCreateEvent() {
         </div>
 
         <h1 className=" text-2xl">Les Extras</h1>
-        <div className="flex flex-col w-full h-full items-center justify-center gap-4">
+        <p className="text-base-content/70">Il y aura une option 'Rien' à 0€</p>
+        <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
           <div
             onClick={() => createEmptyItem("side")}
             className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6"
@@ -407,7 +408,9 @@ function AdminCreateEvent() {
         </div>
 
         <h1 className=" text-2xl">Les Boissons</h1>
-        <div className="flex flex-col w-full h-full items-center justify-center gap-4">
+        <p className="text-base-content/70">Il y aura une option 'Rien' à 0€</p>
+
+        <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
           <div
             onClick={() => createEmptyItem("drink")}
             className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6"
@@ -473,6 +476,18 @@ function AdminCreateEvent() {
           >
             Créer l'événement
           </button>
+          <div
+            className={`flex flex-col md:flex-row w-full items-center gap-2 ${
+              removingBackground ? "" : "invisible"
+            }`}
+          >
+            <p className="text-center">
+              Suppresion des arrières plans en cours (cela peut prendre
+              plusieurs minutes) La page ne se rafraichira pas pendant ce
+              processus.
+            </p>
+            <span className="loading loading-dots loading-sm"></span>
+          </div>
           <div
             className={`loading loading-spinner loading-md ${
               !loading && "invisible"
