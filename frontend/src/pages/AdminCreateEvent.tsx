@@ -11,6 +11,7 @@ import BinWithModal from "../components/BinWithModal";
 import SvgPlus from "../components/SvgPlus";
 import Logo from "../components/Logo";
 import postEvent from "../utils/dbFetch/PostEvent";
+import CreateItems from "../components/CreateItems";
 
 function AdminCreateEvent() {
   const [eventName, setEventName] = useState<string>("");
@@ -288,176 +289,39 @@ function AdminCreateEvent() {
             </div>
           </div>
         </CardImageGen>
-        <h1 className=" text-2xl">Les Plats</h1>
-        <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
-          <div
-            onClick={() => createEmptyItem("dish")}
-            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6 hover:bg-base-300/80  hover:cursor-pointer"
-          >
-            <div className="bg-base-300 rounded-box flex items-center justify-center w-20 h-20">
-              <SvgPlus className="w-40 h-40" />
-            </div>
-            <h1 className="text-center font-bold text-2xl">Ajouter un plat</h1>
-          </div>
-          {itemsList.map(
-            (item, index) =>
-              item.type === "dish" && (
-                <CardImageGen
-                  ImgUrl={item.img_url}
-                  setImgUrl={(url) => setItemValue(index, "img_url", url)}
-                  rmBg={removingBackground}
-                  onBgRemovalStart={() => {}}
-                  onBgRemovalEnd={() => {
-                    setActiveBgRemovals((prev) => prev - 1);
-                  }}
-                >
-                  <ContentCreateItem
-                    key={"dish-" + index}
-                    name={item.name}
-                    description={item.description}
-                    quantity={item.quantity}
-                    price={item.price}
-                    img_url={item.img_url}
-                    type={item.type}
-                    setName={(name) => setItemValue(index, "name", name)}
-                    setDescription={(description) =>
-                      setItemValue(index, "description", description)
-                    }
-                    setQuantity={(quantity) =>
-                      setItemValue(index, "quantity", quantity)
-                    }
-                    setPrice={(price) => setItemValue(index, "price", price)}
-                  />
-                  <BinWithModal
-                    id={"delete_item_" + index}
-                    className="w-10 h-10 md:w-20 md:h-20 mt-2 md:ml-2"
-                  />
-                  <DeleteModal
-                    id={"delete_item_" + index}
-                    title="Supprimer l'élément ?"
-                    description={`Vous êtes sur le point de supprimer 
-                l'élément ${item.quantity}x${item.name}. Cette action est irréversible.`}
-                    onDelete={() => deleteItem(index)}
-                  />
-                </CardImageGen>
-              )
-          )}
-        </div>
 
-        <h1 className=" text-2xl">Les Extras</h1>
-        <p className="text-base-content/70">Il y aura une option 'Rien' à 0€</p>
-        <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
-          <div
-            onClick={() => createEmptyItem("side")}
-            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6 hover:bg-base-300/80  hover:cursor-pointer"
-          >
-            <div className="bg-base-300 rounded-box flex items-center justify-center w-20 h-20">
-              <SvgPlus className="w-40 h-40" />
-            </div>
-            <h1 className="text-center font-bold text-2xl">Ajouter un extra</h1>
-          </div>
-          {itemsList
-            .filter((item) => item.type === "side")
-            .map((item, index) => (
-              <CardImageGen
-                ImgUrl={item.img_url}
-                setImgUrl={(url) => setItemValue(index, "img_url", url)}
-                rmBg={removingBackground}
-                onBgRemovalStart={() => {}}
-                onBgRemovalEnd={() => {
-                  setActiveBgRemovals((prev) => prev - 1);
-                }}
-              >
-                <ContentCreateItem
-                  key={"dish-" + index}
-                  name={item.name}
-                  description={item.description}
-                  quantity={item.quantity}
-                  price={item.price}
-                  img_url={item.img_url}
-                  type={item.type}
-                  setName={(name) => setItemValue(index, "name", name)}
-                  setDescription={(description) =>
-                    setItemValue(index, "description", description)
-                  }
-                  setQuantity={(quantity) =>
-                    setItemValue(index, "quantity", quantity)
-                  }
-                  setPrice={(price) => setItemValue(index, "price", price)}
-                />
-                <BinWithModal
-                  id={"delete_item_" + index}
-                  className="w-10 h-10 md:w-20 md:h-20 mt-2 md:ml-2"
-                />
-                <DeleteModal
-                  id={"delete_item_" + index}
-                  title="Supprimer l'élément ?"
-                  description={`Vous êtes sur le point de supprimer 
-                l'élément ${item.quantity}x${item.name}. Cette action est irréversible.`}
-                  onDelete={() => deleteItem(index)}
-                />
-              </CardImageGen>
-            ))}
-        </div>
+        <CreateItems
+          title="Les Plats"
+          type="dish"
+          createEmptyItem={createEmptyItem}
+          itemsList={itemsList}
+          setItemValue={setItemValue}
+          rmbg={removingBackground}
+          setActiveBgRemovals={setActiveBgRemovals}
+          deleteItem={deleteItem}
+        />
 
-        <h1 className=" text-2xl">Les Boissons</h1>
-        <p className="text-base-content/70">Il y aura une option 'Rien' à 0€</p>
+        <CreateItems
+          title="Les Extras"
+          type="side"
+          createEmptyItem={createEmptyItem}
+          itemsList={itemsList}
+          setItemValue={setItemValue}
+          rmbg={removingBackground}
+          setActiveBgRemovals={setActiveBgRemovals}
+          deleteItem={deleteItem}
+        />
 
-        <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
-          <div
-            onClick={() => createEmptyItem("drink")}
-            className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6 hover:bg-base-300/80  hover:cursor-pointer"
-          >
-            <div className="bg-base-300 rounded-box flex items-center justify-center w-20 h-20">
-              <SvgPlus className="w-40 h-40" />
-            </div>
-            <h1 className="text-center font-bold text-2xl">
-              Ajouter une boisson
-            </h1>
-          </div>
-          {itemsList
-            .filter((item) => item.type === "drink")
-            .map((item, index) => (
-              <CardImageGen
-                ImgUrl={item.img_url}
-                setImgUrl={(url) => setItemValue(index, "img_url", url)}
-                rmBg={removingBackground}
-                onBgRemovalStart={() => {}}
-                onBgRemovalEnd={() => {
-                  setActiveBgRemovals((prev) => prev - 1);
-                }}
-              >
-                <ContentCreateItem
-                  key={"dish-" + index}
-                  name={item.name}
-                  description={item.description}
-                  quantity={item.quantity}
-                  price={item.price}
-                  img_url={item.img_url}
-                  type={item.type}
-                  setName={(name) => setItemValue(index, "name", name)}
-                  setDescription={(description) =>
-                    setItemValue(index, "description", description)
-                  }
-                  setQuantity={(quantity) =>
-                    setItemValue(index, "quantity", quantity)
-                  }
-                  setPrice={(price) => setItemValue(index, "price", price)}
-                />
-                <BinWithModal
-                  id={"delete_item_" + index}
-                  className="w-10 h-10 md:w-20 md:h-20 mt-2 md:ml-2"
-                />
-                <DeleteModal
-                  id={"delete_item_" + index}
-                  title="Supprimer l'élément ?"
-                  description={`Vous êtes sur le point de supprimer 
-                l'élément ${item.quantity}x${item.name}. Cette action est irréversible.`}
-                  onDelete={() => deleteItem(index)}
-                />
-              </CardImageGen>
-            ))}
-        </div>
+        <CreateItems
+          title="Les Boissons"
+          type="drink"
+          createEmptyItem={createEmptyItem}
+          itemsList={itemsList}
+          setItemValue={setItemValue}
+          rmbg={removingBackground}
+          setActiveBgRemovals={setActiveBgRemovals}
+          deleteItem={deleteItem}
+        />
 
         <div className="flex flex-col w-full h-full items-center justify-center gap-4">
           <button
