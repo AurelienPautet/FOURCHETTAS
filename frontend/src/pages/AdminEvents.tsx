@@ -1,19 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import CardEvent from "../components/CardEvent";
 import NavbarSpacer from "../components/NavbarSpacer";
-
-import correctDate from "../utils/DateCorrector";
-import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
 
 import getEventsUpcoming from "../utils/dbFetch/getEventsUpcoming";
 import getEventsOld from "../utils/dbFetch/getEventsOld";
 import deleteEvent from "../utils/dbFetch/deleteEvent";
 
 import type Event from "../types/EventType";
-import BinWithModal from "../components/BinWithModal";
-import DeleteModal from "../components/DeleteModal";
 import ListEvents from "../components/ListEvents";
 import AdminEventCardChildren from "../components/AdminEventCardChildren";
 
@@ -29,8 +22,6 @@ const EmptyEvent = {
 };
 
 function AdminEvents() {
-  const navigate = useNavigate();
-
   const [loadingUpcoming, setLoadingUpcoming] = useState(true);
   const [loadingOld, setLoadingOld] = useState(true);
 

@@ -1,19 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import CardEvent from "../components/CardEvent";
 import NavbarSpacer from "../components/NavbarSpacer";
-
-import correctDate from "../utils/DateCorrector";
-import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
 
 import getEventsUpcoming from "../utils/dbFetch/getEventsUpcoming";
 import ListEvents from "../components/ListEvents";
 import UserEventCardChildren from "../components/UserEventCardChildren";
 
 function UpcomingEvents() {
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([
     {
