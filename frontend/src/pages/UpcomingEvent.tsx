@@ -8,6 +8,8 @@ import correctDate from "../utils/DateCorrector";
 import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
 
 import getEventsUpcoming from "../utils/dbFetch/getEventsUpcoming";
+import ListEvents from "../components/ListEvents";
+import UserEventCardChildren from "../components/UserEventCardChildren";
 
 function UpcomingEvents() {
   const navigate = useNavigate();
@@ -46,49 +48,12 @@ function UpcomingEvents() {
 
       <h1> Prochains Evenements </h1>
 
-      {events.length > 0 ? (
-        events.map((event) => {
-          let secondsLeft = SecondsBetweenNowAndDates(
-            new Date(
-              correctDate(event.form_closing_date) +
-                "T" +
-                event.form_closing_time
-            )
-          );
-          return (
-            <CardEvent
-              key={event.id}
-              title={event.title}
-              description={event.description}
-              date={correctDate(event.date)}
-              time={event.time}
-              form_closing_date={correctDate(event.form_closing_date)}
-              form_closing_time={event.form_closing_time}
-              loading={loading}
-              img_url={event.img_url}
-            >
-              <div className="indicator">
-                {secondsLeft < 60 * 60 * 12 && (
-                  <span className="indicator-item badge badge-warning">
-                    {secondsLeft <= 0 ? "Trop tard :(" : "Vite !"}
-                  </span>
-                )}
-
-                <button
-                  className={`btn btn-accent md:ml-auto ${
-                    secondsLeft <= 0 ? "btn-disabled" : ""
-                  }`}
-                  onClick={() => navigate("/event/" + event.id + "/order")}
-                >
-                  Commander {event.title} !!!
-                </button>
-              </div>
-            </CardEvent>
-          );
-        })
-      ) : (
-        <p>Aucun événement à venir</p>
-      )}
+      <ListEvents
+        events={events}
+        loading={loading}
+        noEventsMessage="Aucun événement à venir"
+        EventCardChildren={UserEventCardChildren}
+      />
     </div>
   );
 }

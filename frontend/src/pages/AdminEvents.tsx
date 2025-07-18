@@ -14,6 +14,8 @@ import deleteEvent from "../utils/dbFetch/deleteEvent";
 import type Event from "../types/EventType";
 import BinWithModal from "../components/BinWithModal";
 import DeleteModal from "../components/DeleteModal";
+import ListEvents from "../components/ListEvents";
+import AdminEventCardChildren from "../components/AdminEventCardChildren";
 
 const EmptyEvent = {
   id: 0,
@@ -92,130 +94,23 @@ function AdminEvents() {
 
       <h1> Prochains Evenements </h1>
 
-      {upcomingEvents.length > 0 ? (
-        upcomingEvents.map((event) => {
-          let secondsLeft = SecondsBetweenNowAndDates(
-            new Date(
-              correctDate(event.form_closing_date) +
-                "T" +
-                event.form_closing_time
-            )
-          );
-          return (
-            <CardEvent
-              key={event.id}
-              title={event.title}
-              description={event.description}
-              date={correctDate(event.date)}
-              time={event.time}
-              form_closing_date={correctDate(event.form_closing_date)}
-              form_closing_time={event.form_closing_time}
-              loading={loadingUpcoming}
-              img_url={event.img_url}
-            >
-              <div>
-                <button
-                  className={`btn btn-accent md:ml-auto `}
-                  onClick={() =>
-                    navigate("/admin/event/" + event.id + "/orders")
-                  }
-                >
-                  Statistique
-                </button>
-                <button
-                  className={`btn btn-accent md:ml-auto `}
-                  onClick={() =>
-                    navigate("/admin/event/" + event.id + "/modify")
-                  }
-                >
-                  Modifier
-                </button>
-                <BinWithModal
-                  id={"delete_item_" + event.id}
-                  className={`w-10 h-10 ${event.deleting ? "opacity-15" : ""}`}
-                />
-                <DeleteModal
-                  id={"delete_item_" + event.id}
-                  title="Supprimer l'élément ?"
-                  description={`Vous êtes sur le point de supprimer 
-                l'evenement ${event.title} du ${correctDate(event.date)} à ${
-                    event.time
-                  }. Cette action est irréversible.`}
-                  onDelete={() => {
-                    handleDeleteEvent(event);
-                  }}
-                />
-              </div>
-            </CardEvent>
-          );
-        })
-      ) : (
-        <p>Aucun événement à venir</p>
-      )}
+      <ListEvents
+        events={upcomingEvents}
+        loading={loadingUpcoming}
+        onDelete={handleDeleteEvent}
+        EventCardChildren={AdminEventCardChildren}
+        noEventsMessage="Aucun événement passé"
+      />
 
       <h1> Anciens Evenements </h1>
 
-      {oldEvents.length > 0 ? (
-        oldEvents.map((event) => {
-          let secondsLeft = SecondsBetweenNowAndDates(
-            new Date(
-              correctDate(event.form_closing_date) +
-                "T" +
-                event.form_closing_time
-            )
-          );
-          return (
-            <CardEvent
-              key={event.id}
-              title={event.title}
-              description={event.description}
-              date={correctDate(event.date)}
-              time={event.time}
-              form_closing_date={correctDate(event.form_closing_date)}
-              form_closing_time={event.form_closing_time}
-              loading={loadingOld}
-              img_url={event.img_url}
-            >
-              <div>
-                <button
-                  className={`btn btn-accent md:ml-auto `}
-                  onClick={() =>
-                    navigate("/admin/event/" + event.id + "/orders")
-                  }
-                >
-                  Statistique
-                </button>
-                <button
-                  className={`btn btn-accent md:ml-auto `}
-                  onClick={() =>
-                    navigate("/admin/event/" + event.id + "/modify")
-                  }
-                >
-                  Modifier
-                </button>
-
-                <BinWithModal
-                  id={"delete_item_" + event.id}
-                  className={`w-10 h-10 ${event.deleting ? "opacity-15" : ""}`}
-                />
-                <DeleteModal
-                  id={"delete_item_" + event.id}
-                  title="Supprimer l'élément ?"
-                  description={`Vous êtes sur le point de supprimer 
-                l'evenement ${event.title} du ${correctDate(event.date)} à ${
-                    event.time
-                  }. Cette action est irréversible.`}
-                  onDelete={() => {
-                    handleDeleteEvent(event);
-                  }}
-                />
-              </div>
-            </CardEvent>
-          );
-        })
-      ) : (
-        <p>Aucun événement passé</p>
-      )}
+      <ListEvents
+        events={oldEvents}
+        loading={loadingOld}
+        onDelete={handleDeleteEvent}
+        EventCardChildren={AdminEventCardChildren}
+        noEventsMessage="Aucun événement passé"
+      />
     </div>
   );
 }
