@@ -15,27 +15,30 @@ import type Event from "../types/EventType";
 import BinWithModal from "../components/BinWithModal";
 import DeleteModal from "../components/DeleteModal";
 
+const EmptyEvent = {
+  id: 0,
+  title: "",
+  description: "",
+  date: "2025-02-09T22:00:00.000Z",
+  time: "",
+  form_closing_date: "",
+  form_closing_time: "",
+  img_url: "",
+};
+
 function AdminEvents() {
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([
-    {
-      id: 0,
-      title: "",
-      description: "",
-      date: "2025-02-09T22:00:00.000Z",
-      time: "",
-      form_closing_date: "",
-      form_closing_time: "",
-      img_url: "",
-    },
-  ]);
-  const [oldEvents, setOldEvents] = useState<Event[]>([]);
+  const [loadingUpcoming, setLoadingUpcoming] = useState(true);
+  const [loadingOld, setLoadingOld] = useState(true);
 
-  function handleDeleteEvent(id: number) {
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([EmptyEvent]);
+  const [oldEvents, setOldEvents] = useState<Event[]>([EmptyEvent, EmptyEvent]);
+
+  function handleDeleteEvent(event: Event) {
+    event.deleting = true;
     deleteEvent(
-      id,
+      event.id,
       () => {},
       () => {},
       () => {
@@ -49,19 +52,26 @@ function AdminEvents() {
 
   function fetchNeededData() {
     getEventsUpcoming(
-      () => setLoading(true),
-      () => setLoading(false),
+      () => setLoadingUpcoming(true),
+      () => {
+        setLoadingUpcoming(false);
+        setUpcomingEvents([]);
+      },
       () => {
         setUpcomingEvents([]);
       },
       (data) => {
+        setUpcomingEvents([]);
         setUpcomingEvents(data);
         console.log("Successfully fetched upcoming events");
       }
     );
     getEventsOld(
-      () => setLoading(true),
-      () => setLoading(false),
+      () => setLoadingOld(true),
+      () => {
+        setLoadingOld(false);
+        setOldEvents([]);
+      },
       () => {
         setOldEvents([]);
       },
@@ -100,7 +110,7 @@ function AdminEvents() {
               time={event.time}
               form_closing_date={correctDate(event.form_closing_date)}
               form_closing_time={event.form_closing_time}
-              loading={loading}
+              loading={loadingUpcoming}
               img_url={event.img_url}
             >
               <div>
@@ -122,7 +132,7 @@ function AdminEvents() {
                 </button>
                 <BinWithModal
                   id={"delete_item_" + event.id}
-                  className="w-10 h-10"
+                  className={`w-10 h-10 ${event.deleting ? "opacity-15" : ""}`}
                 />
                 <DeleteModal
                   id={"delete_item_" + event.id}
@@ -132,7 +142,7 @@ function AdminEvents() {
                     event.time
                   }. Cette action est irréversible.`}
                   onDelete={() => {
-                    handleDeleteEvent(event.id);
+                    handleDeleteEvent(event);
                   }}
                 />
               </div>
@@ -163,7 +173,7 @@ function AdminEvents() {
               time={event.time}
               form_closing_date={correctDate(event.form_closing_date)}
               form_closing_time={event.form_closing_time}
-              loading={loading}
+              loading={loadingOld}
               img_url={event.img_url}
             >
               <div>
@@ -183,9 +193,10 @@ function AdminEvents() {
                 >
                   Modifier
                 </button>
+
                 <BinWithModal
                   id={"delete_item_" + event.id}
-                  className="w-10 h-10"
+                  className={`w-10 h-10 ${event.deleting ? "opacity-15" : ""}`}
                 />
                 <DeleteModal
                   id={"delete_item_" + event.id}
@@ -195,7 +206,7 @@ function AdminEvents() {
                     event.time
                   }. Cette action est irréversible.`}
                   onDelete={() => {
-                    handleDeleteEvent(event.id);
+                    handleDeleteEvent(event);
                   }}
                 />
               </div>
