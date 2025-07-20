@@ -9,6 +9,8 @@ import deleteEvent from "../utils/dbFetch/deleteEvent";
 import type Event from "../types/EventType";
 import ListEvents from "../components/ListEvents";
 import AdminEventCardChildren from "../components/AdminEventCardChildren";
+import PlusCard from "../components/PlusCard";
+import { useNavigate } from "react-router-dom";
 
 const EmptyEvent = {
   id: 0,
@@ -22,6 +24,8 @@ const EmptyEvent = {
 };
 
 function AdminEvents() {
+  const navigate = useNavigate();
+
   const [loadingUpcoming, setLoadingUpcoming] = useState(true);
   const [loadingOld, setLoadingOld] = useState(true);
 
@@ -84,6 +88,11 @@ function AdminEvents() {
       <NavbarSpacer />
 
       <h1> Prochains Evenements </h1>
+
+      <PlusCard
+        onClick={() => navigate("/admin/event/create")}
+        legend={`Créer un nouvel événement !`}
+      />
 
       <ListEvents
         events={upcomingEvents}

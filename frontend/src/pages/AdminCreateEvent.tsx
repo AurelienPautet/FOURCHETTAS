@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
-import { CalendarDate } from "cally";
 import Calendar from "../components/Calendar";
 import CardImageGen from "../components/CardImageGen";
-import ContentCreateItem from "../components/ContentCreateItem";
-import DeleteModal from "../components/DeleteModal";
 import type CreateItem from "../types/CreateItemType";
-import BinWithModal from "../components/BinWithModal";
-import SvgPlus from "../components/SvgPlus";
 import Logo from "../components/Logo";
 import postEvent from "../utils/dbFetch/PostEvent";
 import CreateItems from "../components/CreateItems";
@@ -27,9 +22,7 @@ function AdminCreateEvent() {
   const [error, setError] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
 
-  const [eventImgUrl, setEventImgUrl] = useState<string>(
-    "https://storage.imagerouter.io/b920e2a2-b8c0-4220-933b-042c7f9ea7f2.png"
-  );
+  const [eventImgUrl, setEventImgUrl] = useState<string>("");
 
   const [removingBackground, setRemovingBackground] = useState<boolean>(false);
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);

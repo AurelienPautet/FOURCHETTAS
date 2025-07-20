@@ -5,6 +5,7 @@ import BinWithModal from "./BinWithModal";
 import DeleteModal from "./DeleteModal";
 import type CreateItem from "../types/CreateItemType";
 import type { Dispatch, SetStateAction } from "react";
+import PlusCard from "./PlusCard";
 interface CreateItemProps {
   title: string;
   type: string;
@@ -30,15 +31,10 @@ function CreateItems({
     <>
       <h1 className=" text-2xl">{title}</h1>
       <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
-        <div
+        <PlusCard
           onClick={() => createEmptyItem(type)}
-          className="card bg-base-200 h-30 shadow-sm flex justify-start flex-row md:w-3/4 items-center p-6 gap-6 hover:bg-base-300/80  hover:cursor-pointer"
-        >
-          <div className="bg-base-300 rounded-box flex items-center justify-center w-20 h-20">
-            <SvgPlus className="w-40 h-40" />
-          </div>
-          <h1 className="text-center font-bold text-2xl">Ajouter un plat</h1>
-        </div>
+          legend={`Ajouter un ${type}`}
+        />
         {itemsList.map(
           (item, index) =>
             item.type === type && (

@@ -5,6 +5,8 @@ import DeleteModal from "./DeleteModal";
 import correctDate from "../utils/DateCorrector";
 
 import type EventCardChildren from "../types/EventCardChildren";
+import EditSvg from "./EditSvg";
+import StatsSvg from "./StatsSvg";
 
 function AdminEventCardChildren({ event, onDelete }: EventCardChildren) {
   const navigate = useNavigate();
@@ -16,20 +18,15 @@ function AdminEventCardChildren({ event, onDelete }: EventCardChildren) {
   }
   return (
     <>
-      <div>
-        <button
-          className={`btn btn-accent md:ml-auto `}
+      <div className="flex gap-4 items-center">
+        <StatsSvg
+          className="w-10 h-10"
           onClick={() => navigate("/admin/event/" + event.id + "/orders")}
-        >
-          Statistique
-        </button>
-        <button
-          className={`btn btn-accent md:ml-auto `}
+        />
+        <EditSvg
+          className="w-10 h-10"
           onClick={() => navigate("/admin/event/" + event.id + "/modify")}
-        >
-          Modifier
-        </button>
-
+        />
         <BinWithModal
           id={"delete_item_" + event.id}
           className={`w-10 h-10 ${event.deleting ? "opacity-15" : ""}`}
