@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
   origin: [
+    "https://fourchettas.vercel.app/",
     "https://fourchettas-client.vercel.app",
     "http://localhost:5173",
     "http://localhost:3000",
