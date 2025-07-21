@@ -20,7 +20,8 @@ function AdminCreateEvent() {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  if(error) {}
+  if (error) {
+  }
   const [success, setSuccess] = useState<boolean>(false);
 
   const [eventImgUrl, setEventImgUrl] = useState<string>("");
@@ -33,9 +34,9 @@ function AdminCreateEvent() {
     let jsonBody = {
       title: eventName,
       description: eventDescription,
-      date: CorrectDateFormat(eventDate),
+      date: eventDate,
       time: eventTime,
-      form_closing_date: CorrectDateFormat(eventOrdersClosingDate),
+      form_closing_date: eventOrdersClosingDate,
       form_closing_time: eventOrdersClosingTime,
       img_url: eventImgUrl,
       items: itemsList,
