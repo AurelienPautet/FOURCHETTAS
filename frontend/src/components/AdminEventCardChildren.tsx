@@ -21,7 +21,9 @@ function AdminEventCardChildren({ event, onDelete }: EventCardChildren) {
       <div className="flex gap-4 items-center">
         <StatsSvg
           className="w-10 h-10"
-          onClick={() => navigate("/admin/event/" + event.id + "/orders")}
+          onClick={() =>
+            navigate("/admin/event/" + event.id + "/orders?tab=overview")
+          }
         />
         <EditSvg
           className="w-10 h-10"

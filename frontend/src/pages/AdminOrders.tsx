@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 import NavbarSpacer from "../components/NavbarSpacer";
 import TextDate from "../components/TextDate.tsx";
@@ -18,6 +18,9 @@ import getOrdersFromEventId from "../utils/dbFetch/getOrdersFromEventId.ts";
 
 function AdminOrders() {
   let { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentTab = searchParams.get("tab") || "overview";
+
   if (!id) {
     id = "0";
   }
@@ -61,6 +64,10 @@ function AdminOrders() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleTabChange = (tab: string) => {
+    setSearchParams({ tab });
+  };
+
   const ordersCount = orders.length;
   const preparedCount = orders.filter((order) => order.prepared).length;
   const deliveredCount = orders.filter((order) => order.delivered).length;
@@ -81,7 +88,8 @@ function AdminOrders() {
             name="my_tabs_1"
             className="tab w-1/2"
             aria-label="Résumé"
-            defaultChecked
+            checked={currentTab === "overview"}
+            onChange={() => handleTabChange("overview")}
           />
           <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
             <OverviewOrder
@@ -99,6 +107,8 @@ function AdminOrders() {
             name="my_tabs_1"
             className="tab w-1/2 "
             aria-label="Commandes"
+            checked={currentTab === "orders"}
+            onChange={() => handleTabChange("orders")}
           />
           <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
             <div className="flex flex-col w-full h-full">
