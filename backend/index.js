@@ -23,7 +23,18 @@ app.use(helmet());
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
+const corsOptions = {
+  origin: [
+    "https://fourchettas-client.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+};
+
+app.use(cors(corsOptions));
 app.use(morgan("dev"));
 
 app.use("/api/events", eventRoutes);
