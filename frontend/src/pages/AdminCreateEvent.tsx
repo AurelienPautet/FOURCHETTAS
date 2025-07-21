@@ -20,6 +20,7 @@ function AdminCreateEvent() {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  if(error) {}
   const [success, setSuccess] = useState<boolean>(false);
 
   const [eventImgUrl, setEventImgUrl] = useState<string>("");

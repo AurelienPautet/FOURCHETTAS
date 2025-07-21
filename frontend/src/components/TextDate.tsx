@@ -1,5 +1,4 @@
 import correctDate from "../utils/DateCorrector";
-import StatusEvent from "./StatusEvent";
 function TextDate(date: string | undefined, time: string | undefined) {
   if (!date || !time) {
     return <span className="font-bold">Date indisponible</span>;

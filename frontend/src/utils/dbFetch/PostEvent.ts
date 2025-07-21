@@ -36,5 +36,6 @@ export default async function postEvent({
     .catch((error) => {
       onRequestEnd();
       onError();
+      console.error("Error posting event:", error);
     });
 }

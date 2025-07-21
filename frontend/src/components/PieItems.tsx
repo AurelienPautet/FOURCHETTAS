@@ -1,7 +1,7 @@
 //FROM : https://recharts.org/en-US/examples/PieChartWithCustomizedLabel
 // mais bien modifié poru mes besoins
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Pie, PieChart, ResponsiveContainer, Sector, Cell } from "recharts";
 
 import type { SectorProps } from "recharts";
@@ -68,7 +68,6 @@ function generateAccentColors(count: number): string[] {
 const renderActiveShape = ({
   cx,
   cy,
-  midAngle,
   innerRadius,
   outerRadius,
   startAngle,

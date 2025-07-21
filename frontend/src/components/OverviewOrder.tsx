@@ -1,8 +1,5 @@
-import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-
 import type Order from "../types/OrderType";
 import type Item from "../types/ItemType";
-import type Event from "../types/EventType";
 import type AdminOrdersChildProps from "../types/AdminOrdersChild";
 import PieItems from "./PieItems";
 import { useState, useEffect } from "react";
@@ -10,7 +7,6 @@ import { useState, useEffect } from "react";
 import calculateCA from "../utils/calculateCA";
 
 function OverviewOrder({
-  event,
   dishes,
   sides,
   drinks,
@@ -56,7 +52,7 @@ function OverviewOrder({
     calculateCA({ orders, itemsMap, setCA });
     let filteredOrders: Order[];
     filteredOrders = [];
-    orders.map((order: Order, index) => {
+    orders.map((order: Order) => {
       if (order.prepared) {
         filteredOrders.push(order);
       } else {

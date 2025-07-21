@@ -3,7 +3,6 @@ import SecondsBetweenNowAndDates from "../utils/SecondsBetweenNowAndDates";
 import correctDate from "../utils/DateCorrector";
 
 import type Event from "../types/EventType";
-import type { ReactNode } from "react";
 import type { JSX } from "react";
 import type EventCardChildren from "../types/EventCardChildren";
 interface ListEventsProps {

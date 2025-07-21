@@ -1,5 +1,4 @@
 import CardImageGen from "./CardImageGen";
-import SvgPlus from "./SvgPlus";
 import ContentCreateItem from "./ContentCreateItem";
 import BinWithModal from "./BinWithModal";
 import DeleteModal from "./DeleteModal";

@@ -17,7 +17,6 @@ function ReciepeEvent({
   event,
   name,
   firstName,
-  phone,
   dish,
   side,
   drink,

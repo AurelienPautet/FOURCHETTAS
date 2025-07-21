@@ -1,18 +1,10 @@
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type AdminOrdersChildProps from "../types/AdminOrdersChild";
-import InputField from "./InputField";
 import ListOrdersListItem from "./ListOrdersListItem";
 import calculatePriceOrder from "../utils/calculatePriceOrder";
-import putOrderUpdateFromId from "../utils/dbFetch/putOrderUpdateFromId.ts";
-import type Order from "../types/OrderType";
 
-import PieItems from "./PieItems.tsx";
 
 function ListOrders({
-  event,
-  dishes,
-  sides,
-  drinks,
   orders,
   itemsMap,
 }: AdminOrdersChildProps) {

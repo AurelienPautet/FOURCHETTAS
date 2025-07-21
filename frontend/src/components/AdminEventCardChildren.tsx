@@ -1,4 +1,3 @@
-import type Event from "../types/EventType";
 import { useNavigate } from "react-router-dom";
 import BinWithModal from "./BinWithModal";
 import DeleteModal from "./DeleteModal";
