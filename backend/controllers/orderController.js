@@ -140,3 +140,38 @@ export const deleteOrderByEventId = (req, res = false) => {
       }
     });
 };
+
+export const getOrderByPhoneAndEvent = (req, res) => {
+  const event_id = req.params.id;
+  const { phone } = req.body;
+  console.log("Fetching order for phone:", phone, "and event_id:", event_id);
+  client
+    .query("SELECT * FROM orders WHERE phone = $1 AND event_id = $2", [phone, event_id])
+    .then((result) => {
+      res.status(200).json(result.rows);
+    })
+    .catch((err) => {
+      console.error("Error fetching order by phone and event", err.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
+}
+
+export const updateOrderContentByPhoneAndEvent = (req, res) => {
+  const event_id = req.params.id;
+  const { phone, dish_id, side_id, drink_id } = req.body;
+  client
+    .query(
+      "UPDATE orders SET dish_id = $1, side_id = $2, drink_id = $3 WHERE phone = $4 AND event_id = $5 RETURNING *",
+      [dish_id, side_id, drink_id, phone, event_id]
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "No orders found for this phone and event" });
+      }
+      res.status(200).json(result.rows[0]);
+    })
+    .catch((err) => {
+      console.error("Error updating order content by phone and event", err.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
+}
