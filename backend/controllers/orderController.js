@@ -142,8 +142,8 @@ export const deleteOrderByEventId = (req, res = false) => {
 };
 
 export const getOrderByPhoneAndEvent = (req, res) => {
-  const event_id = req.params.id;
-  const { phone } = req.body;
+  const { id: event_id, phone } = req.params;
+  console.log("Fetching order for phone:", phone, "and event_id:", event_id);
   console.log("Fetching order for phone:", phone, "and event_id:", event_id);
   client
     .query("SELECT * FROM orders WHERE phone = $1 AND event_id = $2", [phone, event_id])
