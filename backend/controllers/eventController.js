@@ -45,7 +45,7 @@ export const getUpcomingEvents = (req, res) => {
 export const getUpcomingEventsWithPhoneOrder = (req, res) => {
   const phone = req.params.phone;
   client
-    .query("SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e JOIN orders o ON e.id = o.event_id WHERE date >= CURRENT_DATE AND o.phone = $1 ORDER BY date ASC", [phone])
+    .query("SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e LEFT JOIN orders o ON e.id = o.event_id WHERE date >= CURRENT_DATE AND o.phone = $1 ORDER BY date ASC", [phone])
     .then((result) => {
       res.status(200).json(result.rows);
     })
