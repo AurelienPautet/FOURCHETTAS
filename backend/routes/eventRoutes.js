@@ -6,6 +6,7 @@ import {
   updateEvent,
   deleteEvent,
   getOldEvents,
+  getUpcomingEventsWithPhoneOrder 
 } from "../controllers/eventController.js";
 
 import { getItemByEventId } from "../controllers/itemController.js";
