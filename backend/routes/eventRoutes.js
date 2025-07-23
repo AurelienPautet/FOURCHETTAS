@@ -15,6 +15,8 @@ const router = express.Router();
 
 router.get("/upcoming", getUpcomingEvents);
 
+router.get("/upcoming/phone/:phone", getUpcomingEventsWithPhoneOrder);
+
 router.get("/old", getOldEvents);
 
 router.get("/:id", getEventById);
