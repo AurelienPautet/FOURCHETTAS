@@ -52,10 +52,10 @@ function CardImageGen({
       }, 1000);
       return;
     }
-    if (ImgUrl.startsWith("data:image/png;base64,")) {
+    if (ImgUrl.startsWith("https://storage.imagerouter.io/") == false) {
       setTimeout(() => {
         onBgRemovalEnd();
-      }, 1000);
+      }, 1000); 
       return;
     }
     setIsRemovingBg(true);
