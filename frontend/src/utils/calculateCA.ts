@@ -15,7 +15,7 @@ export default function calculateCA({
     const orderPrice = calculatePriceOrder(order, itemsMap);
     return acc + orderPrice;
   }, 0);
-
+  console.log(total)
   setCA(total);
   return total;
 }

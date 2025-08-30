@@ -24,7 +24,7 @@ function OverviewOrder({
     created_at: "",
   };
 
-  //console.log("Items Map:", itemsMap);
+  console.log("Items Map:", itemsMap);
 
   function generatePieDataForItems(
     items: Item[],
