@@ -56,7 +56,7 @@ function AdminOrders() {
 
     getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
     console.log(dishes,sides,drinks)
-  }, []);
+  }, [eventData]);
 
   useEffect(() => {
     getOrdersFromEventId(Number(id), setOrders);
