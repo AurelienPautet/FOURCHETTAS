@@ -76,6 +76,13 @@ function OverviewOrder({
         </div>
         <div className="stats shadow h-30 w-50 bg-base-200">
           <div className="stat">
+            <div className="stat-title">Prix moyen commande</div>
+            <div className="stat-value">{(CA / orders.length).toFixed(2)} €</div>
+            <div className="stat-desc">la moula</div>
+          </div>
+        </div>
+        <div className="stats shadow h-30 w-50 bg-base-200">
+          <div className="stat">
             <div className="stat-title">CA estimé</div>
             <div className="stat-value">{CA.toFixed(2)} €</div>
             <div className="stat-desc">la moula</div>
