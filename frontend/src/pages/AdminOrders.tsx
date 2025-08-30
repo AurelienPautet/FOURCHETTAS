@@ -35,6 +35,7 @@ function AdminOrders() {
 
   useEffect(() => {
     getEventFromId(Number(id), setEventData);
+
   }, []);
 
   useEffect(() => {
@@ -57,6 +58,7 @@ function AdminOrders() {
 
   useEffect(() => {
     getOrdersFromEventId(Number(id), setOrders);
+    console.log("Orders:", orders);
     const interval = setInterval(async () => {
       await getOrdersFromEventId(Number(id), setOrders);
     }, 2000);
