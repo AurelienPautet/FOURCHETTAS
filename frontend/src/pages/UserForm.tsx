@@ -15,6 +15,7 @@ import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
 import postOrder from "../utils/dbFetch/postOrder";
 import Logo from "../components/Logo";
+import correctDate from "../utils/DateCorrector";
 
 function UserForm() {
   const maxTabs = 4;
@@ -203,6 +204,21 @@ function UserForm() {
   /*   console.log("Name:", name);
   console.log("First Name:", firstName);
   console.log("Dish ID:", dishID); */
+  
+
+  if (
+    eventData?.form_closing_date &&
+    eventData?.time &&
+    new Date(`${correctDate(eventData.form_closing_date)}T${eventData.time}`) < new Date()
+  ) {
+    return (
+      <div className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-center items-center">
+        <div className="h-1/3"></div>
+        <Logo className=" h-40 w-40 animate-spin-slow" alive={false} />
+        <p className="text-error">Les commandes sont fermées :( </p>
+      </div>
+    );
+  }
 
   if (orderSuccess) {
     return (

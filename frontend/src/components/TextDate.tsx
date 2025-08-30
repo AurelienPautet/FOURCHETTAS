@@ -12,7 +12,7 @@ function TextDate(date: string | undefined, time: string | undefined) {
       <span className="font-bold">
         {splitDate[2]}/{splitDate[1]}/{splitDate[0]}
       </span>{" "}
-      à <span className="font-bold">{time}</span>
+      à partir de <span className="font-bold">{time}</span>
     </>
   );
 }
