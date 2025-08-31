@@ -9,7 +9,7 @@ import NotFound404 from "./pages/NotFound404.tsx";
 import AdminCreateEvent from "./pages/AdminCreateEvent.tsx";
 import AdminEvents from "./pages/AdminEvents.tsx";
 import AuthProvider from "./components/AuthContext.tsx";
-import AdminLogin from "./components/AdminLogin.tsx";
+import AdminLogin from "./pages/AdminLogin.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 function App() {

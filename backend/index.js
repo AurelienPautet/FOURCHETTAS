@@ -4,10 +4,10 @@ import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
 
-
 import eventRoutes from "./routes/eventRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import imageGenRoutes from "./routes/imageGenRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -37,6 +37,7 @@ app.use(morgan("dev"));
 app.use("/api/events", eventRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/image-gen", imageGenRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");

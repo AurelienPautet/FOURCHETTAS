@@ -1,26 +1,37 @@
 import { createContext, useState } from "react";
+import api_url from "../api_url";
 
  
 interface AuthContextType {
   isLogged: boolean;
-  login: (password: string) => boolean;
+  login: (password: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isLogged: false,
-  login: () => false, 
+  login: () => Promise.resolve(false),
 });
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLogged, setIsLogged] = useState(false);
 
-  const login = (password: string) => {
-    if (password === "yourPassword") {
-      setIsLogged(true);
-      console.log("Logged in successfully",isLogged);
-      return true;
+  const login = async (password: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${api_url}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      
+      if (response.ok) {
+        setIsLogged(true);
+        localStorage.setItem('adminAuth', 'true');
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
     }
-    return false;
   };
 
   return (
