@@ -27,7 +27,7 @@ function CardEvent({
   const splitDate = date.split("-");
 
   return (
-    <div className="rounded-2xl flex flex-col md:flex-row h-[30rem] w-full md:w-2/3  bg-base-200 shadow-sm p-6 justify-center items-center">
+    <div className="rounded-2xl flex flex-col md:flex-row h-[34rem] w-full md:w-2/3  bg-base-200 shadow-sm p-6 justify-center items-center">
       <div className="md:w-1/3 md:h-full w-full h-1/2 flex justify-center items-center ">
         {loading ? (
           <div className="skeleton  h-48 w-24 md:h-1/2 md:w-2/3"></div>

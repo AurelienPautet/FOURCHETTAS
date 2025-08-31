@@ -63,7 +63,7 @@ function AdminOrders() {
     console.log("Orders:", orders);
     const interval = setInterval(async () => {
       await getOrdersFromEventId(Number(id), setOrders);
-    }, 2000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, []);
