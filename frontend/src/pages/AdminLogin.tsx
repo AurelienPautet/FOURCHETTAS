@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import NavbarSpacer from "../components/NavbarSpacer";
-import InputField from "../components/InputField";
 import Logo from "../components/Logo";
 
 function AdminLogin() {
