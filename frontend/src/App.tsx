@@ -7,6 +7,7 @@ import UpcomingEvents from "./pages/UpcomingEvent";
 import AdminOrders from "./pages/AdminOrders";
 import NotFound404 from "./pages/NotFound404.tsx";
 import AdminCreateEvent from "./pages/AdminCreateEvent.tsx";
+import AdminModifyEvent from "./pages/AdminModifyEvent.tsx"
 import AdminEvents from "./pages/AdminEvents.tsx";
 import AuthProvider from "./components/AuthContext.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
@@ -37,6 +38,11 @@ function App() {
             <Route path="/admin/event/create" element={
               <ProtectedRoute>
                 <AdminCreateEvent />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/event/:id/modify" element={
+              <ProtectedRoute>
+                <AdminModifyEvent />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound404 />} />
