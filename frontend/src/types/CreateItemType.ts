@@ -6,3 +6,4 @@ export default interface CreateItem {
   img_url: string;
   type: string;
 }
+

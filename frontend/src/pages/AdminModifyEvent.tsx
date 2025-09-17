@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
 import Calendar from "../components/Calendar";
 import CardImageGen from "../components/CardImageGen";
-import type CreateItem from "../types/CreateItemType";
+import type ModifyItem from "../types/ModifyItemType.ts";
 import Logo from "../components/Logo";
 import postEvent from "../utils/dbFetch/PostEvent";
 import CreateItems from "../components/CreateItems";
+import getEventFromId from "../utils/dbFetch/getEventFromId";
+import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
+
+import type Item from "../types/ItemType";
+import type Event from "../types/EventType";
 
 function AdminModifyEvent() {
+  let { id } = useParams();
+
   const [eventName, setEventName] = useState<string>("");
   const [eventDescription, setEventDescription] = useState<string>("");
   const [eventDate, setEventDate] = useState<string>("");
@@ -29,7 +38,22 @@ function AdminModifyEvent() {
   const [removingBackground, setRemovingBackground] = useState<boolean>(false);
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
   const [eventId, setEventId] = useState<string>("");
-  const [itemsList, setItemsList] = useState<CreateItem[]>([]);
+  const [itemsList, setItemsList] = useState<ModifyItem[]>([]);
+
+  const [eventData, setEventData] = useState<Event | null>(null);
+  const [dishes, setDishes] = useState<Item[]>([]);
+  const [sides, setSides] = useState<Item[]>([]);
+  const [drinks, setDrinks] = useState<Item[]>([]);
+
+  useEffect(() => {
+    getEventFromId(Number(id), setEventData);
+  }, []);
+
+  useEffect(() => {
+    getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
+    console.log(dishes, sides, drinks);
+  }, [eventData]);
+
   function createPostRequestBody(): object {
     let jsonBody = {
       title: eventName,

@@ -17,7 +17,7 @@ export default async function postImageGen(req, res) {
       prompt:
         "Genere un dessin dans le style cartoon, avec un fond totalement noir d'un : " +
         body.prompt,
-      model: "google/gemini-2.5-flash:free",
+      model: "stabilityai/sdxl-turbo:free",
     }),
   };
 
