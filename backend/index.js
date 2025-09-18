@@ -7,6 +7,7 @@ import eventRoutes from "./routes/eventRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import imageGenRoutes from "./routes/imageGenRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import itemRoutes from "./routes/itemRoutes.js";
 
 dotenv.config();
 const PORT = process.env.PORT;

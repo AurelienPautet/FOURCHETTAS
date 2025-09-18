@@ -4,7 +4,6 @@ import {
   createItem,
   updateItems,
   deleteItems,
-  getItemsByEvent,
 } from "../controllers/itemController.js";
 
 const router = express.Router();
@@ -12,3 +11,5 @@ const router = express.Router();
 router.post("/", createItem);
 router.put("/", updateItems);
 router.delete("/", deleteItems);
+
+export default router;
