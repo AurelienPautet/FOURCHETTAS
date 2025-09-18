@@ -43,6 +43,7 @@ function AdminModifyEvent() {
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
   const [eventId, setEventId] = useState<string>("");
   const [itemsList, setItemsList] = useState<ModifyItem[]>([]);
+  const [itemsDeletedIds, setItemsDeletedIds] = useState<number[]>([]);
 
   const [eventData, setEventData] = useState<Event | null>(null);
   const [dishes, setDishes] = useState<Item[]>([]);
@@ -88,6 +89,7 @@ function AdminModifyEvent() {
 
   useEffect(() => {
     setItemsList([...dishes, ...sides, ...drinks]);
+    console.log("items loaded", [...dishes, ...sides, ...drinks]);
   }, [dishes, sides, drinks]);
 
   function createPostRequestBody(): object {
@@ -138,6 +140,7 @@ function AdminModifyEvent() {
 
   function createEmptyItem(type: string) {
     const newItem: ModifyItem = {
+      new: true,
       name: "",
       description: "",
       quantity: 1,
@@ -160,6 +163,9 @@ function AdminModifyEvent() {
   ) {
     const updatedItems = [...itemsList];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
+    if (updatedItems[index].new !== true) {
+      updatedItems[index].modified = true;
+    }
     setItemsList(updatedItems);
   }
 
