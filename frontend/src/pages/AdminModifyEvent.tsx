@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
@@ -19,6 +19,7 @@ import correctDate from "../utils/DateCorrector.ts";
 function AdminModifyEvent() {
   let { id } = useParams();
 
+  const navigate = useNavigate();
   const [eventName, setEventName] = useState<string>("");
   const [eventDescription, setEventDescription] = useState<string>("");
   const [eventDate, setEventDate] = useState<string>("");
@@ -92,7 +93,7 @@ function AdminModifyEvent() {
     console.log("items loaded", [...dishes, ...sides, ...drinks]);
   }, [dishes, sides, drinks]);
 
-  function createPostRequestBody(): object {
+  function createPutRequestBody(): object {
     let jsonBody = {
       title: eventName,
       description: eventDescription,
@@ -101,7 +102,6 @@ function AdminModifyEvent() {
       form_closing_date: eventOrdersClosingDate,
       form_closing_time: eventOrdersClosingTime,
       img_url: eventImgUrl,
-      items: itemsList,
     };
     return jsonBody;
   }
@@ -115,10 +115,10 @@ function AdminModifyEvent() {
   useEffect(() => {
     if (!removingBackground || !loading || activeBgRemovals !== 0) return;
     console.log("backgrounds removed");
-    const postBody = createPostRequestBody();
+    const putBody = createPutRequestBody();
     setRemovingBackground(false);
     postEvent({
-      eventData: postBody,
+      eventData: putBody,
       onRequestStart: () => {
         console.log("Request started");
       },
@@ -392,7 +392,7 @@ function AdminModifyEvent() {
             <button
               className={`btn btn-error w-1/2 m-5 ${loading && "btn-disabled"}`}
               onClick={() => {
-                handleCreateOrder();
+                navigate("/admin");
               }}
             >
               annuler
@@ -405,7 +405,7 @@ function AdminModifyEvent() {
                 handleCreateOrder();
               }}
             >
-              Créer l'événement
+              Modifier l'événement
             </button>
           </div>
           <div

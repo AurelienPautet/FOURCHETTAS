@@ -28,7 +28,45 @@ export const deleteEvent = async (req, res) => {
     });
 };
 
-export const updateEvent = (req, res) => {};
+export const updateEvent = (req, res) => {
+  const body = req.body;
+  const event_id = req.params.id;
+  if (
+    !body.title ||
+    !body.description ||
+    !body.date ||
+    !body.time ||
+    !body.form_closing_date ||
+    !body.form_closing_time ||
+    !body.img_url
+  ) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+  client
+    .query(
+      "UPDATE events SET title=$1, description=$2, date=$3, time=$4, form_closing_date=$5, form_closing_time=$6, img_url=$7 WHERE id=$8 RETURNING *",
+      [
+        body.title,
+        body.description,
+        body.date,
+        body.time,
+        body.form_closing_date,
+        body.form_closing_time,
+        body.img_url,
+        event_id,
+      ]
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+      res.status(200).json(result.rows[0]);
+    })
+    .catch((err) => {
+      console.error("Error updating event", err.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};
 
 export const getUpcomingEvents = (req, res) => {
   client
@@ -45,7 +83,10 @@ export const getUpcomingEvents = (req, res) => {
 export const getUpcomingEventsWithPhoneOrder = (req, res) => {
   const phone = req.params.phone;
   client
-    .query("SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e LEFT JOIN orders o ON e.id = o.event_id  AND o.phone = $1 WHERE date >= CURRENT_DATE ORDER BY date ASC", [phone])
+    .query(
+      "SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e LEFT JOIN orders o ON e.id = o.event_id  AND o.phone = $1 WHERE date >= CURRENT_DATE ORDER BY date ASC",
+      [phone]
+    )
     .then((result) => {
       res.status(200).json(result.rows);
     })

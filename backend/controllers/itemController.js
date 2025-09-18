@@ -71,3 +71,68 @@ export const createItem = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const deleteItems = async (req, res) => {
+  const { itemIds } = req.body;
+
+  if (!Array.isArray(itemIds) || itemIds.length === 0) {
+    return res.status(400).json({ error: "Invalid item IDs" });
+  }
+
+  try {
+    const result = await client.query(
+      "DELETE FROM items WHERE id = ANY($1) RETURNING *",
+      [itemIds]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No items found" });
+    }
+
+    res.status(200).json({ message: "Items deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting items", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const updateItems = async (req, res) => {
+  const { items } = req.body;
+  if (items.length === 0) {
+    return res.status(400).json({ error: "Invalid items data" });
+  }
+  try {
+    const updatedItems = [];
+    for (const item of items) {
+      if (
+        !item.id ||
+        !item.name ||
+        !item.description ||
+        item.price === undefined ||
+        !item.event_id ||
+        !item.type ||
+        item.quantity === undefined
+      ) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      const result = await client.query(
+        "UPDATE items SET name=$1, description=$2, price=$3, event_id=$4, img_url=$5, type=$6, quantity=$7 WHERE id=$8 RETURNING *",
+        [
+          item.name,
+          item.description,
+          Number(item.price),
+          item.event_id,
+          item.img_url,
+          item.type,
+          item.quantity,
+          item.id,
+        ]
+      );
+      updatedItems.push(result.rows[0]);
+    }
+    res.status(200).json(updatedItems);
+  } catch (err) {
+    console.error("Error updating items", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

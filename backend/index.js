@@ -37,6 +37,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/image-gen", imageGenRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/items", itemRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
