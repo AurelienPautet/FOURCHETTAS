@@ -14,6 +14,7 @@ import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
 
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
+import correctDate from "../utils/DateCorrector.ts";
 
 function AdminModifyEvent() {
   let { id } = useParams();
@@ -26,6 +27,9 @@ function AdminModifyEvent() {
   const [eventTime, setEventTime] = useState<string>("");
   const [eventOrdersClosingTime, setEventOrdersClosingTime] =
     useState<string>("");
+
+  const [isEventModified, setIsEventModified] = useState<boolean>(false);
+  const [isReadyToModify, setIsReadyToModify] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -47,12 +51,44 @@ function AdminModifyEvent() {
 
   useEffect(() => {
     getEventFromId(Number(id), setEventData);
-  }, []);
+  }, [id]);
+
+  useEffect(() => {
+    console.log("event data changed", eventData);
+    setEventName(eventData?.title || "");
+    setEventDescription(eventData?.description || "");
+    setEventDate(correctDate(eventData?.date || ""));
+    setEventTime(eventData?.time?.substring(0, 5) || "");
+    setEventOrdersClosingDate(correctDate(eventData?.form_closing_date || ""));
+    setEventOrdersClosingTime(
+      eventData?.form_closing_time.substring(0, 5) || ""
+    );
+    setEventImgUrl(eventData?.img_url || "");
+    if (eventData !== null) setIsReadyToModify(true);
+  }, [eventData]);
+
+  useEffect(() => {
+    if (isReadyToModify) {
+      setIsEventModified(true);
+      console.log("event modified");
+    }
+  }, [
+    eventName,
+    eventDescription,
+    eventDate,
+    eventTime,
+    eventOrdersClosingDate,
+    eventOrdersClosingTime,
+    eventImgUrl,
+  ]);
 
   useEffect(() => {
     getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
-    console.log(dishes, sides, drinks);
-  }, [eventData]);
+  }, [id]);
+
+  useEffect(() => {
+    setItemsList([...dishes, ...sides, ...drinks]);
+  }, [dishes, sides, drinks]);
 
   function createPostRequestBody(): object {
     let jsonBody = {
@@ -101,7 +137,7 @@ function AdminModifyEvent() {
   }, [activeBgRemovals]);
 
   function createEmptyItem(type: string) {
-    const newItem: CreateItem = {
+    const newItem: ModifyItem = {
       name: "",
       description: "",
       quantity: 1,
@@ -119,7 +155,7 @@ function AdminModifyEvent() {
 
   function setItemValue(
     index: number,
-    field: keyof CreateItem,
+    field: keyof ModifyItem,
     value: string | number
   ) {
     const updatedItems = [...itemsList];
@@ -195,7 +231,9 @@ function AdminModifyEvent() {
               className="input"
               placeholder="Nom de l'événement"
               value={eventName}
-              onChange={(e) => setEventName(e.target.value)}
+              onChange={(e) => {
+                setEventName(e.target.value);
+              }}
             />
             <legend className="fieldset-legend">
               Description de l'événement
@@ -204,7 +242,9 @@ function AdminModifyEvent() {
               className="textarea h-24"
               placeholder="Description de l'événement"
               value={eventDescription}
-              onChange={(e) => setEventDescription(e.target.value)}
+              onChange={(e) => {
+                setEventDescription(e.target.value);
+              }}
             ></textarea>
             <legend className="fieldset-legend">Début de l'événement</legend>
             <div className="flex w-full h-full items-center justify-center flex-row gap-4">
@@ -342,14 +382,26 @@ function AdminModifyEvent() {
         />
 
         <div className="flex flex-col w-full h-full items-center justify-center gap-4">
-          <button
-            className={`btn btn-primary w-1/2 m-5 ${loading && "btn-disabled"}`}
-            onClick={() => {
-              handleCreateOrder();
-            }}
-          >
-            Créer l'événement
-          </button>
+          <div className="flex  h-full items-center justify-center flex-row">
+            <button
+              className={`btn btn-error w-1/2 m-5 ${loading && "btn-disabled"}`}
+              onClick={() => {
+                handleCreateOrder();
+              }}
+            >
+              annuler
+            </button>
+            <button
+              className={`btn btn-primary w-1/2 m-5 ${
+                loading && "btn-disabled"
+              }`}
+              onClick={() => {
+                handleCreateOrder();
+              }}
+            >
+              Créer l'événement
+            </button>
+          </div>
           <div
             className={`flex flex-col md:flex-row w-full items-center justify-center gap-2 ${
               removingBackground ? "" : "invisible"
