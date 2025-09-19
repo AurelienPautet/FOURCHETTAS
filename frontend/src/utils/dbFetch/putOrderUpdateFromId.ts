@@ -1,13 +1,10 @@
 import api_url from "../../api_url.ts";
+import type resType from "../../types/ResType.ts";
 
-interface putOrderUpdateFromIdProps {
+interface putOrderUpdateFromIdProps extends resType {
   orderId: number;
   prepared?: boolean | null;
   delivered?: boolean | null;
-  onRequestStart?: () => void;
-  onRequestEnd?: () => void;
-  onSuccess?: () => void;
-  onError?: () => void;
 }
 
 export default async function putOrderUpdateFromId({

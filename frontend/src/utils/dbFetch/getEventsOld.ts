@@ -1,11 +1,14 @@
 import api_url from "../../api_url";
-import type Event from "../../types/EventType";
+import type resType from "../../types/ResType";
+
+
 export default async function getEventsOld(
-  onRequestStart: () => void = () => {},
-  onRequestEnd: () => void = () => {},
-  onError: () => void = () => {},
-  onSuccess: (data: Event[]) => void = () => {}
-) {
+  {
+  onRequestStart= () => {},
+  onRequestEnd = () => {},
+  onError = () => {},
+  onSuccess = () => {}}
+ : resType) {
   onRequestStart();
   try {
     const response = await fetch(`${api_url}/api/events/old`);
@@ -20,7 +23,7 @@ export default async function getEventsOld(
     //console.log(" ca va marcher maintenant a la inshalah", data);
   } catch (error) {
     onRequestEnd();
-    onError();
+    onError(error);
     console.error("Error fetching upcoming events:", error);
   }
 }

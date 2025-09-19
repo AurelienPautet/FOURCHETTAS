@@ -1,4 +1,5 @@
 import api_url from "../../api_url.ts";
+import type resType from "../../types/ResType.ts";
 
 interface orderData {
   event_id: number;
@@ -32,12 +33,7 @@ function orderJson({
   return res_json;
 }
 
-interface postOrderProps extends orderData {
-  onRequestStart?: () => void;
-  onRequestEnd?: () => void;
-  onSuccess?: () => void;
-  onError?: () => void;
-}
+interface postOrderProps extends orderData, resType {}
 
 export default async function postOrder({
   event_id,

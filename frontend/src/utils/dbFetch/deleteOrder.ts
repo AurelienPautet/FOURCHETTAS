@@ -1,12 +1,17 @@
 import api_url from "../../api_url";
+import type resType from "../../types/ResType";
 
-export default async function deleteOrder(
-  id: number,
-  onRequestStart: () => void = () => {},
-  onRequestEnd: () => void = () => {},
-  onError: () => void = () => {},
-  onSuccess: () => void = () => {}
-) {
+interface deleteOrderProps extends resType{
+  id:number
+}
+
+export default async function deleteOrder({
+  id,
+  onRequestStart = () => {},
+  onRequestEnd = () => {},
+  onError = () => {},
+  onSuccess = () => {}
+} : deleteOrderProps) {
   onRequestStart();
   try {
     const response = await fetch(`${api_url}/api/orders/${id}`, {

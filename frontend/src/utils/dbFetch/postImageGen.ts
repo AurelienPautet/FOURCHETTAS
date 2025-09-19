@@ -1,11 +1,8 @@
 import api_url from "../../api_url";
+import type resType from "../../types/ResType";
 
-interface postImageGenProps {
+interface postImageGenProps extends resType{
   prompt: string;
-  onRequestStart?: () => void;
-  onRequestEnd?: () => void;
-  onSuccess?: (url: string) => void;
-  onError?: () => void;
 }
 
 export default async function postImageGen({
