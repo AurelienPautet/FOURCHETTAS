@@ -204,12 +204,12 @@ function UserForm() {
   /*   console.log("Name:", name);
   console.log("First Name:", firstName);
   console.log("Dish ID:", dishID); */
-  
 
   if (
     eventData?.form_closing_date &&
     eventData?.time &&
-    new Date(`${correctDate(eventData.form_closing_date)}T${eventData.time}`) < new Date()
+    new Date(`${correctDate(eventData.form_closing_date)}T${eventData.time}`) <
+      new Date()
   ) {
     return (
       <div className="flex-grow h-full w-full flex flex-col gap-4 p-4 justify-center items-center">
@@ -303,7 +303,7 @@ function UserForm() {
           <h1 className="mb-3 w-full text-center text-3xl font-bold">
             Tu veux quoi ?
           </h1>
-          <div className="flex flex-row flex-wrap justify-center gap-2">
+          <div className="flex flex-row flex-wrap w-fit justify-center gap-2">
             {dishes.map((dish: Item) => (
               <CardItem
                 key={dish.id}
