@@ -1,5 +1,5 @@
-import ThemeController from "./ThemeController.tsx";
-import Logo from "./Logo.tsx";
+import ThemeController from "./ThemeController";
+import Logo from "./Logo";
 import { useNavigate } from "react-router-dom";
 
 function Navbar() {

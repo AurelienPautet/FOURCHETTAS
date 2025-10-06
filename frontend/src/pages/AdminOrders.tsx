@@ -13,8 +13,8 @@ import type Item from "../types/ItemType";
 import type Order from "../types/OrderType";
 
 import getEventFromId from "../utils/dbFetch/getEventFromId";
-import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
-import getOrdersFromEventId from "../utils/dbFetch/getOrdersFromEventId.ts";
+import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
+import getOrdersFromEventId from "../utils/dbFetch/getOrdersFromEventId";
 
 function AdminOrders() {
   let { id } = useParams();

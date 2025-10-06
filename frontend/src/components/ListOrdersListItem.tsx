@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import type Order from "../types/OrderType";
 import type Item from "../types/ItemType";
 
-import putOrderUpdateFromId from "../utils/dbFetch/putOrderUpdateFromId.ts";
-import timestampToStrings from "../utils/timestampToStrings.ts";
-import DeleteModal from "./DeleteModal.tsx";
-import deleteOrder from "../utils/dbFetch/deleteOrder.ts";
+import putOrderUpdateFromId from "../utils/dbFetch/putOrderUpdateFromId";
+import timestampToStrings from "../utils/timestampToStrings";
+import DeleteModal from "./DeleteModal";
+import deleteOrder from "../utils/dbFetch/deleteOrder";
 import BinWithModal from "./BinWithModal.tsx";
 
 function ListOrdersListItem({

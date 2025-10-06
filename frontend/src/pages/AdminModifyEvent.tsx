@@ -5,16 +5,16 @@ import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
 import Calendar from "../components/Calendar";
 import CardImageGen from "../components/CardImageGen";
-import type ModifyItem from "../types/ModifyItemType.ts";
+import type ModifyItem from "../types/ModifyItemType";
 import Logo from "../components/Logo";
 import postEvent from "../utils/dbFetch/postEvent";
 import CreateItems from "../components/CreateItems";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
-import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
+import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
 
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
-import correctDate from "../utils/DateCorrector.ts";
+import correctDate from "../utils/DateCorrector";
 
 function AdminModifyEvent() {
   let { id } = useParams();

@@ -5,13 +5,13 @@ import Navbar from "./components/Navbar";
 import UserForm from "./pages/UserForm";
 import UpcomingEvents from "./pages/UpcomingEvent";
 import AdminOrders from "./pages/AdminOrders";
-import NotFound404 from "./pages/NotFound404.tsx";
-import AdminCreateEvent from "./pages/AdminCreateEvent.tsx";
-import AdminModifyEvent from "./pages/AdminModifyEvent.tsx"
-import AdminEvents from "./pages/AdminEvents.tsx";
-import AuthProvider from "./components/AuthContext.tsx";
-import AdminLogin from "./pages/AdminLogin.tsx";
-import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import NotFound404 from "./pages/NotFound404";
+import AdminCreateEvent from "./pages/AdminCreateEvent";
+import AdminModifyEvent from "./pages/AdminModifyEvent"
+import AdminEvents from "./pages/AdminEvents";
+import AuthProvider from "./components/AuthContext";
+import AdminLogin from "./pages/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
