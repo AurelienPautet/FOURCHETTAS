@@ -42,7 +42,7 @@ function CardItem({
         <h1 className="card-title font-bold">{title}</h1>
         <h2 className="text-lg font-bold">{price}€</h2>
 
-        <p>{description}</p>
+        <p className="whitespace-pre-line">{description}</p>
       </div>
     </div>
   );
