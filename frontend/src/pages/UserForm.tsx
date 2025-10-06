@@ -277,21 +277,17 @@ function UserForm() {
               <input
                 ref={phoneInputRef}
                 type="tel"
-                className="input validator tabular-nums text-2xl"
+                className="input  tabular-nums text-2xl"
                 required
                 placeholder="0612345678"
-                pattern="^0[1-9][0-9]{8}$"
-                minLength={10}
-                maxLength={10}
+                minLength={1}
+                maxLength={100}
                 value={phone}
                 onChange={(e) => {
                   setPhone(e.target.value);
                   phoneInputRef.current?.setCustomValidity("");
                 }}
               />
-              <p className="validator-hint mt-[2px]">
-                Dois être de 10 chiffres
-              </p>
             </fieldset>
           </fieldset>
         </TransitionDiv>
