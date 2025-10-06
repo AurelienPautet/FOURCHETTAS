@@ -31,7 +31,13 @@ function ListOrdersListItem({
 
   function handleDelete() {
     setIsDeleting(true);
-    deleteOrder(order.id);
+    deleteOrder({
+      id: order.id,
+      onRequestStart: () => {},
+      onRequestEnd: () => {},
+      onError: () => {},
+      onSuccess: () => {},
+    });
   }
 
   if (isDeleting) {

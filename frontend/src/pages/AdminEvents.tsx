@@ -63,20 +63,20 @@ function AdminEvents() {
         console.log("Successfully fetched upcoming events");
       }
     );
-    getEventsOld(
-      () => setLoadingOld(true),
-      () => {
+    getEventsOld({
+      onRequestStart: () => setLoadingOld(true),
+      onRequestEnd: () => {
         setLoadingOld(false);
         setOldEvents([]);
       },
-      () => {
+      onError: () => {
         setOldEvents([]);
       },
-      (data) => {
+      onSuccess: (data: Event[]) => {
         setOldEvents(data);
         console.log("Successfully fetched upcoming events");
-      }
-    );
+      },
+    });
   }
 
   useEffect(() => {

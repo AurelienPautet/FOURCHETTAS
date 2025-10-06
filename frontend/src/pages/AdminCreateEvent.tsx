@@ -65,7 +65,7 @@ function AdminCreateEvent() {
         setLoading(false);
         setActiveBgRemovals(0);
       },
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         setEventId(data);
         console.log("Event created successfully");
         setSuccess(true);

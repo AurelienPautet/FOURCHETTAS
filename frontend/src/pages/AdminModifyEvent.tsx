@@ -7,7 +7,7 @@ import Calendar from "../components/Calendar";
 import CardImageGen from "../components/CardImageGen";
 import type ModifyItem from "../types/ModifyItemType.ts";
 import Logo from "../components/Logo";
-import postEvent from "../utils/dbFetch/postEvent.ts";
+import postEvent from "../utils/dbFetch/postEvent";
 import CreateItems from "../components/CreateItems";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId.ts";
@@ -29,9 +29,6 @@ function AdminModifyEvent() {
   const [eventOrdersClosingTime, setEventOrdersClosingTime] =
     useState<string>("");
 
-  const [isEventModified, setIsEventModified] = useState<boolean>(false);
-  const [isReadyToModify, setIsReadyToModify] = useState<boolean>(false);
-
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   if (error) {
@@ -44,7 +41,6 @@ function AdminModifyEvent() {
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
   const [eventId, setEventId] = useState<string>("");
   const [itemsList, setItemsList] = useState<ModifyItem[]>([]);
-  const [itemsDeletedIds, setItemsDeletedIds] = useState<number[]>([]);
 
   const [eventData, setEventData] = useState<Event | null>(null);
   const [dishes, setDishes] = useState<Item[]>([]);
@@ -66,23 +62,7 @@ function AdminModifyEvent() {
       eventData?.form_closing_time.substring(0, 5) || ""
     );
     setEventImgUrl(eventData?.img_url || "");
-    if (eventData !== null) setIsReadyToModify(true);
   }, [eventData]);
-
-  useEffect(() => {
-    if (isReadyToModify) {
-      setIsEventModified(true);
-      console.log("event modified");
-    }
-  }, [
-    eventName,
-    eventDescription,
-    eventDate,
-    eventTime,
-    eventOrdersClosingDate,
-    eventOrdersClosingTime,
-    eventImgUrl,
-  ]);
 
   useEffect(() => {
     getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
@@ -127,7 +107,7 @@ function AdminModifyEvent() {
         setLoading(false);
         setActiveBgRemovals(0);
       },
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         setEventId(data);
         console.log("Event created successfully");
         setSuccess(true);
