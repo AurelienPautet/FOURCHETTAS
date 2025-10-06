@@ -21,7 +21,7 @@ function CardItem({
     <div
       className={`card bg-base-200 ${
         selected ? "border-accent border-2" : ""
-      } w-80 h-full shadow-sm`}
+      } w-80 h-fit shadow-sm`}
       onClick={onclick}
     >
       <figure className="px-10 pt-10 h-40 w-full flex justify-center items-center">
