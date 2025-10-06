@@ -6,7 +6,7 @@ import CardImageGen from "../components/CardImageGen";
 import type CreateItem from "../types/CreateItemType";
 import Logo from "../components/Logo";
 import CreateItems from "../components/CreateItems";
-import postEvent from "../utils/dbFetch/postEvent.ts";
+import postEvent from "../utils/dbFetch/postEvent";
 
 function AdminCreateEvent() {
   const [eventName, setEventName] = useState<string>("");

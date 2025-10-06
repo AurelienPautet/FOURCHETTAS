@@ -10,7 +10,7 @@ import Logo from "../components/Logo";
 import CreateItems from "../components/CreateItems";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
-import postEvent from "../utils/dbFetch/postEvent.ts";
+import postEvent from "../utils/dbFetch/postEvent";
 
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
