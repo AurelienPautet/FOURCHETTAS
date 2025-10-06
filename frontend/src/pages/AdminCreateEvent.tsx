@@ -5,7 +5,7 @@ import Calendar from "../components/Calendar";
 import CardImageGen from "../components/CardImageGen";
 import type CreateItem from "../types/CreateItemType";
 import Logo from "../components/Logo";
-import postEvent from "../utils/dbFetch/postEvent";
+import postEvent from "../utils/dbFetch/postEvent.ts";
 import CreateItems from "../components/CreateItems";
 
 function AdminCreateEvent() {
