@@ -7,10 +7,10 @@ import Calendar from "../components/Calendar";
 import CardImageGen from "../components/CardImageGen";
 import type ModifyItem from "../types/ModifyItemType";
 import Logo from "../components/Logo";
-import postEvent from "../utils/dbFetch/postEvent.ts";
 import CreateItems from "../components/CreateItems";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
+import postEvent from "../utils/dbFetch/postEvent.ts";
 
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
