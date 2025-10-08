@@ -41,22 +41,23 @@ export const deleteItemByEventId = async (req, res = false) => {
 };
 
 export const createItem = async (req, res) => {
-  const body = req.body;
-  if (!body.items) {
+  const { items, eventid } = req.body;
+  console.log("Creating items with body:", items);
+  if (!items) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
     const insertedItems = [];
 
-    for (const item of body.items) {
+    for (const item of items) {
       const result = await client.query(
         "INSERT INTO items (name, description, price, event_id,img_url,type,quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
         [
           item.name,
           item.description,
           Number(item.price),
-          body.event_id,
+          eventid,
           item.img_url,
           item.type,
           item.quantity,
@@ -65,7 +66,7 @@ export const createItem = async (req, res) => {
       insertedItems.push(result.rows[0]);
     }
 
-    res.status(201).json(body.event_id);
+    res.status(201).json(insertedItems);
   } catch (err) {
     console.error("Error creating item", err.stack);
     res.status(500).json({ error: "Internal server error" });
@@ -73,8 +74,8 @@ export const createItem = async (req, res) => {
 };
 
 export const deleteItems = async (req, res) => {
-  const { itemIds } = req.body;
-
+  const itemIds = req.body;
+  console.log("Deleting items with IDs:", itemIds);
   if (!Array.isArray(itemIds) || itemIds.length === 0) {
     return res.status(400).json({ error: "Invalid item IDs" });
   }
@@ -97,7 +98,8 @@ export const deleteItems = async (req, res) => {
 };
 
 export const updateItems = async (req, res) => {
-  const { items } = req.body;
+  const items = req.body;
+  console.log("Updating items with data:", items);
   if (items.length === 0) {
     return res.status(400).json({ error: "Invalid items data" });
   }
