@@ -35,7 +35,8 @@ function ListOrders({ orders, itemsMap }: AdminOrdersChildProps) {
           .toLowerCase()
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "")
-          .includes(lowerCaseQuery)
+          .includes(lowerCaseQuery) ||
+        order.phone.includes(lowerCaseQuery)
     );
     setFilteredOrders(filtered);
   }
