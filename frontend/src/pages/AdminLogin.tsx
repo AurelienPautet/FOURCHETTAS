@@ -37,6 +37,7 @@ function AdminLogin() {
           placeholder="Mot de passe admin"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onSubmit={handleLogin}
         />
         {error && (
           <div className="text-error">Mot de passe incorrect, réessayez.</div>
