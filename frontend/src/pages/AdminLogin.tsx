@@ -9,14 +9,18 @@ function AdminLogin() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/admin';
+  const from = location.state?.from?.pathname || "/admin";
 
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
 
   const handleLogin = async () => {
-    if (password && await login(password)) {
-      navigate(from, { replace: true });
-    } else {
+    if (password) {
+      const success = await login(password);
+      if (success) navigate(from, { replace: true });
+      else {
+        setError(true);
+      }
     }
   };
 
@@ -25,16 +29,21 @@ function AdminLogin() {
       <NavbarSpacer />
       <div className="flex-grow h-full w-full flex flex-col items-center justify-center gap-4">
         <Logo />
-      <input
-          className="input text-2xl rounded-md"
+        <input
+          className={`input text-2xl rounded-md ${error && "input-error"}`}
           type="password"
-              key="admin-password"
-              ref={null}
-              placeholder="Mot de passe admin"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-      <button className="btn mr-4 btn-accent" onClick={handleLogin}>Se connecter</button>
+          key="admin-password"
+          ref={null}
+          placeholder="Mot de passe admin"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && (
+          <div className="text-error">Mot de passe incorrect, réessayez.</div>
+        )}
+        <button className="btn mr-4 btn-accent" onClick={handleLogin}>
+          Se connecter
+        </button>
       </div>
     </div>
   );
