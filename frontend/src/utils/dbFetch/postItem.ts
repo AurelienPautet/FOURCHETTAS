@@ -1,24 +1,25 @@
 import api_url from "../../api_url";
+import type ModifyItem from "../../types/ModifyItemType";
 import type resType from "../../types/ResType";
 
-interface putEventUpdateProps extends resType {
-  id: number;
-  eventData: any;
+interface postItemProps extends resType {
+  Items: ModifyItem[];
+  eventid: number;
 }
 
-export default async function putEventUpdate({
-  id,
-  eventData,
+export default async function postItem({
+  Items,
+  eventid,
   onRequestStart = () => {},
   onRequestEnd = () => {},
   onSuccess = () => {},
   onError = () => {},
-}: putEventUpdateProps) {
+}: postItemProps) {
   onRequestStart();
-  fetch(`${api_url}/api/events/${id}`, {
-    method: "PUT",
+  fetch(`${api_url}/api/items`, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(eventData),
+    body: JSON.stringify({ items: Items, eventid: eventid }),
   })
     .then((response) => {
       onRequestEnd();
@@ -29,7 +30,7 @@ export default async function putEventUpdate({
       return response.json();
     })
     .then((data) => {
-      console.log("Event modified successfully", data);
+      console.log("Item modified successfully", data);
       onSuccess();
     });
 }

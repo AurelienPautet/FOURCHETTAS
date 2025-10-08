@@ -10,11 +10,14 @@ import Logo from "../components/Logo";
 import CreateItems from "../components/CreateItems";
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
-import postEvent from "../utils/dbFetch/postEvent";
+import putEventUpdate from "../utils/dbFetch/putEventUpdate";
 
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
 import correctDate from "../utils/DateCorrector";
+import postItem from "../utils/dbFetch/postItem";
+import putItemUpdate from "../utils/dbFetch/putItemUpdate";
+import deleteItem from "../utils/dbFetch/deleteItem";
 
 function AdminModifyEvent() {
   let { id } = useParams();
@@ -41,6 +44,7 @@ function AdminModifyEvent() {
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
   const [eventId, setEventId] = useState<string>("");
   const [itemsList, setItemsList] = useState<ModifyItem[]>([]);
+  const [itemsToDelete, setItemsToDelete] = useState<ModifyItem[]>([]);
 
   const [eventData, setEventData] = useState<Event | null>(null);
   const [dishes, setDishes] = useState<Item[]>([]);
@@ -97,8 +101,70 @@ function AdminModifyEvent() {
     console.log("backgrounds removed");
     const putBody = createPutRequestBody();
     setRemovingBackground(false);
-    postEvent({
+
+    let newItems: ModifyItem[] = [];
+    let modifiedItems: ModifyItem[] = [];
+
+    for (let item of itemsList) {
+      if (item.new) {
+        newItems.push(item);
+      } else if (item.modified) {
+        modifiedItems.push(item);
+      }
+    }
+
+    if (newItems.length > 0) {
+      console.log("Posting new items", newItems);
+      postItem({
+        Items: newItems,
+        eventid: Number(id),
+        onRequestStart: () => {
+          console.log("Request started");
+        },
+        onRequestEnd: () => {
+          console.log("Request ended");
+        },
+        onSuccess: (data: any) => {
+          console.log("New items created successfully", data);
+        },
+      });
+    }
+
+    if (modifiedItems.length > 0) {
+      console.log("Posting modified items", modifiedItems);
+      putItemUpdate({
+        Items: modifiedItems,
+        onRequestStart: () => {
+          console.log("Request started");
+        },
+        onRequestEnd: () => {
+          console.log("Request ended");
+        },
+        onSuccess: (data: any) => {
+          console.log("Modified items updated successfully", data);
+        },
+      });
+    }
+
+    if (itemsToDelete.length > 0) {
+      console.log("Posting items to delete", itemsToDelete);
+      deleteItem({
+        Items: itemsToDelete,
+        onRequestStart: () => {
+          console.log("Request started");
+        },
+        onRequestEnd: () => {
+          console.log("Request ended");
+        },
+        onSuccess: (data: any) => {
+          console.log("Items deleted successfully", data);
+        },
+      });
+    }
+
+    putEventUpdate({
       eventData: putBody,
+      id: Number(id),
       onRequestStart: () => {
         console.log("Request started");
       },
@@ -131,15 +197,17 @@ function AdminModifyEvent() {
     setItemsList([newItem, ...itemsList]);
   }
 
-  function deleteItem(index: number) {
-    const updatedItems = itemsList.filter((_, i) => i !== index);
+  function deleteItemLocally(index: number) {
+    setItemsToDelete([itemsList[index], ...itemsToDelete]);
+    const updatedItems = [...itemsList];
+    updatedItems.splice(index, 1);
     setItemsList(updatedItems);
   }
 
   function setItemValue(
     index: number,
     field: keyof ModifyItem,
-    value: string | number
+    value: string | number | boolean
   ) {
     const updatedItems = [...itemsList];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
@@ -342,7 +410,7 @@ function AdminModifyEvent() {
           setItemValue={setItemValue}
           rmbg={removingBackground}
           setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItem}
+          deleteItem={deleteItemLocally}
         />
 
         <CreateItems
@@ -353,7 +421,7 @@ function AdminModifyEvent() {
           setItemValue={setItemValue}
           rmbg={removingBackground}
           setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItem}
+          deleteItem={deleteItemLocally}
         />
 
         <CreateItems
@@ -364,7 +432,7 @@ function AdminModifyEvent() {
           setItemValue={setItemValue}
           rmbg={removingBackground}
           setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItem}
+          deleteItem={deleteItemLocally}
         />
 
         <div className="flex flex-col w-full h-full items-center justify-center gap-4">

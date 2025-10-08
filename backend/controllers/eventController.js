@@ -29,8 +29,11 @@ export const deleteEvent = async (req, res) => {
 };
 
 export const updateEvent = (req, res) => {
+  console.log("Received request to update event");
   const body = req.body;
   const event_id = req.params.id;
+  console.log("Updating event with body:", body);
+  console.log("Event ID:", event_id);
   if (
     !body.title ||
     !body.description ||
