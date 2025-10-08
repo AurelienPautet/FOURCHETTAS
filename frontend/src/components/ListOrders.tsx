@@ -3,11 +3,7 @@ import type AdminOrdersChildProps from "../types/AdminOrdersChild";
 import ListOrdersListItem from "./ListOrdersListItem";
 import calculatePriceOrder from "../utils/calculatePriceOrder";
 
-
-function ListOrders({
-  orders,
-  itemsMap,
-}: AdminOrdersChildProps) {
+function ListOrders({ orders, itemsMap }: AdminOrdersChildProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const ordersWithPrices = useMemo(() => {
@@ -24,11 +20,22 @@ function ListOrders({
       setFilteredOrders(ordersWithPrices);
       return;
     }
-    const lowerCaseQuery = searchQuery.toLowerCase();
+    const lowerCaseQuery = searchQuery
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     let filtered = ordersWithPrices.filter(
       (order) =>
-        order.name.toLowerCase().includes(lowerCaseQuery) ||
-        order.firstname.toLowerCase().includes(lowerCaseQuery)
+        order.name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .includes(lowerCaseQuery) ||
+        order.firstname
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .includes(lowerCaseQuery)
     );
     setFilteredOrders(filtered);
   }
