@@ -20,7 +20,9 @@ export const getItemByEventId = async (req, res) => {
 export const deleteItemByEventId = async (req, res = false) => {
   const event_id = req.params.id;
   await client
-    .query("DELETE FROM items WHERE event_id =$1 RETURNING *", [event_id])
+    .query("UPDATE items SET deleted = TRUE WHERE event_id =$1 RETURNING *", [
+      event_id,
+    ])
     .then((result) => {
       if (result.rows.length === 0) {
         if (res !== false) {
@@ -82,7 +84,7 @@ export const deleteItems = async (req, res) => {
 
   try {
     const result = await client.query(
-      "DELETE FROM items WHERE id = ANY($1) RETURNING *",
+      "UPDATE items SET deleted = TRUE WHERE id = ANY($1) RETURNING *",
       [itemIds]
     );
 

@@ -15,7 +15,9 @@ export const deleteEvent = async (req, res) => {
   }
   const event_id = req.params.id;
   client
-    .query("DELETE FROM events WHERE id = $1 RETURNING *", [event_id])
+    .query("UPDATE events SET deleted = TRUE WHERE id = $1 RETURNING *", [
+      event_id,
+    ])
     .then((result) => {
       if (result.rows.length === 0) {
         return res.status(404).json({ error: "Event not found" });

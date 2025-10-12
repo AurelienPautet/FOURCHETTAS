@@ -105,7 +105,9 @@ export const getOrdersByEventId = (req, res) => {
 export const deleteOrder = (req, res) => {
   const orderId = req.params.id;
   client
-    .query("DELETE FROM orders WHERE id = $1 RETURNING *", [orderId])
+    .query("UPDATE orders SET deleted = TRUE WHERE id = $1 RETURNING *", [
+      orderId,
+    ])
     .then((result) => {
       if (result.rows.length === 0) {
         return res.status(404).json({ error: "Order not found" });
@@ -121,7 +123,9 @@ export const deleteOrder = (req, res) => {
 export const deleteOrderByEventId = (req, res = false) => {
   const orderId = req.params.id;
   client
-    .query("DELETE FROM orders WHERE event_id = $1 RETURNING *", [orderId])
+    .query("UPDATE orders SET deleted = TRUE WHERE event_id = $1 RETURNING *", [
+      orderId,
+    ])
     .then((result) => {
       if (result.rows.length === 0) {
         if (res !== false) {
@@ -146,7 +150,10 @@ export const getOrderByPhoneAndEvent = (req, res) => {
   console.log("Fetching order for phone:", phone, "and event_id:", event_id);
   console.log("Fetching order for phone:", phone, "and event_id:", event_id);
   client
-    .query("SELECT * FROM orders WHERE phone = $1 AND event_id = $2", [phone, event_id])
+    .query("SELECT * FROM orders WHERE phone = $1 AND event_id = $2", [
+      phone,
+      event_id,
+    ])
     .then((result) => {
       res.status(200).json(result.rows);
     })
@@ -154,7 +161,7 @@ export const getOrderByPhoneAndEvent = (req, res) => {
       console.error("Error fetching order by phone and event", err.stack);
       res.status(500).json({ error: "Internal server error" });
     });
-}
+};
 
 export const updateOrderContentByPhoneAndEvent = (req, res) => {
   const event_id = req.params.id;
@@ -166,12 +173,17 @@ export const updateOrderContentByPhoneAndEvent = (req, res) => {
     )
     .then((result) => {
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: "No orders found for this phone and event" });
+        return res
+          .status(404)
+          .json({ error: "No orders found for this phone and event" });
       }
       res.status(200).json(result.rows[0]);
     })
     .catch((err) => {
-      console.error("Error updating order content by phone and event", err.stack);
+      console.error(
+        "Error updating order content by phone and event",
+        err.stack
+      );
       res.status(500).json({ error: "Internal server error" });
     });
-}
+};
