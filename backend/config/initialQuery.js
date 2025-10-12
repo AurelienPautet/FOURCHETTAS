@@ -35,7 +35,7 @@ function initialQuery() {
             type VARCHAR(20) NOT NULL,
             quantity INT NOT NULL,
             img_url TEXT NOT NULL,
-            deleted BOOLEAN DEFAULT FALSE,
+            deleted BOOLEAN DEFAULT FALSE
         );
 
         CREATE TABLE IF NOT EXISTS orders (
