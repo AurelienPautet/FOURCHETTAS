@@ -1,3 +1,14 @@
+/*
+ DROP TABLE IF EXISTS orders_items CASCADE;
+        DROP TABLE IF EXISTS images CASCADE;
+        DROP TABLE IF EXISTS items_types CASCADE;
+        DROP TABLE IF EXISTS items_events CASCADE;
+        DROP TABLE IF EXISTS items_types_events CASCADE;
+        DROP TABLE IF EXISTS orders CASCADE;
+        DROP TABLE IF EXISTS items CASCADE;
+        DROP TABLE IF EXISTS events CASCADE;
+*/
+
 function initialQuery() {
   return `
 
@@ -10,12 +21,7 @@ function initialQuery() {
         CREATE TABLE IF NOT EXISTS orders_backup AS
              SELECT * FROM orders;
         
-        DROP TABLE IF EXISTS orders_items CASCADE;
-        DROP TABLE IF EXISTS items_events CASCADE;
-        DROP TABLE IF EXISTS items_types_events CASCADE;
-        DROP TABLE IF EXISTS orders CASCADE;
-        DROP TABLE IF EXISTS items CASCADE;
-        DROP TABLE IF EXISTS events CASCADE;
+       
 
         CREATE TABLE IF NOT EXISTS events (
           	id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -25,6 +31,7 @@ function initialQuery() {
             time TIME NOT NULL,
             form_closing_date DATE NOT NULL,
             form_closing_time TIME NOT NULL,
+            img_url TEXT NOT NULL,
             deleted BOOLEAN DEFAULT FALSE
         );
         CREATE TABLE IF NOT EXISTS items (
@@ -69,7 +76,7 @@ function initialQuery() {
 
         CREATE TABLE IF NOT EXISTS items_types (
             id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            name VARCHAR(50) NOT NULL 
+            name VARCHAR(50) UNIQUE NOT NULL 
         );
 
         CREATE TABLE IF NOT EXISTS items_types_events (

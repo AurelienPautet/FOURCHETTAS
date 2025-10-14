@@ -1,7 +1,8 @@
 import client from "../config/db.js";
 import { createItem, deleteItemByEventId } from "./itemController.js";
 import { deleteOrderByEventId } from "./orderController.js";
-
+import { serverUrl } from "../index.js";
+import { saveImageToDb } from "./imagesController.js";
 export const deleteEvent = async (req, res) => {
   try {
     await deleteOrderByEventId(req);
@@ -129,7 +130,7 @@ export const getEventById = (req, res) => {
     });
 };
 
-export const createEvent = (req, res) => {
+export const createEvent = async (req, res) => {
   const body = req.body;
   if (
     !body.title ||
@@ -138,13 +139,18 @@ export const createEvent = (req, res) => {
     !body.time ||
     !body.form_closing_date ||
     !body.form_closing_time ||
-    !body.img_url
+    !body.img_url ||
+    !body.items ||
+    !body.types
   ) {
     return res.status(400).json({ error: "Missing required fields" });
   }
+
   console.log("Creating event with body:", body);
-  client
-    .query(
+  try {
+    client.query("BEGIN");
+    const eventImgId = await saveImageToDb(body.img_url);
+    let result = await client.query(
       "INSERT INTO events (title, description, date, time, form_closing_date, form_closing_time, img_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
       [
         body.title,
@@ -153,15 +159,50 @@ export const createEvent = (req, res) => {
         body.time,
         body.form_closing_date,
         body.form_closing_time,
-        body.img_url,
+        `${serverUrl}/api/images/${eventImgId.rows[0].id}`,
       ]
-    )
-    .then((result) => {
-      req.body["event_id"] = result.rows[0].id;
-      createItem(req, res);
-    })
-    .catch((err) => {
-      console.error("Error creating event", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+    );
+    let eventId = result.rows[0].id;
+    console.log("Created event with ID:", eventId);
+
+    for (let type of body.types) {
+      console.log("Processing type:", type);
+      let typeId = await client.query(
+        "INSERT INTO items_types (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
+        [type.name]
+      );
+      console.log("Inserted type:", typeId.rows[0]);
+      await client.query(
+        "INSERT INTO items_types_events (type_id, event_id,order_index,is_required) VALUES ($1, $2, $3, $4)",
+        [typeId.rows[0].id, eventId, type.order_index, type.is_required]
+      );
+      console.log("Linked type to event:", typeId.rows[0].id, eventId);
+    }
+    for (let item of body.items) {
+      const imageId = await saveImageToDb(item.img_url);
+      console.log("Inserted image for item:", imageId.rows[0]);
+      const inserted_item = await client.query(
+        "INSERT INTO items (name, description, price,img_url,type,quantity) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+        [
+          item.name,
+          item.description,
+          Number(item.price),
+          `${serverUrl}/api/images/${imageId.rows[0].id}`,
+          item.type,
+          item.quantity,
+        ]
+      );
+      console.log("Inserted item:", inserted_item.rows[0]);
+      await client.query(
+        "INSERT INTO items_events (item_id, event_id,type_id) VALUES ($1, $2, (SELECT id FROM items_types WHERE name=$3))",
+        [inserted_item.rows[0].id, eventId, item.type]
+      );
+    }
+    await client.query("COMMIT");
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Error creating event", error.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };

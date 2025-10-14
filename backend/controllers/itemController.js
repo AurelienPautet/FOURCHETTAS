@@ -43,7 +43,7 @@ export const deleteItemByEventId = async (req, res = false) => {
 };
 
 export const createItem = async (req, res) => {
-  const { items, eventid } = req.body;
+  const { items } = req.body;
   console.log("Creating items with body:", items);
   if (!items) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -53,22 +53,27 @@ export const createItem = async (req, res) => {
     const insertedItems = [];
 
     for (const item of items) {
+      const imageId = await client.query(
+        "INSERT INTO images (data) VALUES ($1) RETURNING id",
+        [[Buffer.from(item.img_url, "utf-8")]]
+      );
+
       const result = await client.query(
-        "INSERT INTO items (name, description, price, event_id,img_url,type,quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+        "INSERT INTO items (name, description, price,img_url,type,quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
         [
           item.name,
           item.description,
           Number(item.price),
-          eventid,
-          item.img_url,
+          `${serverUrl}/api/images/${imageId.rows[0].id}`,
           item.type,
           item.quantity,
         ]
       );
+
       insertedItems.push(result.rows[0]);
     }
-
     res.status(201).json(insertedItems);
+    return insertedItems;
   } catch (err) {
     console.error("Error creating item", err.stack);
     res.status(500).json({ error: "Internal server error" });

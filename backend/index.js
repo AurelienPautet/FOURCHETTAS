@@ -51,9 +51,14 @@ app.get("/api/health", (req, res) => {
 });
 
 if (process.env.NODE_ENV !== "production") {
+  var serverUrl = `http://localhost:${PORT}`;
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
+} else {
+  serverUrl = "https://fourchettas.vercel.app";
 }
+
+export { serverUrl };
 
 export default app;
