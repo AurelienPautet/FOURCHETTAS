@@ -3,14 +3,15 @@ import client from "../config/db.js";
 export const getImage = (req, res) => {
   const imageId = req.params.id;
   client
-    .query("SELECT data FROM images WHERE id = $1", [imageId])
+    .query("SELECT data, mime_type FROM images WHERE id = $1", [imageId])
     .then((result) => {
       if (result.rows.length === 0) {
         return res.status(404).json({ error: "Image not found" });
       }
       const imageBuffer = result.rows[0].data;
+      const mimeType = result.rows[0].mime_type;
       res.writeHead(200, {
-        "Content-Type": "image/jpeg",
+        "Content-Type": mimeType,
         "Cross-Origin-Resource-Policy": "cross-origin",
       });
       res.end(imageBuffer);
@@ -30,7 +31,10 @@ export function saveImageToDb(data) {
     throw new Error("Invalid image data format");
   }
   return client
-    .query("INSERT INTO images (data) VALUES ($1) RETURNING id", [imageBuffer])
+    .query("INSERT INTO images (data,mime_type) VALUES ($1,$2) RETURNING id", [
+      imageBuffer,
+      "image/jpeg",
+    ])
     .then((result) => result);
 }
 

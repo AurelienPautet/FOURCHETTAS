@@ -62,6 +62,7 @@ function initialQuery() {
         CREATE TABLE IF NOT EXISTS images (
             id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
             data BYTEA NOT NULL,
+            mime_type VARCHAR(50) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
