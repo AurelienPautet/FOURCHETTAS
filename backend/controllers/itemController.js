@@ -4,7 +4,7 @@ export const getItemByEventId = async (req, res) => {
   const event_id = req.params.id;
   try {
     const result = await client.query(
-      "SELECT * FROM items WHERE event_id = $1",
+      "SELECT items.id,name,description,price,(SELECT name FROM items_types WHERE items_types.name = items.type) AS type,quantity,img_url FROM items join items_events ON items.id = items_events.item_id WHERE items_events.event_id = $1",
       [event_id]
     );
     if (result.rows.length === 0) {

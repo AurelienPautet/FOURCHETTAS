@@ -10,12 +10,14 @@ import TextDate from "../components/TextDate";
 
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
+import type Type from "../types/TypeType";
 
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
 import postOrder from "../utils/dbFetch/postOrder";
 import Logo from "../components/Logo";
 import correctDate from "../utils/DateCorrector";
+import getTypesFromEventId from "../utils/dbFetch/getTypesFromEventId";
 
 function UserForm() {
   const maxTabs = 4;
@@ -23,12 +25,20 @@ function UserForm() {
   let event_id = parseInt(id || "0");
   const [currentTab, setCurrentTab] = useState(0);
 
-  const [transitionState, setTransitionState] = useState({
+  const [transitionState, setTransitionState] = useState<{
+    [key: number]: string;
+  }>({
     0: "idle",
     1: "idle",
     2: "idle",
     3: "idle",
     4: "idle",
+    5: "idle",
+    6: "idle",
+    7: "idle",
+    8: "idle",
+    9: "idle",
+    10: "idle",
   });
 
   const [ErrorIndicator, setErrorIndicator] = useState({
@@ -51,13 +61,10 @@ function UserForm() {
     const storedPhone = localStorage.getItem("phone");
     return storedPhone ? storedPhone : "";
   });
-  const [dishID, setDishID] = useState(0);
-  const [sideID, setSideID] = useState(0);
-  const [drinkID, setDrinkID] = useState(0);
+  const [items, setItems] = useState<Item[]>([]);
+  const [types, setTypes] = useState<Type[]>([]);
 
-  const [dishes, setDishes] = useState<Item[]>([]);
-  const [sides, setSides] = useState<Item[]>([]);
-  const [drinks, setDrinks] = useState<Item[]>([]);
+  const [orderedItems, setOrderedItems] = useState<Item[]>([]);
 
   const [eventData, setEventData] = useState<Event>();
 
@@ -81,7 +88,8 @@ function UserForm() {
   }, []);
 
   useEffect(() => {
-    getItemsFromEventId(event_id, setDishes, setSides, setDrinks);
+    getTypesFromEventId(event_id, setTypes);
+    getItemsFromEventId(event_id, setItems);
   }, []);
 
   function densePostOrder() {
@@ -90,9 +98,7 @@ function UserForm() {
       name: name,
       firstName: firstName,
       phone: phone,
-      dish_id: dishID,
-      side_id: sideID,
-      drink_id: drinkID,
+      items: orderedItems,
       onRequestStart: () => {
         setOrdering(true);
         setErrorIndicator({
@@ -149,8 +155,14 @@ function UserForm() {
           phoneInputRef.current?.setCustomValidity("Dois être de 10 chiffres");
           isValid = false;
         }
-      } else if (currentTab === 1) {
-        isValid = dishID > 0;
+      } else if (currentTab > 0 && currentTab < 1 + types.length) {
+        isValid = true;
+        if (types[currentTab - 1].is_required) {
+          isValid =
+            orderedItems.filter(
+              (item) => item.type === types[currentTab - 1].name
+            ).length > 0;
+        }
         if (!isValid) {
           setErrorIndicator({
             has: true,
@@ -291,105 +303,77 @@ function UserForm() {
             </fieldset>
           </fieldset>
         </TransitionDiv>
-        <TransitionDiv
-          state={transitionState[1]}
-          show={currentTab === 1}
-          classes={`flex-grow  flex flex-col gap-3  w-full items-center justify-center`}
-        >
-          <h1 className="mb-3 w-full text-center text-3xl font-bold">
-            Tu veux quoi ?
-          </h1>
-          <div className="flex flex-row flex-wrap justify-center gap-2">
-            {dishes.map((dish: Item) => (
-              <CardItem
-                key={dish.id}
-                title={dish.name}
-                description={dish.description}
-                price={dish.price}
-                quantity={dish.quantity}
-                img_url={dish.img_url}
-                onclick={() => {
-                  setDishID(dish.id);
-                  setErrorIndicator({
-                    has: false,
-                    message: "",
-                  });
-                }}
-                selected={dishID === dish.id}
-              />
-            ))}
-          </div>
-        </TransitionDiv>
+        {types.map((type, index) => (
+          <TransitionDiv
+            state={transitionState[1 + index]}
+            show={currentTab === 1 + index}
+            classes={`flex-grow  flex flex-col gap-3  w-full items-center justify-center`}
+          >
+            <h1 className="mb-3 w-full text-center text-3xl font-bold">
+              Tu veux quoi ?
+            </h1>
+            <div className="flex flex-row flex-wrap justify-center gap-2">
+              {items
+                .filter((item) => item.type === type.name)
+                .map((dish: Item) => (
+                  <CardItem
+                    key={dish.id}
+                    title={dish.name}
+                    description={dish.description}
+                    price={dish.price}
+                    quantity={dish.quantity}
+                    img_url={dish.img_url}
+                    ordered_quantity={
+                      orderedItems.find((item) => item.id === dish.id)
+                        ?.ordered_quantity || 0
+                    }
+                    onChangeOrderedQuantity={(toAdd: number) => {
+                      console.log("Changing quantity for:", dish.id);
+                      setOrderedItems((prev) => {
+                        return prev
+                          .map((item) => {
+                            if (item.id === dish.id) {
+                              let newQuantity =
+                                (item.ordered_quantity || 0) + toAdd;
+                              if (newQuantity <= 0) {
+                                newQuantity = 0;
+                                return null;
+                              }
+                              return { ...item, ordered_quantity: newQuantity };
+                            }
+                            return item;
+                          })
+                          .filter((item): item is Item => item !== null);
+                      });
+                    }}
+                    onclick={() => {
+                      setOrderedItems((prev) => {
+                        let exists = prev.find((item) => item.id === dish.id);
+                        if (exists) {
+                          return prev.filter((item) => item.id !== dish.id);
+                        } else {
+                          return [...prev, { ...dish, ordered_quantity: 1 }];
+                        }
+                      });
+                      console.log(orderedItems);
+
+                      setErrorIndicator({
+                        has: false,
+                        message: "",
+                      });
+                    }}
+                    selected={orderedItems.some(
+                      (orderedItem) => orderedItem.id === dish.id
+                    )}
+                  />
+                ))}
+            </div>
+          </TransitionDiv>
+        ))}
 
         <TransitionDiv
-          state={transitionState[2]}
-          show={currentTab === 2}
-          classes={`flex-grow flex flex-col gap-3  w-full items-center justify-center`}
-        >
-          <h1 className="mb-3 w-full text-center text-3xl font-bold">
-            Un accompagnement ?
-          </h1>
-          <div className="flex flex-row flex-wrap justify-center gap-2">
-            <CardItem
-              title="Non merci"
-              description="J'ai un petit appétit aujourd'hui, rien pour moi."
-              price={0}
-              quantity={0}
-              img_url="https://cdn.pixabay.com/photo/2013/07/13/12/32/cross-159808_960_720.png"
-              onclick={() => setSideID(0)}
-              selected={sideID === 0}
-            />
-            {sides.map((side: Item) => (
-              <CardItem
-                key={side.id}
-                title={side.name}
-                description={side.description}
-                price={side.price}
-                quantity={side.quantity}
-                img_url={side.img_url}
-                onclick={() => setSideID(side.id)}
-                selected={sideID === side.id}
-              />
-            ))}
-          </div>
-        </TransitionDiv>
-
-        <TransitionDiv
-          state={transitionState[3]}
-          show={currentTab === 3}
-          classes={` flex-grow flex flex-col gap-3 w-full items-center justify-center`}
-        >
-          <h1 className="mb-3 w-full text-center text-3xl font-bold">
-            Une boisson ?
-          </h1>
-          <div className="flex flex-row flex-wrap justify-center gap-2">
-            <CardItem
-              title="Non merci"
-              description="Je préfère boire de l'eau."
-              price={0}
-              quantity={0}
-              img_url="https://cdn.pixabay.com/photo/2013/07/13/12/32/cross-159808_960_720.png"
-              onclick={() => setDrinkID(0)}
-              selected={drinkID === 0}
-            />
-            {drinks.map((drink: Item) => (
-              <CardItem
-                key={drink.id}
-                title={drink.name}
-                description={drink.description}
-                price={drink.price}
-                quantity={drink.quantity}
-                img_url={drink.img_url}
-                onclick={() => setDrinkID(drink.id)}
-                selected={drinkID === drink.id}
-              />
-            ))}
-          </div>
-        </TransitionDiv>
-
-        <TransitionDiv
-          state={transitionState[4]}
-          show={currentTab === 4}
+          state={transitionState[1 + types.length]}
+          show={currentTab === 1 + types.length}
           classes={`flex-grow flex flex-col gap-3 w-full items-center justify-center`}
         >
           {eventData ? (
@@ -398,9 +382,8 @@ function UserForm() {
               name={name}
               firstName={firstName}
               phone={phone}
-              dish={dishes.find((d) => d.id === dishID) || null}
-              side={sides.find((s) => s.id === sideID) || null}
-              drink={drinks.find((d) => d.id === drinkID) || null}
+              types={types}
+              orderedItems={orderedItems}
               onClick={() => densePostOrder()}
               ordering={ordering}
             />
@@ -442,16 +425,19 @@ function UserForm() {
             <li className={`step ${currentTab >= 0 && "step-accent"}`}>
               C qui ?
             </li>
-            <li className={`step ${currentTab >= 1 && "step-accent"}`}>
-              Plats
-            </li>
-            <li className={`step ${currentTab >= 2 && "step-accent"}`}>
-              Extras
-            </li>
-            <li className={`step ${currentTab >= 3 && "step-accent"}`}>
-              Boissons
-            </li>
-            <li className={`step ${currentTab >= 4 && "step-accent"}`}>
+            {types.map((type, index) => (
+              <li
+                key={"step-indicator-" + index}
+                className={`step ${currentTab >= 1 + index && "step-accent"}`}
+              >
+                {type.name}s
+              </li>
+            ))}
+            <li
+              className={`step ${
+                currentTab >= 1 + types.length && "step-accent"
+              }`}
+            >
               Résumé
             </li>
           </ul>

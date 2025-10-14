@@ -1,4 +1,5 @@
 import api_url from "../../api_url.ts";
+import type Item from "../../types/ItemType.ts";
 import type resType from "../../types/ResType.ts";
 
 interface orderData {
@@ -6,28 +7,16 @@ interface orderData {
   name: string;
   firstName: string;
   phone: string;
-  dish_id: number;
-  side_id: number;
-  drink_id: number;
+  items: Item[];
 }
 
-function orderJson({
-  event_id,
-  name,
-  firstName,
-  phone,
-  dish_id,
-  side_id,
-  drink_id,
-}: orderData) {
+function orderJson({ event_id, name, firstName, phone, items }: orderData) {
   let res_json = {
     event_id: event_id,
     name: name,
     firstname: firstName,
     phone: phone,
-    dish_id: dish_id,
-    side_id: side_id > 0 ? side_id : null,
-    drink_id: drink_id > 0 ? drink_id : null,
+    items,
   };
 
   return res_json;
@@ -40,9 +29,7 @@ export default async function postOrder({
   name,
   firstName,
   phone,
-  dish_id,
-  side_id,
-  drink_id,
+  items,
   onRequestStart = () => {},
   onRequestEnd = () => {},
   onSuccess = () => {},
@@ -60,9 +47,7 @@ export default async function postOrder({
         name,
         firstName,
         phone,
-        dish_id,
-        side_id,
-        drink_id,
+        items,
       })
     ),
   })

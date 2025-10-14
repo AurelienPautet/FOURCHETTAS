@@ -1,3 +1,6 @@
+import MinusSvg from "./MinusSvg";
+import AddSvg from "./AddSvg";
+
 interface InputFieldProps {
   title: string;
   description: string;
@@ -5,7 +8,9 @@ interface InputFieldProps {
   quantity: number;
   img_url: string;
   selected: boolean;
+  ordered_quantity: number;
   onclick?: () => void;
+  onChangeOrderedQuantity: (toAdd: number) => void;
 }
 
 function CardItem({
@@ -16,6 +21,8 @@ function CardItem({
   img_url,
   selected = false,
   onclick,
+  ordered_quantity,
+  onChangeOrderedQuantity,
 }: InputFieldProps) {
   return (
     <div
@@ -43,6 +50,24 @@ function CardItem({
         <h2 className="text-lg font-bold">{price}€</h2>
 
         <p className="whitespace-pre-line">{description}</p>
+        <div
+          className={`flex flex-row justify-center items-center gap-3 ${
+            ordered_quantity === 0 ? "invisible" : ""
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <MinusSvg
+            className=" w-7 hover:w-8 "
+            fill="fill-accent"
+            onClick={() => onChangeOrderedQuantity(-1)}
+          />
+          <h3 className="text-xl font-bold"> {ordered_quantity}</h3>
+          <AddSvg
+            className=" w-7 hover:w-8 "
+            fill="fill-accent"
+            onClick={() => onChangeOrderedQuantity(1)}
+          />
+        </div>
       </div>
     </div>
   );

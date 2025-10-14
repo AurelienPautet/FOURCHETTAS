@@ -76,7 +76,9 @@ export const updateEvent = (req, res) => {
 
 export const getUpcomingEvents = (req, res) => {
   client
-    .query("SELECT * FROM events WHERE date >= CURRENT_DATE ORDER BY date ASC")
+    .query(
+      "SELECT * FROM events WHERE date >= CURRENT_DATE AND deleted = FALSE ORDER BY date ASC"
+    )
     .then((result) => {
       res.status(200).json(result.rows);
     })
@@ -90,7 +92,7 @@ export const getUpcomingEventsWithPhoneOrder = (req, res) => {
   const phone = req.params.phone;
   client
     .query(
-      "SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e LEFT JOIN orders o ON e.id = o.event_id  AND o.phone = $1 WHERE date >= CURRENT_DATE ORDER BY date ASC",
+      "SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e LEFT JOIN orders o ON e.id = o.event_id  AND o.phone = $1 WHERE date >= CURRENT_DATE AND e.deleted = FALSE ORDER BY date ASC",
       [phone]
     )
     .then((result) => {
@@ -104,7 +106,9 @@ export const getUpcomingEventsWithPhoneOrder = (req, res) => {
 
 export const getOldEvents = (req, res) => {
   client
-    .query("SELECT * FROM events WHERE date < CURRENT_DATE ORDER BY date ASC")
+    .query(
+      "SELECT * FROM events WHERE date < CURRENT_DATE AND deleted = FALSE ORDER BY date ASC"
+    )
     .then((result) => {
       res.status(200).json(result.rows);
     })
@@ -199,7 +203,7 @@ export const createEvent = async (req, res) => {
       );
     }
     await client.query("COMMIT");
-    res.status(201).json(result.rows[0]);
+    res.status(201).json(eventId);
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Error creating event", error.stack);
