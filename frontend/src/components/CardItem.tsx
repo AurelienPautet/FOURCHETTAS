@@ -61,7 +61,7 @@ function CardItem({
             fill="fill-accent"
             onClick={() => onChangeOrderedQuantity(-1)}
           />
-          <h3 className="text-xl font-bold"> {ordered_quantity}</h3>
+          <h3 className="text-xl font-bold select-none"> {ordered_quantity}</h3>
           <AddSvg
             className=" w-7 hover:w-8 "
             fill="fill-accent"
