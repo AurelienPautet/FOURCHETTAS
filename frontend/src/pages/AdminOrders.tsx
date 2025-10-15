@@ -11,10 +11,12 @@ import PieItems from "../components/PieItems.tsx";
 import type Event from "../types/EventType";
 import type Item from "../types/ItemType";
 import type Order from "../types/OrderType";
+import type Type from "../types/TypeType";
 
 import getEventFromId from "../utils/dbFetch/getEventFromId";
 import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
 import getOrdersFromEventId from "../utils/dbFetch/getOrdersFromEventId";
+import getTypesFromEventId from "../utils/dbFetch/getTypesFromEventId.ts";
 
 function AdminOrders() {
   let { id } = useParams();
@@ -26,9 +28,8 @@ function AdminOrders() {
   }
 
   const [eventData, setEventData] = useState<Event | null>(null);
-  const [dishes, setDishes] = useState<Item[]>([]);
-  const [sides, setSides] = useState<Item[]>([]);
-  const [drinks, setDrinks] = useState<Item[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
+  const [types, setTypes] = useState<Type[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
 
   const [itemsMap, setItemsMap] = useState<Map<number, Item>>(new Map());
@@ -41,19 +42,24 @@ function AdminOrders() {
     if (eventData) {
       setItemsInMap();
     }
-  }, [dishes, sides, drinks]);
+  }, [items]);
 
   function setItemsInMap() {
     const map = new Map<number, Item>();
-    [...dishes, ...sides, ...drinks].forEach((item) => {
+    items.forEach((item) => {
       map.set(item.id, item);
     });
     setItemsMap(map);
   }
 
   useEffect(() => {
-    getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
-    console.log(dishes, sides, drinks);
+    getItemsFromEventId(Number(id), setItems);
+    console.log(items);
+  }, [eventData]);
+
+  useEffect(() => {
+    getTypesFromEventId(Number(id), setTypes);
+    console.log(items);
   }, [eventData]);
 
   useEffect(() => {
@@ -96,11 +102,10 @@ function AdminOrders() {
           <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
             <OverviewOrder
               event={eventData}
-              dishes={dishes}
-              sides={sides}
-              drinks={drinks}
+              items={items}
               orders={orders}
               itemsMap={itemsMap}
+              types={types}
             />
           </div>
 
@@ -140,9 +145,8 @@ function AdminOrders() {
               </div>
               <ListOrders
                 event={eventData}
-                dishes={dishes}
-                sides={sides}
-                drinks={drinks}
+                items={items}
+                types={types}
                 orders={orders}
                 itemsMap={itemsMap}
               />{" "}

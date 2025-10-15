@@ -1,5 +1,6 @@
 import type Order from "../types/OrderType";
 import type Item from "../types/ItemType";
+import type Type from "../types/TypeType";
 import type AdminOrdersChildProps from "../types/AdminOrdersChild";
 import PieItems from "./PieItems";
 import { useState, useEffect } from "react";
@@ -7,9 +8,8 @@ import { useState, useEffect } from "react";
 import calculateCA from "../utils/calculateCA";
 
 function OverviewOrder({
-  dishes,
-  sides,
-  drinks,
+  items,
+  types,
   orders,
   itemsMap,
 }: AdminOrdersChildProps) {
@@ -20,29 +20,34 @@ function OverviewOrder({
     price: 0,
     description: "Rien n'a été commandé",
     image: "",
-    event_id: 0,
     created_at: "",
   };
 
   console.log("Items Map:", itemsMap);
 
-  function generatePieDataForItems(
-    items: Item[],
-    idName: "dish_id" | "side_id" | "drink_id"
-  ) {
-    let pieData = [...items, emptyItem].map((item) => ({
-      name: (item.quantity > 1 ? item.quantity + "x " : "") + item.name,
-      value: orders.reduce((acc, order) => {
-        if (order[idName] === item.id) {
-          return acc + 1;
-        }
-        if (order[idName] === null && item.id === 0) {
-          return acc + 1;
-        }
-        return acc;
-      }, 0),
-    }));
-    pieData = pieData.filter((item) => item.value > 0);
+  function generatePieDataForItems(filteredItems: Item[], idName: string) {
+    const pieData = filteredItems
+      .map((item) => {
+        const totalQuantity = orders.reduce((acc, order) => {
+          const orderedItem = order.items.find((it) => it.item_id === item.id);
+          return acc + (orderedItem?.ordered_quantity ?? 0);
+        }, 0);
+
+        return {
+          name:
+            item.quantity > 1 ? `${item.quantity}x ${item.name}` : item.name,
+          value: totalQuantity,
+        };
+      })
+      .filter((item) => item.value > 0);
+
+    // Add empty item if no orders exist
+    if (pieData.length === 0) {
+      pieData.push({
+        name: emptyItem.name,
+        value: 1,
+      });
+    }
 
     return pieData;
   }
@@ -77,7 +82,9 @@ function OverviewOrder({
         <div className="stats shadow h-30 w-50 bg-base-200">
           <div className="stat">
             <div className="stat-title">Prix moyen commande</div>
-            <div className="stat-value">{(CA / orders.length).toFixed(2)} €</div>
+            <div className="stat-value">
+              {(CA / orders.length).toFixed(2)} €
+            </div>
             <div className="stat-desc">les rats</div>
           </div>
         </div>
@@ -99,18 +106,17 @@ function OverviewOrder({
       <h1 className="text-2xl font-bold">Résumé des commandes</h1>
       <div className="flex flex-col gap-4"></div>
       <div className="flex w-full h-full flex-row flex-wrap  justify-center items-start ">
-        <PieItems
-          data={generatePieDataForItems(dishes, "dish_id")}
-          labelString="Plats"
-        />
-        <PieItems
-          data={generatePieDataForItems(sides, "side_id")}
-          labelString="Extras"
-        />
-        <PieItems
-          data={generatePieDataForItems(drinks, "drink_id")}
-          labelString="Boissons"
-        />
+        {types.map((type: Type) => {
+          const idName = type.name.toLowerCase() + "_id";
+          const filteredItems = items.filter((item) => item.type === type.name);
+          return (
+            <PieItems
+              key={type.name}
+              data={generatePieDataForItems(filteredItems, idName)}
+              labelString={type.name}
+            />
+          );
+        })}
       </div>
     </div>
   );

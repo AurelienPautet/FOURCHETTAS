@@ -57,14 +57,14 @@ function CardItem({
           onClick={(e) => e.stopPropagation()}
         >
           <MinusSvg
-            className=" w-7 hover:w-8 "
-            fill="fill-accent"
+            className=" w-7 hover:w-8 mb-1 hover:mb-0 "
+            fill="fill-base-content hover:fill-accent"
             onClick={() => onChangeOrderedQuantity(-1)}
           />
           <h3 className="text-xl font-bold select-none"> {ordered_quantity}</h3>
           <AddSvg
-            className=" w-7 hover:w-8 "
-            fill="fill-accent"
+            className=" w-7 hover:w-8 mb-1 hover:mb-0 "
+            fill="fill-base-content hover:fill-accent"
             onClick={() => onChangeOrderedQuantity(1)}
           />
         </div>

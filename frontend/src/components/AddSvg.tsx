@@ -2,7 +2,7 @@ function AddSvg({ className = "", fill = "fill-accent", onClick = () => {} }) {
   return (
     <svg
       viewBox="0 -0.5 21 21"
-      className={className}
+      className={className + fill}
       version="1.1"
       onClick={onClick}
       xmlns="http://www.w3.org/2000/svg"
@@ -10,17 +10,10 @@ function AddSvg({ className = "", fill = "fill-accent", onClick = () => {} }) {
       <title>plus_circle [#1427]</title>
       <desc>Created with Sketch.</desc>
       <defs></defs>
-      <g
-        id="Page-1"
-        stroke="none"
-        stroke-width="1"
-        fill="none"
-        fill-rule="evenodd"
-      >
+      <g id="Page-1" stroke="none" stroke-width="1" fill-rule="evenodd">
         <g
           id="Dribbble-Light-Preview"
           transform="translate(-179.000000, -600.000000)"
-          className={fill}
         >
           <g id="icons" transform="translate(56.000000, 160.000000)">
             <path
