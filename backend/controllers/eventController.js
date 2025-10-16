@@ -31,7 +31,7 @@ export const deleteEvent = async (req, res) => {
     });
 };
 
-export const updateEvent = (req, res) => {
+export const updateEvent = async (req, res) => {
   console.log("Received request to update event");
   const body = req.body;
   const event_id = req.params.id;
@@ -48,8 +48,11 @@ export const updateEvent = (req, res) => {
   ) {
     return res.status(400).json({ error: "Missing required fields" });
   }
-  client
-    .query(
+
+  try {
+    await client.query("BEGIN");
+
+    await client.query(
       "UPDATE events SET title=$1, description=$2, date=$3, time=$4, form_closing_date=$5, form_closing_time=$6, img_url=$7 WHERE id=$8 RETURNING *",
       [
         body.title,
@@ -61,17 +64,105 @@ export const updateEvent = (req, res) => {
         body.img_url,
         event_id,
       ]
-    )
-    .then((result) => {
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Event not found" });
+    );
+
+    if (body.types && Array.isArray(body.types)) {
+      for (let type of body.types) {
+        let typeId = await client.query(
+          "INSERT INTO items_types (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
+          [type.name]
+        );
+
+        const linkExists = await client.query(
+          "SELECT * FROM items_types_events WHERE type_id=$1 AND event_id=$2",
+          [typeId.rows[0].id, event_id]
+        );
+
+        if (linkExists.rows.length === 0) {
+          await client.query(
+            "INSERT INTO items_types_events (type_id, event_id, order_index, is_required) VALUES ($1, $2, $3, $4)",
+            [typeId.rows[0].id, event_id, type.order_index, type.is_required]
+          );
+        } else {
+          await client.query(
+            "UPDATE items_types_events SET order_index=$1, is_required=$2 WHERE type_id=$3 AND event_id=$4",
+            [type.order_index, type.is_required, typeId.rows[0].id, event_id]
+          );
+        }
       }
-      res.status(200).json(result.rows[0]);
-    })
-    .catch((err) => {
-      console.error("Error updating event", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+
+      if (body.typesToDelete && Array.isArray(body.typesToDelete)) {
+        for (let typeName of body.typesToDelete) {
+          await client.query(
+            "DELETE FROM items_types_events WHERE type_id=(SELECT id FROM items_types WHERE name=$1) AND event_id=$2",
+            [typeName, event_id]
+          );
+        }
+      }
+    }
+
+    if (body.items && Array.isArray(body.items)) {
+      for (let item of body.items) {
+        if (item.new) {
+          const imageId = await saveImageToDb(item.img_url);
+          const inserted_item = await client.query(
+            "INSERT INTO items (name, description, price, img_url, type, quantity) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            [
+              item.name,
+              item.description,
+              Number(item.price),
+              `${serverUrl}/api/images/${imageId.rows[0].id}`,
+              item.type,
+              item.quantity,
+            ]
+          );
+          await client.query(
+            "INSERT INTO items_events (item_id, event_id, type_id) VALUES ($1, $2, (SELECT id FROM items_types WHERE name=$3))",
+            [inserted_item.rows[0].id, event_id, item.type]
+          );
+        } else if (item.modified && item.id) {
+          let img_url = item.img_url;
+          if (item.img_url && !item.img_url.startsWith("http")) {
+            const imageId = await saveImageToDb(item.img_url);
+            img_url = `${serverUrl}/api/images/${imageId.rows[0].id}`;
+          }
+          await client.query(
+            "UPDATE items SET name=$1, description=$2, price=$3, img_url=$4, type=$5, quantity=$6 WHERE id=$7",
+            [
+              item.name,
+              item.description,
+              Number(item.price),
+              img_url,
+              item.type,
+              item.quantity,
+              item.id,
+            ]
+          );
+          await client.query(
+            "UPDATE items_events SET type_id=(SELECT id FROM items_types WHERE name=$1) WHERE item_id=$2 AND event_id=$3",
+            [item.type, item.id, event_id]
+          );
+        }
+      }
+    }
+
+    if (body.itemsToDelete && Array.isArray(body.itemsToDelete)) {
+      for (let item of body.itemsToDelete) {
+        if (item.id) {
+          await client.query("UPDATE items SET deleted=TRUE WHERE id=$1", [
+            item.id,
+          ]);
+        }
+      }
+    }
+
+    await client.query("COMMIT");
+    res.status(200).json(event_id);
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error updating event", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const getUpcomingEvents = (req, res) => {
