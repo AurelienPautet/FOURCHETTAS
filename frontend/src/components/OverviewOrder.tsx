@@ -25,7 +25,7 @@ function OverviewOrder({
 
   console.log("Items Map:", itemsMap);
 
-  function generatePieDataForItems(filteredItems: Item[], idName: string) {
+  function generatePieDataForItems(filteredItems: Item[]) {
     console.log("Generating pie data for items with items", filteredItems);
     let orderWithNoItems = orders.length;
     const pieData = filteredItems
@@ -109,13 +109,12 @@ function OverviewOrder({
       <div className="flex flex-col gap-4"></div>
       <div className="flex w-full h-full flex-row flex-wrap  justify-center items-start ">
         {types.map((type: Type) => {
-          const idName = type.name.toLowerCase() + "_id";
           console.log("Generating pie for type:", type.name);
           const filteredItems = items.filter((item) => item.type === type.name);
           return (
             <PieItems
               key={type.name}
-              data={generatePieDataForItems(filteredItems, idName)}
+              data={generatePieDataForItems(filteredItems)}
               labelString={type.name}
             />
           );

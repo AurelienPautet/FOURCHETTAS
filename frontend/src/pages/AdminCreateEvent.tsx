@@ -8,7 +8,6 @@ import Logo from "../components/Logo";
 import CreateItems from "../components/CreateItems";
 import postEvent from "../utils/dbFetch/postEvent";
 import type typeType from "../types/TypeType";
-import InputField from "../components/InputField";
 
 function AdminCreateEvent() {
   const [eventName, setEventName] = useState<string>("");
@@ -346,7 +345,7 @@ function AdminCreateEvent() {
         </div>
         {types
           .filter((typeObj) => typeObj.order_index)
-          .map((typeObj, index) => (
+          .map((typeObj) => (
             <CreateItems
               title={`Les ${typeObj.name}s`}
               type={typeObj.name}

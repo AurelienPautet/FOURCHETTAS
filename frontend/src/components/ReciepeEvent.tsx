@@ -17,7 +17,6 @@ function ReciepeEvent({
   event,
   name,
   firstName,
-  types,
   orderedItems,
   onClick,
   ordering,
