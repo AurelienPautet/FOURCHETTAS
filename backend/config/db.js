@@ -29,6 +29,9 @@ if (process.env.DATABASE_URL == undefined) {
     ssl: {
       rejectUnauthorized: false,
     },
+    max: 1,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
   });
 }
 
@@ -41,7 +44,9 @@ client
 
 console.log("Database client initialized");
 
+/*
 client
   .query(initialQuery())
   .then(() => console.log("Initial query executed successfully"))
   .catch((err) => console.error("Error executing initial query", err.stack));
+*/
