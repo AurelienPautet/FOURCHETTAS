@@ -26,10 +26,15 @@ function OverviewOrder({
   console.log("Items Map:", itemsMap);
 
   function generatePieDataForItems(filteredItems: Item[], idName: string) {
+    console.log("Generating pie data for items with items", filteredItems);
+    let orderWithNoItems = orders.length;
     const pieData = filteredItems
       .map((item) => {
         const totalQuantity = orders.reduce((acc, order) => {
           const orderedItem = order.items.find((it) => it.item_id === item.id);
+          if (orderedItem) {
+            orderWithNoItems--;
+          }
           return acc + (orderedItem?.ordered_quantity ?? 0);
         }, 0);
 
@@ -41,13 +46,10 @@ function OverviewOrder({
       })
       .filter((item) => item.value > 0);
 
-    // Add empty item if no orders exist
-    if (pieData.length === 0) {
-      pieData.push({
-        name: emptyItem.name,
-        value: 1,
-      });
-    }
+    pieData.push({
+      name: emptyItem.name,
+      value: orderWithNoItems,
+    });
 
     return pieData;
   }
@@ -108,6 +110,7 @@ function OverviewOrder({
       <div className="flex w-full h-full flex-row flex-wrap  justify-center items-start ">
         {types.map((type: Type) => {
           const idName = type.name.toLowerCase() + "_id";
+          console.log("Generating pie for type:", type.name);
           const filteredItems = items.filter((item) => item.type === type.name);
           return (
             <PieItems

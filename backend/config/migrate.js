@@ -91,13 +91,21 @@ export const migrateDatabase = async () => {
         console.log("Converted image for item:", item.name, img_url);
         let imgId = await saveImageToDb(img_url);
         item.img_url = `${serverUrl}/api/images/${imgId.rows[0].id}`;
+        let newType = "";
+        if (item.type === "dish") {
+          newType = "Plat";
+        } else if (item.type === "side") {
+          newType = "Extra";
+        } else if (item.type === "drink") {
+          newType = "Boisson";
+        }
         let new_item = await client.query(
           "INSERT INTO items (name, description, price, type, quantity,img_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
           [
             item.name,
             item.description,
             item.price,
-            item.type,
+            newType,
             item.quantity,
             item.img_url,
           ]
