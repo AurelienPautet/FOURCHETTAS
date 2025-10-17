@@ -88,7 +88,6 @@ export const migrateDatabase = async () => {
           );
           continue;
         }
-        console.log("Converted image for item:", item.name, img_url);
         let imgId = await saveImageToDb(img_url);
         item.img_url = `${serverUrl}/api/images/${imgId.rows[0].id}`;
         let newType = "";
@@ -146,7 +145,6 @@ export const migrateDatabase = async () => {
             order.delivered,
           ]
         );
-        console.log(order);
         let order_id = new_order.rows[0].id;
         let dish_id = order.dish_id;
         let side_id = order.side_id;
