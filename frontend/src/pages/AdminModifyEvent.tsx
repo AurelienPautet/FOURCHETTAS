@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import NavbarSpacer from "../components/NavbarSpacer";
@@ -15,9 +15,8 @@ import putEventUpdate from "../utils/dbFetch/putEventUpdate";
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
 import correctDate from "../utils/DateCorrector";
-import postItem from "../utils/dbFetch/postItem";
-import putItemUpdate from "../utils/dbFetch/putItemUpdate";
-import deleteItem from "../utils/dbFetch/deleteItem";
+import type typeType from "../types/TypeType";
+import getTypesFromEventId from "../utils/dbFetch/getTypesFromEventId";
 
 function AdminModifyEvent() {
   let { id } = useParams();
@@ -47,12 +46,15 @@ function AdminModifyEvent() {
   const [itemsToDelete, setItemsToDelete] = useState<ModifyItem[]>([]);
 
   const [eventData, setEventData] = useState<Event | null>(null);
-  const [dishes, setDishes] = useState<Item[]>([]);
-  const [sides, setSides] = useState<Item[]>([]);
-  const [drinks, setDrinks] = useState<Item[]>([]);
+  const [types, setTypes] = useState<typeType[]>([]);
+  const [typesToDelete, setTypesToDelete] = useState<string[]>([]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const checkedRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getEventFromId(Number(id), setEventData);
+    getTypesFromEventId(Number(id), setTypes);
   }, [id]);
 
   useEffect(() => {
@@ -69,13 +71,16 @@ function AdminModifyEvent() {
   }, [eventData]);
 
   useEffect(() => {
-    getItemsFromEventId(Number(id), setDishes, setSides, setDrinks);
+    getItemsFromEventId(Number(id), (items: Item[]) => {
+      const modifiedItems: ModifyItem[] = items.map((item) => ({
+        ...item,
+        new: false,
+        modified: false,
+      }));
+      setItemsList(modifiedItems);
+      console.log("items loaded", modifiedItems);
+    });
   }, [id]);
-
-  useEffect(() => {
-    setItemsList([...dishes, ...sides, ...drinks]);
-    console.log("items loaded", [...dishes, ...sides, ...drinks]);
-  }, [dishes, sides, drinks]);
 
   function createPutRequestBody(): object {
     let jsonBody = {
@@ -86,11 +91,15 @@ function AdminModifyEvent() {
       form_closing_date: eventOrdersClosingDate,
       form_closing_time: eventOrdersClosingTime,
       img_url: eventImgUrl,
+      types: types,
+      items: itemsList,
+      itemsToDelete: itemsToDelete,
+      typesToDelete: typesToDelete,
     };
     return jsonBody;
   }
 
-  function handleCreateOrder() {
+  function handleUpdateEvent() {
     setLoading(true);
     setRemovingBackground(true);
     setActiveBgRemovals(itemsList.length + 1);
@@ -101,66 +110,6 @@ function AdminModifyEvent() {
     console.log("backgrounds removed");
     const putBody = createPutRequestBody();
     setRemovingBackground(false);
-
-    let newItems: ModifyItem[] = [];
-    let modifiedItems: ModifyItem[] = [];
-
-    for (let item of itemsList) {
-      if (item.new) {
-        newItems.push(item);
-      } else if (item.modified) {
-        modifiedItems.push(item);
-      }
-    }
-
-    if (newItems.length > 0) {
-      console.log("Posting new items", newItems);
-      postItem({
-        Items: newItems,
-        eventid: Number(id),
-        onRequestStart: () => {
-          console.log("Request started");
-        },
-        onRequestEnd: () => {
-          console.log("Request ended");
-        },
-        onSuccess: (data: any) => {
-          console.log("New items created successfully", data);
-        },
-      });
-    }
-
-    if (modifiedItems.length > 0) {
-      console.log("Posting modified items", modifiedItems);
-      putItemUpdate({
-        Items: modifiedItems,
-        onRequestStart: () => {
-          console.log("Request started");
-        },
-        onRequestEnd: () => {
-          console.log("Request ended");
-        },
-        onSuccess: (data: any) => {
-          console.log("Modified items updated successfully", data);
-        },
-      });
-    }
-
-    if (itemsToDelete.length > 0) {
-      console.log("Posting items to delete", itemsToDelete);
-      deleteItem({
-        Items: itemsToDelete,
-        onRequestStart: () => {
-          console.log("Request started");
-        },
-        onRequestEnd: () => {
-          console.log("Request ended");
-        },
-        onSuccess: (data: any) => {
-          console.log("Items deleted successfully", data);
-        },
-      });
-    }
 
     putEventUpdate({
       eventData: putBody,
@@ -175,7 +124,7 @@ function AdminModifyEvent() {
       },
       onSuccess: (data: any) => {
         setEventId(data);
-        console.log("Event created successfully");
+        console.log("Event updated successfully");
         setSuccess(true);
       },
       onError: () => {
@@ -197,17 +146,56 @@ function AdminModifyEvent() {
     setItemsList([newItem, ...itemsList]);
   }
 
+  function handleAddType() {
+    if (!inputRef.current || inputRef.current.value.trim() === "") return;
+    const newTypeName = inputRef.current.value.trim();
+    if (types.find((t) => t.name.toLowerCase() === newTypeName.toLowerCase())) {
+      inputRef.current.value = "";
+      return;
+    }
+    const newType: typeType = {
+      name: newTypeName,
+      order_index: types.length + 1,
+      is_required: checkedRef.current ? checkedRef.current.checked : false,
+    };
+    setTypes([...types, newType]);
+    inputRef.current.value = "";
+  }
+
   function deleteItemLocally(index: number) {
-    setItemsToDelete([itemsList[index], ...itemsToDelete]);
+    if (itemsList[index].id) {
+      setItemsToDelete([itemsList[index], ...itemsToDelete]);
+    }
     const updatedItems = [...itemsList];
     updatedItems.splice(index, 1);
     setItemsList(updatedItems);
   }
 
+  function deleteType(type: string) {
+    const updatedItems = itemsList.filter((item) => item.type !== type);
+    setItemsList(updatedItems);
+    const updatedTypes = types.filter((t) => t.name !== type);
+    setTypes(updatedTypes);
+    setTypesToDelete([...typesToDelete, type]);
+  }
+
+  function moveType(type: string, direction: "up" | "down") {
+    const index = types.findIndex((t) => t.name === type);
+    if (index === -1) return;
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= types.length) return;
+    const newTypes = [...types];
+    [newTypes[index], newTypes[newIndex]] = [
+      newTypes[newIndex],
+      newTypes[index],
+    ];
+    setTypes(newTypes);
+  }
+
   function setItemValue(
     index: number,
     field: keyof ModifyItem,
-    value: string | number | boolean
+    value: string | number
   ) {
     const updatedItems = [...itemsList];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
@@ -285,9 +273,7 @@ function AdminModifyEvent() {
               className="input"
               placeholder="Nom de l'événement"
               value={eventName}
-              onChange={(e) => {
-                setEventName(e.target.value);
-              }}
+              onChange={(e) => setEventName(e.target.value)}
             />
             <legend className="fieldset-legend">
               Description de l'événement
@@ -296,9 +282,7 @@ function AdminModifyEvent() {
               className="textarea h-24"
               placeholder="Description de l'événement"
               value={eventDescription}
-              onChange={(e) => {
-                setEventDescription(e.target.value);
-              }}
+              onChange={(e) => setEventDescription(e.target.value)}
             ></textarea>
             <legend className="fieldset-legend">Début de l'événement</legend>
             <div className="flex w-full h-full items-center justify-center flex-row gap-4">
@@ -402,38 +386,35 @@ function AdminModifyEvent() {
           </div>
         </CardImageGen>
 
-        <CreateItems
-          title="Les Plats"
-          type="dish"
-          createEmptyItem={createEmptyItem}
-          itemsList={itemsList}
-          setItemValue={setItemValue}
-          rmbg={removingBackground}
-          setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItemLocally}
-        />
+        <div className="card bg-base-200 p-3 w-full flex flex-col items-center gap-2">
+          <input className="input" ref={inputRef} placeholder="Nouveau type" />
+          <div className="flex items-center gap-2">
+            <input type="checkbox" ref={checkedRef} className="checkbox" />
+            Obligatoire
+          </div>
 
-        <CreateItems
-          title="Les Extras"
-          type="side"
-          createEmptyItem={createEmptyItem}
-          itemsList={itemsList}
-          setItemValue={setItemValue}
-          rmbg={removingBackground}
-          setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItemLocally}
-        />
-
-        <CreateItems
-          title="Les Boissons"
-          type="drink"
-          createEmptyItem={createEmptyItem}
-          itemsList={itemsList}
-          setItemValue={setItemValue}
-          rmbg={removingBackground}
-          setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItemLocally}
-        />
+          <button className="btn btn-primary" onClick={handleAddType}>
+            Ajouter un type
+          </button>
+        </div>
+        {types
+          .filter((typeObj) => typeObj.order_index)
+          .map((typeObj, index) => (
+            <CreateItems
+              key={index}
+              title={`Les ${typeObj.name}s`}
+              type={typeObj.name}
+              required={typeObj.is_required}
+              createEmptyItem={createEmptyItem}
+              itemsList={itemsList}
+              setItemValue={setItemValue}
+              rmbg={removingBackground}
+              setActiveBgRemovals={setActiveBgRemovals}
+              deleteItem={deleteItemLocally}
+              deleteType={deleteType}
+              moveType={moveType}
+            />
+          ))}
 
         <div className="flex flex-col w-full h-full items-center justify-center gap-4">
           <div className="flex  h-full items-center justify-center flex-row">
@@ -450,7 +431,7 @@ function AdminModifyEvent() {
                 loading && "btn-disabled"
               }`}
               onClick={() => {
-                handleCreateOrder();
+                handleUpdateEvent();
               }}
             >
               Modifier l'événement

@@ -8,6 +8,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import imageGenRoutes from "./routes/imageGenRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import itemRoutes from "./routes/itemRoutes.js";
+import imageRoutes from "./routes/imagesRoutes.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -39,6 +40,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/image-gen", imageGenRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/items", itemRoutes);
+app.use("/api/images", imageRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
@@ -49,9 +51,14 @@ app.get("/api/health", (req, res) => {
 });
 
 if (process.env.NODE_ENV !== "production") {
+  var serverUrl = `http://localhost:${PORT}`;
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
+} else {
+  serverUrl = "https://fourchettas.vercel.app";
 }
+
+export { serverUrl };
 
 export default app;

@@ -5,6 +5,6 @@ export default interface Item {
   price: number;
   type: string;
   quantity: number;
+  ordered_quantity?: number;
   img_url: string;
-  event_id: number;
 }

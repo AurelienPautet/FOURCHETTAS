@@ -43,35 +43,53 @@ function CardImageGen({
     });
   }
 
+  function blobToDataURL(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+      reader.onerror = () => {
+        reject(new Error("Failed to convert blob to data URL"));
+      };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function urlToDataURL(url: string): Promise<string> {
+    return fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => blobToDataURL(blob));
+  }
   useEffect(() => {
     console.log("Background removal triggered:", rmBg);
     onBgRemovalStart();
     if (!rmBg || !ImgUrl) {
       setTimeout(() => {
         onBgRemovalEnd();
-      }, 1000);
+      }, 100);
       return;
     }
     if (ImgUrl.startsWith("https://storage.imagerouter.io/") == false) {
+      urlToDataURL(ImgUrl)
+        .then((dataUrl) => {
+          setImgUrl(dataUrl);
+        })
+        .catch((error) => {
+          console.error("Error converting URL to Data URL:", error);
+        });
+
       setTimeout(() => {
         onBgRemovalEnd();
-      }, 1000); 
+      }, 100);
       return;
     }
     setIsRemovingBg(true);
-
     removeBackground(ImgUrl)
       .then((blob: Blob) => {
-        return blob.arrayBuffer();
+        return blobToDataURL(blob);
       })
-      .then((arrayBuffer) => {
-        const base64 = btoa(
-          new Uint8Array(arrayBuffer).reduce(
-            (data, byte) => data + String.fromCharCode(byte),
-            ""
-          )
-        );
-        const dataUrl = `data:image/png;base64,${base64}`;
+      .then((dataUrl) => {
         console.log("Background removed, new URL:");
         setImgUrl(dataUrl);
       })

@@ -1,14 +1,14 @@
 import type Item from "../types/ItemType";
 import type Event from "../types/EventType";
+import type Type from "../types/TypeType";
 
 interface ReciepeEventProps {
   event: Event;
   name: string;
   firstName: string;
   phone: string;
-  dish: Item | null;
-  side: Item | null;
-  drink: Item | null;
+  types: Type[];
+  orderedItems: Item[];
   onClick: () => void;
   ordering: boolean;
 }
@@ -17,16 +17,16 @@ function ReciepeEvent({
   event,
   name,
   firstName,
-  dish,
-  side,
-  drink,
+  types,
+  orderedItems,
   onClick,
   ordering,
 }: ReciepeEventProps) {
-  let drinkPrice = parseFloat(drink ? drink.price.toString() : "0");
-  let sidePrice = parseFloat(side ? side.price.toString() : "0");
-  let dishPrice = parseFloat(dish ? dish.price.toString() : "0");
-  const floatTotalPrice = (drinkPrice + sidePrice + dishPrice).toFixed(2);
+  let totalPrice = 0;
+  orderedItems.forEach((item) => {
+    if (item.ordered_quantity) totalPrice += item.price * item.ordered_quantity;
+  });
+
   return (
     <div className="flex w-full justify-center items-center flex-col gap-4 md:gap-1">
       <h1 className="mb-3 w-full text-center text-3xl font-bold">
@@ -49,32 +49,26 @@ function ReciepeEvent({
               </tr>
             </thead>
             <tbody>
-              {dish && (
-                <tr>
+              {orderedItems.map((dish) => (
+                <tr key={dish.id}>
                   <td>{dish?.name}</td>
-                  <td>{dish?.quantity}</td>
-                  <td>{dish?.price} €</td>
+                  <td>
+                    {dish?.ordered_quantity
+                      ? dish.ordered_quantity * dish.quantity
+                      : 0}
+                  </td>
+                  <td>
+                    {dish?.ordered_quantity &&
+                      dish?.price * dish.ordered_quantity}{" "}
+                    €
+                  </td>
                 </tr>
-              )}
-              {side && (
-                <tr>
-                  <td>{side?.name}</td>
-                  <td>{side?.quantity}</td>
-                  <td>{side?.price} €</td>
-                </tr>
-              )}
-              {drink && (
-                <tr>
-                  <td>{drink?.name}</td>
-                  <td>{drink?.quantity}</td>
-                  <td>{drink?.price} €</td>
-                </tr>
-              )}
+              ))}
 
               <tr className="font-bold h-full">
                 <td>TOTAL</td>
                 <td></td>
-                <td>{floatTotalPrice} €</td>
+                <td>{totalPrice} €</td>
               </tr>
             </tbody>
           </table>

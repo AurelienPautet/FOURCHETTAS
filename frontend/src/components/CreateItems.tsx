@@ -14,6 +14,9 @@ interface CreateItemProps {
   rmbg: boolean;
   setActiveBgRemovals: Dispatch<SetStateAction<number>>;
   deleteItem: (index: number) => void;
+  deleteType: (type: string) => void;
+  moveType: (type: string, direction: "up" | "down") => void;
+  required: boolean;
 }
 
 function CreateItems({
@@ -25,10 +28,36 @@ function CreateItems({
   rmbg,
   setActiveBgRemovals,
   deleteItem,
+  deleteType,
+  moveType,
+  required,
 }: CreateItemProps) {
   return (
     <>
-      <h1 className=" text-2xl">{title}</h1>
+      <div className="divider w-full"></div>
+      <div className="flex items-center gap-4 ">
+        <h1 className=" text-2xl">{title}</h1>
+        {required && <span className="badge badge-primary">Obligatoire</span>}
+        <div className="flex flex-col items-center justify-center">
+          <button className="btn" onClick={() => moveType(type, "up")}>
+            UP
+          </button>
+          <button className="btn" onClick={() => moveType(type, "down")}>
+            DOWN
+          </button>
+        </div>
+        <BinWithModal
+          id={"delete_type_" + type}
+          className="w-5 h-5 md:w-20 md:h-20 mt-2 md:ml-2"
+        />
+        <DeleteModal
+          id={"delete_type_" + type}
+          title="Supprimer le type ?"
+          description={`Vous êtes sur le point de supprimer 
+                le type ${type} ainsi que tous ses éléments. Cette action est irréversible.`}
+          onDelete={() => deleteType(type)}
+        />{" "}
+      </div>
       <div className="flex flex-col w-full md:w-3/4 h-full items-center justify-center gap-4">
         <PlusCard
           onClick={() => createEmptyItem(type)}

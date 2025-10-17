@@ -15,10 +15,17 @@ function ListOrdersListItem({
   order: Order;
   itemsMap: Map<number, Item>;
 }) {
-  const dish = itemsMap.get(order.dish_id);
-  const side = itemsMap.get(order.side_id);
-  const drink = itemsMap.get(order.drink_id);
+  const orderedItems = order.items
+    .map((it) => {
+      const item = itemsMap.get(it.item_id);
+      if (item) {
+        return { ...item, ordered_quantity: it.ordered_quantity };
+      }
+    })
+    .filter((item) => item !== undefined && item.ordered_quantity > 0);
 
+  console.log(order);
+  console.log("Ordered Items:", orderedItems);
   const [localPrepared, setLocalPrepared] = useState(order.prepared);
   const [localDelivered, setLocalDelivered] = useState(order.delivered);
   useEffect(() => {
@@ -95,21 +102,14 @@ function ListOrdersListItem({
         </div>
       </td>
       <td>
-        {dish && (
+        {orderedItems.map((item) => (
           <>
-            {dish.quantity}*{dish.name} <br />
+            {item &&
+              item.quantity *
+                (item.ordered_quantity ? item.ordered_quantity : 1)}
+            *{item?.name} <br />
           </>
-        )}
-        {side && (
-          <>
-            {side.quantity}*{side.name} <br />
-          </>
-        )}
-        {drink && (
-          <>
-            {drink.quantity}*{drink.name}
-          </>
-        )}
+        ))}
       </td>
       <td>{order.price}€</td>
       <td>

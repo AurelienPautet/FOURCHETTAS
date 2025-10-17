@@ -24,7 +24,6 @@ function App() {
               <Route path="/" element={<UpcomingEvents />} />
               <Route path="/event/:id/order" element={<UserForm />} />
               <Route path="/admin/login" element={<AdminLogin />} />
-
               <Route
                 path="admin/"
                 element={

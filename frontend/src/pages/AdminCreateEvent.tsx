@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
 import Calendar from "../components/Calendar";
@@ -7,6 +7,8 @@ import type CreateItem from "../types/CreateItemType";
 import Logo from "../components/Logo";
 import CreateItems from "../components/CreateItems";
 import postEvent from "../utils/dbFetch/postEvent";
+import type typeType from "../types/TypeType";
+import InputField from "../components/InputField";
 
 function AdminCreateEvent() {
   const [eventName, setEventName] = useState<string>("");
@@ -29,6 +31,15 @@ function AdminCreateEvent() {
   const [removingBackground, setRemovingBackground] = useState<boolean>(false);
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
   const [eventId, setEventId] = useState<string>("");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const checkedRef = useRef<HTMLInputElement>(null);
+
+  const [types, setTypes] = useState<typeType[]>([
+    { name: "Plat", order_index: 1, is_required: true },
+    { name: "Boisson", order_index: 3, is_required: false },
+    { name: "Extra", order_index: 2, is_required: false },
+  ]);
   const [itemsList, setItemsList] = useState<CreateItem[]>([]);
   function createPostRequestBody(): object {
     let jsonBody = {
@@ -39,6 +50,7 @@ function AdminCreateEvent() {
       form_closing_date: eventOrdersClosingDate,
       form_closing_time: eventOrdersClosingTime,
       img_url: eventImgUrl,
+      types: types,
       items: itemsList,
     };
     return jsonBody;
@@ -88,9 +100,45 @@ function AdminCreateEvent() {
     setItemsList([newItem, ...itemsList]);
   }
 
+  function handleAddType() {
+    if (!inputRef.current || inputRef.current.value.trim() === "") return;
+    const newTypeName = inputRef.current.value.trim();
+    if (types.find((t) => t.name.toLowerCase() === newTypeName.toLowerCase())) {
+      inputRef.current.value = "";
+      return;
+    }
+    const newType: typeType = {
+      name: newTypeName,
+      order_index: types.length + 1,
+      is_required: checkedRef.current ? checkedRef.current.checked : false,
+    };
+    setTypes([...types, newType]);
+    inputRef.current.value = "";
+  }
+
   function deleteItem(index: number) {
     const updatedItems = itemsList.filter((_, i) => i !== index);
     setItemsList(updatedItems);
+  }
+
+  function deleteType(type: string) {
+    const updatedItems = itemsList.filter((item) => item.type !== type);
+    setItemsList(updatedItems);
+    const updatedTypes = types.filter((t) => t.name !== type);
+    setTypes(updatedTypes);
+  }
+
+  function moveType(type: string, direction: "up" | "down") {
+    const index = types.findIndex((t) => t.name === type);
+    if (index === -1) return;
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= types.length) return;
+    const newTypes = [...types];
+    [newTypes[index], newTypes[newIndex]] = [
+      newTypes[newIndex],
+      newTypes[index],
+    ];
+    setTypes(newTypes);
   }
 
   function setItemValue(
@@ -285,38 +333,34 @@ function AdminCreateEvent() {
           </div>
         </CardImageGen>
 
-        <CreateItems
-          title="Les Plats"
-          type="dish"
-          createEmptyItem={createEmptyItem}
-          itemsList={itemsList}
-          setItemValue={setItemValue}
-          rmbg={removingBackground}
-          setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItem}
-        />
+        <div className="card bg-base-200 p-3 w-full flex flex-col items-center gap-2">
+          <input className="input" ref={inputRef} placeholder="Nouveau type" />
+          <div className="flex items-center gap-2">
+            <input type="checkbox" ref={checkedRef} className="checkbox" />
+            Obligatoire
+          </div>
 
-        <CreateItems
-          title="Les Extras"
-          type="side"
-          createEmptyItem={createEmptyItem}
-          itemsList={itemsList}
-          setItemValue={setItemValue}
-          rmbg={removingBackground}
-          setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItem}
-        />
-
-        <CreateItems
-          title="Les Boissons"
-          type="drink"
-          createEmptyItem={createEmptyItem}
-          itemsList={itemsList}
-          setItemValue={setItemValue}
-          rmbg={removingBackground}
-          setActiveBgRemovals={setActiveBgRemovals}
-          deleteItem={deleteItem}
-        />
+          <button className="btn btn-primary" onClick={handleAddType}>
+            Ajouter un type
+          </button>
+        </div>
+        {types
+          .filter((typeObj) => typeObj.order_index)
+          .map((typeObj, index) => (
+            <CreateItems
+              title={`Les ${typeObj.name}s`}
+              type={typeObj.name}
+              required={typeObj.is_required}
+              createEmptyItem={createEmptyItem}
+              itemsList={itemsList}
+              setItemValue={setItemValue}
+              rmbg={removingBackground}
+              setActiveBgRemovals={setActiveBgRemovals}
+              deleteItem={deleteItem}
+              deleteType={deleteType}
+              moveType={moveType}
+            />
+          ))}
 
         <div className="flex flex-col w-full h-full items-center justify-center gap-4">
           <button

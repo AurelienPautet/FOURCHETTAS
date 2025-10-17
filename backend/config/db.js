@@ -1,6 +1,7 @@
 import { Client } from "pg";
 import dotenv from "dotenv";
 import initialQuery from "./initialQuery.js";
+import { migrateDatabase } from "./migrate.js";
 
 dotenv.config();
 
@@ -31,6 +32,8 @@ if (process.env.DATABASE_URL == undefined) {
   });
 }
 
+export default client;
+
 client
   .connect()
   .then(() => console.log("Connected to PostgreSQL database"))
@@ -40,7 +43,5 @@ console.log("Database client initialized");
 
 client
   .query(initialQuery())
-  .then(() => console.log("Initial query executed successfully"))
+  .then(() => migrateDatabase())
   .catch((err) => console.error("Error executing initial query", err.stack));
-
-export default client;
