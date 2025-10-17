@@ -20,7 +20,7 @@ import correctDate from "../utils/DateCorrector";
 import getTypesFromEventId from "../utils/dbFetch/getTypesFromEventId";
 
 function UserForm() {
-  const maxTabs = 4;
+  let maxTabs = 4;
   let { id } = useParams();
   let event_id = parseInt(id || "0");
   const [currentTab, setCurrentTab] = useState(0);
@@ -91,6 +91,8 @@ function UserForm() {
     getTypesFromEventId(event_id, setTypes);
     getItemsFromEventId(event_id, setItems);
   }, []);
+
+  maxTabs = 1 + types.length;
 
   function densePostOrder() {
     postOrder({
