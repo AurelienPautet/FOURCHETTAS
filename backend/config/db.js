@@ -43,5 +43,5 @@ console.log("Database client initialized");
 
 client
   .query(initialQuery())
-  .then(() => migrateDatabase())
+  .then(() => console.log("Initial query executed successfully"))
   .catch((err) => console.error("Error executing initial query", err.stack));

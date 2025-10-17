@@ -20,15 +20,7 @@ function initialQuery() {
 
         CREATE TABLE IF NOT EXISTS orders_backup AS
              SELECT * FROM orders;
-        
-        DROP TABLE IF EXISTS orders_items CASCADE;
-        DROP TABLE IF EXISTS images CASCADE;
-        DROP TABLE IF EXISTS items_types CASCADE;
-        DROP TABLE IF EXISTS items_events CASCADE;
-        DROP TABLE IF EXISTS items_types_events CASCADE;
-        DROP TABLE IF EXISTS orders CASCADE;
-        DROP TABLE IF EXISTS items CASCADE;
-        DROP TABLE IF EXISTS events CASCADE;
+    
 
         CREATE TABLE IF NOT EXISTS events (
           	id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
