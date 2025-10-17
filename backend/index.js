@@ -9,6 +9,7 @@ import imageGenRoutes from "./routes/imageGenRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import itemRoutes from "./routes/itemRoutes.js";
 import imageRoutes from "./routes/imagesRoutes.js";
+import migrationRoutes from "./routes/migrationRoutes.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -41,6 +42,7 @@ app.use("/api/image-gen", imageGenRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/images", imageRoutes);
+app.use("/api/migration", migrationRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
