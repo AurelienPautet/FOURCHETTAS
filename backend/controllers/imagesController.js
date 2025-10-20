@@ -26,8 +26,15 @@ export const getImage = (req, res) => {
 export async function saveImageToDb(data) {
   let imageBuffer;
   try {
-    if (!data.startsWith("https://fourchettas.vercel.app/api/images"))
+    console.log("Saving image to DB");
+    if (
+      !data.startsWith("https://fourchettas.vercel.app/api/images") &&
+      !data.startsWith("http://localhost:") &&
+      !data.startsWith("data:")
+    ) {
+      console.log(`Image data received: ${data?.substring(0, 50)}...`);
       data = await convertToBase64(data);
+    }
     const base64Data = data.replace(/^data:image\/\w+;base64,/, "");
     imageBuffer = Buffer.from(base64Data, "base64");
   } catch (err) {
@@ -57,7 +64,7 @@ function convertToBase64(img_url) {
       console.log(
         `Converting buffer of size ${buffer.byteLength} bytes to base64`
       );
-      const base64Flag = "data:image/jpeg;base64,";
+      const base64Flag = "data:image/jpeg;base64,/";
       const imageStr = arrayBufferToBase64(buffer);
       return base64Flag + imageStr;
     })
