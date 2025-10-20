@@ -27,7 +27,7 @@ if (process.env.DATABASE_URL == undefined) {
   client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: false, //for heroku SSL connection
     },
     max: 1,
     idleTimeoutMillis: 10000,
