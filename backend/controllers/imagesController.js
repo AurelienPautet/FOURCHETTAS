@@ -1,4 +1,5 @@
 import client from "../config/db.js";
+import nodeFetch from "node-fetch";
 
 export const getImage = (req, res) => {
   const imageId = req.params.id;
@@ -25,6 +26,7 @@ export const getImage = (req, res) => {
 export function saveImageToDb(data) {
   let imageBuffer;
   try {
+    data = convertToBase64(data);
     const base64Data = data.replace(/^data:image\/\w+;base64,/, "");
     imageBuffer = Buffer.from(base64Data, "base64");
   } catch (err) {
@@ -36,6 +38,42 @@ export function saveImageToDb(data) {
       "image/jpeg",
     ])
     .then((result) => result);
+}
+
+function convertToBase64(img_url) {
+  console.log(`Converting image to base64: ${img_url?.substring(0, 50)}...`);
+  // first check if the img_url is a data URL or a regular URL
+  if (img_url.startsWith("data:")) {
+    console.log("Image is already a data URL");
+    return img_url;
+  }
+  return fetch(img_url)
+    .then((response) => {
+      console.log(`Fetch response status: ${response.status}`);
+      return response.arrayBuffer();
+    })
+    .then((buffer) => {
+      console.log(
+        `Converting buffer of size ${buffer.byteLength} bytes to base64`
+      );
+      const base64Flag = "data:image/jpeg;base64,";
+      const imageStr = arrayBufferToBase64(buffer);
+      return base64Flag + imageStr;
+    })
+    .catch((error) => {
+      console.error("Error converting image to base64:", error);
+      return null;
+    });
+}
+
+function arrayBufferToBase64(buffer) {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return Buffer.from(binary, "binary").toString("base64");
 }
 
 export const saveImage = (req, res) => {
