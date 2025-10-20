@@ -24,28 +24,40 @@ export const getImage = (req, res) => {
 };
 
 export async function saveImageToDb(data) {
+  // If the data is already a server image URL, extract and return the ID
+  if (
+    data.startsWith("https://fourchettas.vercel.app/api/images/") ||
+    (data.startsWith("http://localhost:") && data.includes("/api/images/"))
+  ) {
+    const match = data.match(/\/api\/images\/(\d+)/);
+    if (match) {
+      return { rows: [{ id: match[1] }] };
+    }
+  }
+
   let imageBuffer;
   try {
     console.log("Saving image to DB");
-    if (
-      !data.startsWith("https://fourchettas.vercel.app/api/images") &&
-      !data.startsWith("http://localhost:") &&
-      !data.startsWith("data:")
-    ) {
+    if (!data.startsWith("data:")) {
       console.log(`Image data received: ${data?.substring(0, 50)}...`);
       data = await convertToBase64(data);
     }
     const base64Data = data.replace(/^data:image\/\w+;base64,/, "");
     imageBuffer = Buffer.from(base64Data, "base64");
   } catch (err) {
-    throw new Error("Invalid image data format");
+    console.error("Error processing image data:", err);
+    throw new Error(`Invalid image data format: ${err.message}`);
   }
   return client
     .query("INSERT INTO images (data,mime_type) VALUES ($1,$2) RETURNING id", [
       imageBuffer,
       "image/jpeg",
     ])
-    .then((result) => result);
+    .then((result) => result)
+    .catch((err) => {
+      console.error("Error inserting image into database:", err);
+      throw err;
+    });
 }
 
 function convertToBase64(img_url) {
@@ -55,22 +67,27 @@ function convertToBase64(img_url) {
     console.log("Image is already a data URL");
     return img_url;
   }
-  return fetch(img_url)
+  return nodeFetch(img_url)
     .then((response) => {
       console.log(`Fetch response status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch image: ${response.status} ${response.statusText}`
+        );
+      }
       return response.arrayBuffer();
     })
     .then((buffer) => {
       console.log(
         `Converting buffer of size ${buffer.byteLength} bytes to base64`
       );
-      const base64Flag = "data:image/jpeg;base64,/";
+      const base64Flag = "data:image/jpeg;base64,";
       const imageStr = arrayBufferToBase64(buffer);
       return base64Flag + imageStr;
     })
     .catch((error) => {
       console.error("Error converting image to base64:", error);
-      return null;
+      throw error;
     });
 }
 

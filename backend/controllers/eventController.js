@@ -243,7 +243,7 @@ export const createEvent = async (req, res) => {
 
   console.log("Creating event with body:", body);
   try {
-    client.query("BEGIN");
+    await client.query("BEGIN");
     const eventImgId = await saveImageToDb(body.img_url);
     let result = await client.query(
       "INSERT INTO events (title, description, date, time, form_closing_date, form_closing_time, img_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
