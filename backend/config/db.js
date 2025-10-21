@@ -1,4 +1,4 @@
-import { Client } from "pg";
+import { Pool } from "pg";
 import dotenv from "dotenv";
 import initialQuery from "./initialQuery.js";
 import { migrateDatabase } from "./migrate.js";
@@ -11,42 +11,43 @@ const DB_USER = process.env.DB_USER;
 const DB_NAME = process.env.DB_NAME;
 const DB_PORT = process.env.DB_PORT;
 
-let client;
-//console.log(process.env.DATABASE_URL, "DATABASE_URL");
+let pool;
+
 if (process.env.DATABASE_URL == undefined) {
   console.log("Using local db");
-  client = new Client({
+  pool = new Pool({
     host: DB_HOST,
     port: DB_PORT,
     user: DB_USER,
     password: DB_PASSWORD,
     database: DB_NAME,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
   });
 } else {
-  console.log("Using heroku db");
-  client = new Client({
+  console.log("Using production db");
+  pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-      rejectUnauthorized: false, //for heroku SSL connection
+      rejectUnauthorized: false,
     },
-    max: 1,
-    idleTimeoutMillis: 10000,
+    max: 5,
+    idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
+    allowExitOnIdle: true,
   });
 }
 
-export default client;
+pool.on("error", (err, client) => {
+  console.error("Unexpected error on idle client", err);
+});
 
-client
-  .connect()
+pool
+  .query("SELECT NOW()")
   .then(() => console.log("Connected to PostgreSQL database"))
   .catch((err) => console.error("Connection error", err.stack));
 
-console.log("Database client initialized");
+console.log("Database pool initialized");
 
-/*
-client
-  .query(initialQuery())
-  .then(() => console.log("Initial query executed successfully"))
-  .catch((err) => console.error("Error executing initial query", err.stack));
-*/
+export default pool;

@@ -1,9 +1,9 @@
-import client from "../config/db.js";
+import pool from "../config/db.js";
 
 export const getTypeByEventId = async (req, res) => {
   const event_id = req.params.id;
   try {
-    const result = await client.query(
+    const result = await pool.query(
       "SELECT items_types.name,order_index,is_required FROM items_types JOIN items_types_events ON items_types.id = items_types_events.type_id WHERE items_types_events.event_id = $1",
       [event_id]
     );

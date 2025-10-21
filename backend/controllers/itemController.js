@@ -1,9 +1,9 @@
-import client from "../config/db.js";
+import pool from "../config/db.js";
 
 export const getItemByEventId = async (req, res) => {
   const event_id = req.params.id;
   try {
-    const result = await client.query(
+    const result = await pool.query(
       "SELECT items.id,name,description,price,(SELECT name FROM items_types WHERE items_types.name = items.type) AS type,quantity,img_url FROM items join items_events ON items.id = items_events.item_id WHERE items_events.event_id = $1 AND items.deleted = FALSE",
       [event_id]
     );
@@ -19,27 +19,27 @@ export const getItemByEventId = async (req, res) => {
 
 export const deleteItemByEventId = async (req, res = false) => {
   const event_id = req.params.id;
-  await client
-    .query("UPDATE items SET deleted = TRUE WHERE event_id =$1 RETURNING *", [
-      event_id,
-    ])
-    .then((result) => {
-      if (result.rows.length === 0) {
-        if (res !== false) {
-          return res.status(404).json({ error: "Item(s) not found" });
-        }
-      }
+  try {
+    const result = await pool.query(
+      "UPDATE items SET deleted = TRUE WHERE event_id =$1 RETURNING *",
+      [event_id]
+    );
+
+    if (result.rows.length === 0) {
       if (res !== false) {
-        res.status(200).json({ message: "Item(s) deleted successfully" });
+        return res.status(404).json({ error: "Item(s) not found" });
       }
-      return;
-    })
-    .catch((err) => {
-      console.error("Error deleting Item(s)", err.stack);
-      if (res !== false) {
-        res.status(500).json({ error: "Internal server error" });
-      }
-    });
+    }
+    if (res !== false) {
+      res.status(200).json({ message: "Item(s) deleted successfully" });
+    }
+    return;
+  } catch (err) {
+    console.error("Error deleting Item(s)", err.stack);
+    if (res !== false) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
 };
 
 export const createItem = async (req, res) => {
@@ -53,12 +53,12 @@ export const createItem = async (req, res) => {
     const insertedItems = [];
 
     for (const item of items) {
-      const imageId = await client.query(
+      const imageId = await pool.query(
         "INSERT INTO images (data) VALUES ($1) RETURNING id",
         [[Buffer.from(item.img_url, "utf-8")]]
       );
 
-      const result = await client.query(
+      const result = await pool.query(
         "INSERT INTO items (name, description, price,img_url,type,quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
         [
           item.name,
@@ -88,7 +88,7 @@ export const deleteItems = async (req, res) => {
   }
 
   try {
-    const result = await client.query(
+    const result = await pool.query(
       "UPDATE items SET deleted = TRUE WHERE id = ANY($1) RETURNING *",
       [itemIds]
     );
@@ -124,7 +124,7 @@ export const updateItems = async (req, res) => {
       ) {
         return res.status(400).json({ error: "Missing required fields" });
       }
-      const result = await client.query(
+      const result = await pool.query(
         "UPDATE items SET name=$1, description=$2, price=$3, event_id=$4, img_url=$5, type=$6, quantity=$7 WHERE id=$8 RETURNING *",
         [
           item.name,

@@ -1,10 +1,11 @@
-import client from "../config/db.js";
+import pool from "../config/db.js";
 import nodeFetch from "node-fetch";
 import { saveImageToDb } from "../controllers/imagesController.js";
 import { serverUrl } from "../index.js";
 const fetch = nodeFetch;
 
 export const migrateDatabase = async () => {
+  const client = await pool.connect();
   try {
     console.log("Starting database migration...");
     await client.query("BEGIN");
@@ -256,6 +257,8 @@ export const migrateDatabase = async () => {
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Error during database migration", err.stack);
+  } finally {
+    client.release();
   }
 };
 

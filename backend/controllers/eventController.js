@@ -1,4 +1,4 @@
-import client from "../config/db.js";
+import pool from "../config/db.js";
 import { createItem, deleteItemByEventId } from "./itemController.js";
 import { deleteOrderByEventId } from "./orderController.js";
 import { serverUrl } from "../index.js";
@@ -15,20 +15,21 @@ export const deleteEvent = async (req, res) => {
     console.log(error);
   }
   const event_id = req.params.id;
-  client
-    .query("UPDATE events SET deleted = TRUE WHERE id = $1 RETURNING *", [
-      event_id,
-    ])
-    .then((result) => {
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Event not found" });
-      }
-      res.status(200).json({ message: "Event deleted successfully" });
-    })
-    .catch((err) => {
-      console.error("Error deleting event", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+
+  try {
+    const result = await pool.query(
+      "UPDATE events SET deleted = TRUE WHERE id = $1 RETURNING *",
+      [event_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+    res.status(200).json({ message: "Event deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting event", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const updateEvent = async (req, res) => {
@@ -49,6 +50,7 @@ export const updateEvent = async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
@@ -162,67 +164,65 @@ export const updateEvent = async (req, res) => {
     await client.query("ROLLBACK");
     console.error("Error updating event", err.stack);
     res.status(500).json({ error: "Internal server error" });
+  } finally {
+    client.release();
   }
 };
 
-export const getUpcomingEvents = (req, res) => {
-  client
-    .query(
+export const getUpcomingEvents = async (req, res) => {
+  try {
+    const result = await pool.query(
       "SELECT * FROM events WHERE date >= CURRENT_DATE AND deleted = FALSE ORDER BY date ASC"
-    )
-    .then((result) => {
-      res.status(200).json(result.rows);
-    })
-    .catch((err) => {
-      console.error("Error fetching upcoming events", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching upcoming events", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-export const getUpcomingEventsWithPhoneOrder = (req, res) => {
+export const getUpcomingEventsWithPhoneOrder = async (req, res) => {
   const phone = req.params.phone;
-  client
-    .query(
+  try {
+    const result = await pool.query(
       "SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e LEFT JOIN orders o ON e.id = o.event_id  AND o.phone = $1 WHERE date >= CURRENT_DATE AND e.deleted = FALSE ORDER BY date ASC",
       [phone]
-    )
-    .then((result) => {
-      res.status(200).json(result.rows);
-    })
-    .catch((err) => {
-      console.error("Error fetching upcoming events", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching upcoming events", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-export const getOldEvents = (req, res) => {
-  client
-    .query(
+export const getOldEvents = async (req, res) => {
+  try {
+    const result = await pool.query(
       "SELECT * FROM events WHERE date < CURRENT_DATE AND deleted = FALSE ORDER BY date ASC"
-    )
-    .then((result) => {
-      res.status(200).json(result.rows);
-    })
-    .catch((err) => {
-      console.error("Error fetching upcoming events", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching upcoming events", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-export const getEventById = (req, res) => {
+export const getEventById = async (req, res) => {
   const event_id = req.params.id;
-  client
-    .query("SELECT * FROM events WHERE events.id = $1", [event_id])
-    .then((result) => {
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Event not found" });
-      }
-      res.status(200).json(result.rows[0]);
-    })
-    .catch((err) => {
-      console.error("Error fetching event by ID", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+  try {
+    const result = await pool.query(
+      "SELECT * FROM events WHERE events.id = $1",
+      [event_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error fetching event by ID", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const createEvent = async (req, res) => {
@@ -242,6 +242,7 @@ export const createEvent = async (req, res) => {
   }
 
   console.log("Creating event with body:", body);
+  const client = await pool.connect();
   try {
     await client.query("BEGIN");
     const eventImgId = await saveImageToDb(body.img_url);
@@ -299,5 +300,7 @@ export const createEvent = async (req, res) => {
     await client.query("ROLLBACK");
     console.error("Error creating event", error.stack);
     res.status(500).json({ error: "Internal server error" });
+  } finally {
+    client.release();
   }
 };

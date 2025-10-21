@@ -1,4 +1,4 @@
-import client from "../config/db.js";
+import pool from "../config/db.js";
 
 export const createOrder = async (req, res) => {
   if (!req.body.name || !req.body.firstname || !req.body.items) {
@@ -9,6 +9,7 @@ export const createOrder = async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  const client = await pool.connect();
   try {
     await client.query("BEGIN");
     const result = await client.query(
@@ -29,10 +30,12 @@ export const createOrder = async (req, res) => {
     await client.query("ROLLBACK");
     console.error("Error starting transaction", err.stack);
     return res.status(500).json({ error: "Internal server error" });
+  } finally {
+    client.release();
   }
 };
 
-export const updateOrder = (req, res) => {
+export const updateOrder = async (req, res) => {
   const orderId = req.params.id;
   const { prepared, delivered } = req.body;
   if (prepared === undefined && delivered === undefined) {
@@ -61,29 +64,29 @@ export const updateOrder = (req, res) => {
   }
   console.log(set_string, [...values, parseInt(orderId)]);
 
-  client
-    .query(
+  try {
+    const result = await pool.query(
       "update orders set " +
         set_string +
         " where id = $" +
         (nb_of_change + 1) +
         " returning *",
       [...values, parseInt(orderId)]
-    )
-    .then((result) => {
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      res.status(200).json(result.rows[0]);
-    })
-    .catch((err) => {
-      console.error("Error updating order", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating order", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const getOrdersByEventId = async (req, res) => {
   const event_id = req.params.id;
+  const client = await pool.connect();
   try {
     await client.query("BEGIN");
     let result = await client.query(
@@ -96,91 +99,87 @@ export const getOrdersByEventId = async (req, res) => {
     await client.query("ROLLBACK");
     console.error("Error fetching orders by event id", err.stack);
     res.status(500).json({ error: "Internal server error" });
+  } finally {
+    client.release();
   }
 };
 
-export const deleteOrder = (req, res) => {
+export const deleteOrder = async (req, res) => {
   const orderId = req.params.id;
-  client
-    .query("UPDATE orders SET deleted = TRUE WHERE id = $1 RETURNING *", [
-      orderId,
-    ])
-    .then((result) => {
-      if (result.rows.length === 0) {
+  try {
+    const result = await pool.query(
+      "UPDATE orders SET deleted = TRUE WHERE id = $1 RETURNING *",
+      [orderId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.status(200).json({ message: "Order deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting order", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteOrderByEventId = async (req, res = false) => {
+  const orderId = req.params.id;
+  try {
+    const result = await pool.query(
+      "UPDATE orders SET deleted = TRUE WHERE event_id = $1 RETURNING *",
+      [orderId]
+    );
+
+    if (result.rows.length === 0) {
+      if (res !== false) {
         return res.status(404).json({ error: "Order not found" });
       }
+      return;
+    }
+    if (res !== false) {
       res.status(200).json({ message: "Order deleted successfully" });
-    })
-    .catch((err) => {
-      console.error("Error deleting order", err.stack);
+    }
+  } catch (err) {
+    console.error("Error deleting order", err.stack);
+    if (res !== false) {
       res.status(500).json({ error: "Internal server error" });
-    });
+    }
+  }
 };
 
-export const deleteOrderByEventId = (req, res = false) => {
-  const orderId = req.params.id;
-  client
-    .query("UPDATE orders SET deleted = TRUE WHERE event_id = $1 RETURNING *", [
-      orderId,
-    ])
-    .then((result) => {
-      if (result.rows.length === 0) {
-        if (res !== false) {
-          return res.status(404).json({ error: "Order not found" });
-        }
-        return;
-      }
-      if (res !== false) {
-        res.status(200).json({ message: "Order deleted successfully" });
-      }
-    })
-    .catch((err) => {
-      console.error("Error deleting order", err.stack);
-      if (res !== false) {
-        res.status(500).json({ error: "Internal server error" });
-      }
-    });
-};
-
-export const getOrderByPhoneAndEvent = (req, res) => {
+export const getOrderByPhoneAndEvent = async (req, res) => {
   const { id: event_id, phone } = req.params;
   console.log("Fetching order for phone:", phone, "and event_id:", event_id);
   console.log("Fetching order for phone:", phone, "and event_id:", event_id);
-  client
-    .query("SELECT * FROM orders WHERE phone = $1 AND event_id = $2", [
-      phone,
-      event_id,
-    ])
-    .then((result) => {
-      res.status(200).json(result.rows);
-    })
-    .catch((err) => {
-      console.error("Error fetching order by phone and event", err.stack);
-      res.status(500).json({ error: "Internal server error" });
-    });
+  try {
+    const result = await pool.query(
+      "SELECT * FROM orders WHERE phone = $1 AND event_id = $2",
+      [phone, event_id]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching order by phone and event", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-export const updateOrderContentByPhoneAndEvent = (req, res) => {
+export const updateOrderContentByPhoneAndEvent = async (req, res) => {
   const event_id = req.params.id;
   const { phone, dish_id, side_id, drink_id } = req.body;
-  client
-    .query(
+  try {
+    const result = await pool.query(
       "UPDATE orders SET dish_id = $1, side_id = $2, drink_id = $3 WHERE phone = $4 AND event_id = $5 RETURNING *",
       [dish_id, side_id, drink_id, phone, event_id]
-    )
-    .then((result) => {
-      if (result.rows.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "No orders found for this phone and event" });
-      }
-      res.status(200).json(result.rows[0]);
-    })
-    .catch((err) => {
-      console.error(
-        "Error updating order content by phone and event",
-        err.stack
-      );
-      res.status(500).json({ error: "Internal server error" });
-    });
+    );
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No orders found for this phone and event" });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating order content by phone and event", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };

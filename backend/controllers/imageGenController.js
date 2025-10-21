@@ -4,7 +4,6 @@ const IMAGEROUTER_API_KEY = process.env.IMAGEROUTER_API_KEY;
 const get_free_models_url =
   "https://api.imagerouter.io/v1/models?type=image&free=true&sort=arena_score";
 
-//let models = ["qwen/qwen-image"];
 let models = [];
 let modelsLoaded = false;
 
