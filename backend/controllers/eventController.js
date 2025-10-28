@@ -185,7 +185,19 @@ export const getUpcomingEventsWithPhoneOrder = async (req, res) => {
   const phone = req.params.phone;
   try {
     const result = await pool.query(
-      "SELECT e.*, TO_JSONB(o.*) AS orderUser FROM events e LEFT JOIN orders o ON e.id = o.event_id AND o.phone = $1 AND o.deleted = FALSE WHERE e.date >= CURRENT_DATE AND e.deleted = FALSE ORDER BY e.date ASC",
+      `SELECT e.*, 
+              COALESCE(
+                JSON_AGG(
+                  JSON_BUILD_OBJECT('item_id', oi.item_id, 'ordered_quantity', oi.ordered_quantity)
+                ) FILTER (WHERE oi.id IS NOT NULL), 
+                '[]'::json
+              ) AS orderUser 
+       FROM events e 
+       LEFT JOIN orders o ON e.id = o.event_id AND o.phone = $1 AND o.deleted = FALSE 
+       LEFT JOIN orders_items oi ON o.id = oi.order_id 
+       WHERE e.date >= CURRENT_DATE AND e.deleted = FALSE 
+       GROUP BY e.id 
+       ORDER BY e.date ASC`,
       [phone]
     );
     res.status(200).json(result.rows);
