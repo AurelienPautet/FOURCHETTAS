@@ -122,6 +122,21 @@ export const deleteOrder = async (req, res) => {
   }
 };
 
+export const deleteOrdersByEventIdAndPhone = async (req, res) => {
+  const { id: event_id, phone } = req.params;
+  try {
+    const result = await pool.query(
+      "UPDATE orders SET deleted = TRUE WHERE event_id = $1 AND phone = $2 RETURNING *",
+      [event_id, phone]
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.error("Error deleting orders by event id and phone", err.stack);
+    throw new Error("Internal server error");
+  }
+};
+
 export const deleteOrderByEventId = async (req, res = false) => {
   const orderId = req.params.id;
   try {

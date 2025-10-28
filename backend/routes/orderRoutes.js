@@ -5,7 +5,8 @@ import {
   updateOrder,
   deleteOrder,
   getOrderByPhoneAndEvent,
-  updateOrderContentByPhoneAndEvent
+  updateOrderContentByPhoneAndEvent,
+  deleteOrdersByEventIdAndPhone,
 } from "../controllers/orderController.js";
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.get("/phone/:phone/event/:id", getOrderByPhoneAndEvent);
 
 router.put("/update/:id", updateOrderContentByPhoneAndEvent);
 
+router.delete("/event/:id/phone/:phone", deleteOrdersByEventIdAndPhone);
 
 export default router;
