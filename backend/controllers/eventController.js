@@ -190,7 +190,7 @@ export const getUpcomingEventsWithPhoneOrder = async (req, res) => {
                 JSON_AGG(
                   JSON_BUILD_OBJECT('id', oi.item_id, 'ordered_quantity', oi.ordered_quantity)
                 ) FILTER (WHERE oi.id IS NOT NULL), 
-                '[]'::json
+                NULL
               ) AS orderUser 
        FROM events e 
        LEFT JOIN orders o ON e.id = o.event_id AND o.phone = $1 AND o.deleted = FALSE 
