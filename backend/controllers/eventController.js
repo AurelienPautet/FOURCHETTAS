@@ -188,7 +188,7 @@ export const getUpcomingEventsWithPhoneOrder = async (req, res) => {
       `SELECT e.*, 
               COALESCE(
                 JSON_AGG(
-                  JSON_BUILD_OBJECT('item_id', oi.item_id, 'ordered_quantity', oi.ordered_quantity)
+                  JSON_BUILD_OBJECT('id', oi.item_id, 'ordered_quantity', oi.ordered_quantity)
                 ) FILTER (WHERE oi.id IS NOT NULL), 
                 '[]'::json
               ) AS orderUser 
