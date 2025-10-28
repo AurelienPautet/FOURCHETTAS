@@ -4,7 +4,7 @@ export const getTypeByEventId = async (req, res) => {
   const event_id = req.params.id;
   try {
     const result = await pool.query(
-      "SELECT items_types.name,order_index,is_required FROM items_types JOIN items_types_events ON items_types.id = items_types_events.type_id WHERE items_types_events.event_id = $1",
+      "SELECT items_types.name,order_index,is_required FROM items_types JOIN items_types_events ON items_types.id = items_types_events.type_id WHERE items_types_events.event_id = $1 ORDER BY order_index",
       [event_id]
     );
     if (result.rows.length === 0) {

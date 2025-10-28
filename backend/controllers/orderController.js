@@ -153,7 +153,7 @@ export const getOrderByPhoneAndEvent = async (req, res) => {
   console.log("Fetching order for phone:", phone, "and event_id:", event_id);
   try {
     const result = await pool.query(
-      "SELECT * FROM orders WHERE phone = $1 AND event_id = $2",
+      "SELECT * FROM orders WHERE phone = $1 AND event_id = $2 AND deleted = FALSE",
       [phone, event_id]
     );
     res.status(200).json(result.rows);
@@ -165,21 +165,53 @@ export const getOrderByPhoneAndEvent = async (req, res) => {
 
 export const updateOrderContentByPhoneAndEvent = async (req, res) => {
   const event_id = req.params.id;
-  const { phone, dish_id, side_id, drink_id } = req.body;
+  const { phone, items } = req.body;
+
+  if (!phone || !items || !Array.isArray(items)) {
+    return res
+      .status(400)
+      .json({ error: "Missing required fields: phone and items array" });
+  }
+
+  const client = await pool.connect();
   try {
-    const result = await pool.query(
-      "UPDATE orders SET dish_id = $1, side_id = $2, drink_id = $3 WHERE phone = $4 AND event_id = $5 RETURNING *",
-      [dish_id, side_id, drink_id, phone, event_id]
+    await client.query("BEGIN");
+
+    const orderResult = await client.query(
+      "SELECT id FROM orders WHERE phone = $1 AND event_id = $2 AND deleted = FALSE",
+      [phone, event_id]
     );
 
-    if (result.rows.length === 0) {
+    if (orderResult.rows.length === 0) {
+      await client.query("ROLLBACK");
       return res
         .status(404)
         .json({ error: "No orders found for this phone and event" });
     }
-    res.status(200).json(result.rows[0]);
+
+    const orderId = orderResult.rows[0].id;
+
+    await client.query("DELETE FROM orders_items WHERE order_id = $1", [
+      orderId,
+    ]);
+
+    for (const item of items) {
+      await client.query(
+        "INSERT INTO orders_items (order_id, item_id, ordered_quantity) VALUES ($1, $2, $3)",
+        [orderId, item.id, item.ordered_quantity]
+      );
+    }
+
+    await client.query("COMMIT");
+    res.status(200).json({
+      message: "Order items updated successfully",
+      orderId,
+    });
   } catch (err) {
+    await client.query("ROLLBACK");
     console.error("Error updating order content by phone and event", err.stack);
     res.status(500).json({ error: "Internal server error" });
+  } finally {
+    client.release();
   }
 };
