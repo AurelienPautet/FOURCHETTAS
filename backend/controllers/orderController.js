@@ -130,10 +130,11 @@ export const deleteOrdersByEventIdAndPhone = async (req, res) => {
       [event_id, phone]
     );
 
+    res.status(200).json({ message: "Orders deleted successfully" });
     return result.rows;
   } catch (err) {
     console.error("Error deleting orders by event id and phone", err.stack);
-    throw new Error("Internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
