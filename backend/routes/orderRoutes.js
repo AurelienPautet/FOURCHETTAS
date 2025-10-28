@@ -21,6 +21,6 @@ router.get("/phone/:phone/event/:id", getOrderByPhoneAndEvent);
 
 router.put("/update/:id", updateOrderContentByPhoneAndEvent);
 
-router.delete("/event/:id/phone/:phone", deleteOrdersByEventIdAndPhone);
+router.delete("/phone/:phone/event/:id", deleteOrdersByEventIdAndPhone);
 
 export default router;
