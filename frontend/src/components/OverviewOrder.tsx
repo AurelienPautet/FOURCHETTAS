@@ -80,7 +80,12 @@ function OverviewOrder({
       } else {
       }
     });
-    calculateCA({ orders: filteredOrders, itemsMap, event: eventData, setCA: setCAreal });
+    calculateCA({
+      orders: filteredOrders,
+      itemsMap,
+      event: eventData,
+      setCA: setCAreal,
+    });
   }, [orders, itemsMap, eventData]);
 
   console.log(orders);
@@ -100,7 +105,10 @@ function OverviewOrder({
           <div className="stat">
             <div className="stat-title">Prix moyen commande</div>
             <div className="stat-value">
-              {orders.length > 0 ? (Number(CA) / orders.length).toFixed(2) : "0.00"} €
+              {orders.length > 0
+                ? (Number(CA) / orders.length).toFixed(2)
+                : "0.00"}{" "}
+              €
             </div>
             <div className="stat-desc">les rats</div>
           </div>
