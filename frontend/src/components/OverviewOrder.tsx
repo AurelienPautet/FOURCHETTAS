@@ -28,13 +28,16 @@ function OverviewOrder({
 
   function generatePieDataForItems(filteredItems: Item[]) {
     console.log("Generating pie data for items with items", filteredItems);
-    let orderWithNoItems = orders.length;
+
+    // Track which orders have at least one item from filteredItems
+    const ordersWithItems = new Set<number>();
+
     const pieData = filteredItems
       .map((item) => {
         const totalQuantity = orders.reduce((acc, order) => {
           const orderedItem = order.items.find((it) => it.item_id === item.id);
           if (orderedItem) {
-            orderWithNoItems--;
+            ordersWithItems.add(order.id);
           }
           return acc + (orderedItem?.ordered_quantity ?? 0);
         }, 0);
@@ -47,10 +50,15 @@ function OverviewOrder({
       })
       .filter((item) => item.value > 0);
 
-    pieData.push({
-      name: emptyItem.name,
-      value: orderWithNoItems,
-    });
+    // Calculate orders with no items from this type
+    const orderWithNoItems = orders.length - ordersWithItems.size;
+
+    if (orderWithNoItems > 0) {
+      pieData.push({
+        name: emptyItem.name,
+        value: orderWithNoItems,
+      });
+    }
 
     return pieData;
   }
