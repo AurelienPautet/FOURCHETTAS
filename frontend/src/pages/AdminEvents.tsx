@@ -5,8 +5,12 @@ import NavbarSpacer from "../components/NavbarSpacer";
 import getEventsUpcoming from "../utils/dbFetch/getEventsUpcoming";
 import getEventsOld from "../utils/dbFetch/getEventsOld";
 import deleteEvent from "../utils/dbFetch/deleteEvent";
+import getItemsFromEventId from "../utils/dbFetch/getItemsFromEventId";
+import getTypesFromEventId from "../utils/dbFetch/getTypesFromEventId";
 
 import type Event from "../types/EventType";
+import type Item from "../types/ItemType";
+import type Type from "../types/TypeType";
 import ListEvents from "../components/ListEvents";
 import AdminEventCardChildren from "../components/AdminEventCardChildren";
 import PlusCard from "../components/PlusCard";
@@ -47,6 +51,40 @@ function AdminEvents() {
         fetchNeededData();
       }
     );
+  }
+
+  async function handleCopyEvent(event: Event) {
+    try {
+      // Fetch event details, items, and types
+      const items: Item[] = await new Promise((resolve, reject) => {
+        getItemsFromEventId(
+          event.id,
+          resolve,
+          () => reject(new Error("Failed to fetch items")),
+          () => {}
+        );
+      });
+
+      const types: Type[] = await new Promise((resolve, reject) => {
+        getTypesFromEventId(
+          event.id,
+          resolve,
+          () => reject(new Error("Failed to fetch types")),
+          () => {}
+        );
+      });
+
+      // Navigate to create page with state
+      navigate("/admin/event/create", {
+        state: {
+          copiedEvent: event,
+          copiedItems: items,
+          copiedTypes: types,
+        },
+      });
+    } catch (error) {
+      console.error("Error copying event:", error);
+    }
   }
 
   function fetchNeededData() {
@@ -100,6 +138,7 @@ function AdminEvents() {
         events={upcomingEvents}
         loading={loadingUpcoming}
         onDelete={handleDeleteEvent}
+        onCopy={handleCopyEvent}
         EventCardChildren={AdminEventCardChildren}
         noEventsMessage="Aucun événement passé"
       />
@@ -110,6 +149,7 @@ function AdminEvents() {
         events={oldEvents}
         loading={loadingOld}
         onDelete={handleDeleteEvent}
+        onCopy={handleCopyEvent}
         EventCardChildren={AdminEventCardChildren}
         noEventsMessage="Aucun événement passé"
       />

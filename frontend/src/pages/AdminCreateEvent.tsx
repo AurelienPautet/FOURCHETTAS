@@ -1,23 +1,35 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import NavbarSpacer from "../components/NavbarSpacer";
 import "cally";
 import Calendar from "../components/Calendar";
 import CardImageGen from "../components/CardImageGen";
 import type CreateItem from "../types/CreateItemType";
+import type Item from "../types/ItemType";
+import type Event from "../types/EventType";
+import type Type from "../types/TypeType";
 import Logo from "../components/Logo";
 import CreateItems from "../components/CreateItems";
 import postEvent from "../utils/dbFetch/postEvent";
 import type typeType from "../types/TypeType";
 
 function AdminCreateEvent() {
-  const [eventName, setEventName] = useState<string>("");
-  const [eventDescription, setEventDescription] = useState<string>("");
+  const location = useLocation();
+  const copiedEvent = location.state?.copiedEvent as Event | undefined;
+  const copiedItems = location.state?.copiedItems as Item[] | undefined;
+  const copiedTypes = location.state?.copiedTypes as Type[] | undefined;
+
+  const [eventName, setEventName] = useState<string>(copiedEvent?.title || "");
+  const [eventDescription, setEventDescription] = useState<string>(
+    copiedEvent?.description || ""
+  );
   const [eventDate, setEventDate] = useState<string>("");
   const [eventOrdersClosingDate, setEventOrdersClosingDate] =
     useState<string>("");
-  const [eventTime, setEventTime] = useState<string>("");
-  const [eventOrdersClosingTime, setEventOrdersClosingTime] =
-    useState<string>("");
+  const [eventTime, setEventTime] = useState<string>(copiedEvent?.time || "");
+  const [eventOrdersClosingTime, setEventOrdersClosingTime] = useState<string>(
+    copiedEvent?.form_closing_time || ""
+  );
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -25,9 +37,15 @@ function AdminCreateEvent() {
   }
   const [success, setSuccess] = useState<boolean>(false);
 
-  const [eventImgUrl, setEventImgUrl] = useState<string>("");
-  const [deliveryEnabled, setDeliveryEnabled] = useState<boolean>(false);
-  const [deliveryPrice, setDeliveryPrice] = useState<number>(0);
+  const [eventImgUrl, setEventImgUrl] = useState<string>(
+    copiedEvent?.img_url || ""
+  );
+  const [deliveryEnabled, setDeliveryEnabled] = useState<boolean>(
+    copiedEvent?.deliveries_enabled || false
+  );
+  const [deliveryPrice, setDeliveryPrice] = useState<number>(
+    copiedEvent?.deliveries_price || 0
+  );
   const [removingBackground, setRemovingBackground] = useState<boolean>(false);
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
   const [eventId, setEventId] = useState<string>("");
@@ -35,12 +53,25 @@ function AdminCreateEvent() {
   const inputRef = useRef<HTMLInputElement>(null);
   const checkedRef = useRef<HTMLInputElement>(null);
 
-  const [types, setTypes] = useState<typeType[]>([
-    { name: "Plat", order_index: 1, is_required: true },
-    { name: "Boisson", order_index: 3, is_required: false },
-    { name: "Extra", order_index: 2, is_required: false },
-  ]);
-  const [itemsList, setItemsList] = useState<CreateItem[]>([]);
+  const [types, setTypes] = useState<typeType[]>(
+    copiedTypes?.length
+      ? copiedTypes
+      : [
+          { name: "Plat", order_index: 1, is_required: true },
+          { name: "Boisson", order_index: 3, is_required: false },
+          { name: "Extra", order_index: 2, is_required: false },
+        ]
+  );
+  const [itemsList, setItemsList] = useState<CreateItem[]>(
+    copiedItems?.map((item) => ({
+      name: item.name,
+      description: item.description,
+      quantity: item.quantity,
+      price: item.price,
+      type: item.type,
+      img_url: item.img_url,
+    })) || []
+  );
   function createPostRequestBody(): object {
     const jsonBody = {
       title: eventName,

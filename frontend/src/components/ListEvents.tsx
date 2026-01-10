@@ -9,6 +9,7 @@ interface ListEventsProps {
   events: Event[];
   loading: boolean;
   onDelete?: (event: Event) => void;
+  onCopy?: (event: Event) => void;
   EventCardChildren: (card: EventCardChildren) => JSX.Element;
   noEventsMessage: string;
 }
@@ -17,6 +18,7 @@ function ListEvents({
   events,
   loading,
   onDelete,
+  onCopy,
   EventCardChildren,
   noEventsMessage,
 }: ListEventsProps) {
@@ -46,6 +48,7 @@ function ListEvents({
               <EventCardChildren
                 event={event}
                 onDelete={onDelete}
+                onCopy={onCopy}
                 secondsLeft={secondsLeft}
               />
             </CardEvent>
