@@ -97,7 +97,9 @@ function AdminOrders() {
           <input
             type="radio"
             name="my_tabs_1"
-            className="tab w-1/3"
+            className={`tab ${
+              eventData?.deliveries_enabled ? "w-1/3" : "w-1/2"
+            }`}
             aria-label="Résumé"
             checked={currentTab === "overview"}
             onChange={() => handleTabChange("overview")}
@@ -115,7 +117,9 @@ function AdminOrders() {
           <input
             type="radio"
             name="my_tabs_1"
-            className="tab w-1/3 "
+            className={`tab ${
+              eventData?.deliveries_enabled ? "w-1/3" : "w-1/2"
+            }`}
             aria-label="Commandes"
             checked={currentTab === "orders"}
             onChange={() => handleTabChange("orders")}
@@ -156,62 +160,69 @@ function AdminOrders() {
             </div>
           </div>
 
-          <input
-            type="radio"
-            name="my_tabs_1"
-            className="tab w-1/3"
-            aria-label="Livraisons"
-            checked={currentTab === "deliveries"}
-            onChange={() => handleTabChange("deliveries")}
-          />
-          <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
-            <div className="flex flex-col w-full h-full">
-              <div className="grow-0 flex w-full h-full flex-row flex-wrap  justify-center items-start ">
-                <PieItems
-                  data={[
-                    {
-                      name: "Non Préparé",
-                      value:
-                        deliveryOrders.length -
-                        deliveryOrders.filter((order) => order.prepared).length,
-                    },
-                    {
-                      name: "Préparé",
-                      value: deliveryOrders.filter((order) => order.prepared)
-                        .length,
-                    },
-                  ]}
-                  labelString="Préparé"
-                  colors={["var(--color-error)", "var(--color-success)"]}
-                />
-                <PieItems
-                  data={[
-                    {
-                      name: "Non Livré",
-                      value:
-                        deliveryOrders.length -
-                        deliveryOrders.filter((order) => order.delivered)
-                          .length,
-                    },
-                    {
-                      name: "Livré",
-                      value: deliveryOrders.filter((order) => order.delivered)
-                        .length,
-                    },
-                  ]}
-                  labelString="Livré"
-                  colors={["var(--color-error)", "var(--color-success)"]}
-                />
-              </div>
-              <ListOrders
-                event={eventData}
-                items={items}
-                types={types}
-                orders={deliveryOrders}
-                itemsMap={itemsMap}
+          {eventData?.deliveries_enabled && (
+            <>
+              <input
+                type="radio"
+                name="my_tabs_1"
+                className="tab w-1/3"
+                aria-label="Livraisons"
+                checked={currentTab === "deliveries"}
+                onChange={() => handleTabChange("deliveries")}
               />
-            </div>
-          </div>
+              <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
+                <div className="flex flex-col w-full h-full">
+                  <div className="grow-0 flex w-full h-full flex-row flex-wrap  justify-center items-start ">
+                    <PieItems
+                      data={[
+                        {
+                          name: "Non Préparé",
+                          value:
+                            deliveryOrders.length -
+                            deliveryOrders.filter((order) => order.prepared)
+                              .length,
+                        },
+                        {
+                          name: "Préparé",
+                          value: deliveryOrders.filter(
+                            (order) => order.prepared
+                          ).length,
+                        },
+                      ]}
+                      labelString="Préparé"
+                      colors={["var(--color-error)", "var(--color-success)"]}
+                    />
+                    <PieItems
+                      data={[
+                        {
+                          name: "Non Livré",
+                          value:
+                            deliveryOrders.length -
+                            deliveryOrders.filter((order) => order.delivered)
+                              .length,
+                        },
+                        {
+                          name: "Livré",
+                          value: deliveryOrders.filter(
+                            (order) => order.delivered
+                          ).length,
+                        },
+                      ]}
+                      labelString="Livré"
+                      colors={["var(--color-error)", "var(--color-success)"]}
+                    />
+                  </div>
+                  <ListOrders
+                    event={eventData}
+                    items={items}
+                    types={types}
+                    orders={deliveryOrders}
+                    itemsMap={itemsMap}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
