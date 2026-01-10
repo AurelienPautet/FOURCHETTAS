@@ -4,29 +4,6 @@
 import { useEffect, useState } from "react";
 import { Pie, PieChart, ResponsiveContainer, Sector, Cell } from "recharts";
 
-import type { SectorProps } from "recharts";
-
-type Coordinate = {
-  x: number;
-  y: number;
-};
-
-type PieSectorData = {
-  percent?: number;
-  name?: string | number;
-  midAngle?: number;
-  middleRadius?: number;
-  tooltipPosition?: Coordinate;
-  value?: number;
-  paddingAngle?: number;
-  dataKey?: string;
-  payload?: any;
-};
-
-type PieSectorDataItem = React.SVGProps<SVGPathElement> &
-  Partial<SectorProps> &
-  PieSectorData;
-
 function generateAccentColors(count: number): string[] {
   // merci GPT mdrrrrrrr
 
@@ -65,18 +42,19 @@ function generateAccentColors(count: number): string[] {
 
 //const COLORS = ["var(--color-accent)", "#00C49F", "#FFBB28", "#FF0200"];
 
-const renderActiveShape = ({
-  cx,
-  cy,
-  innerRadius,
-  outerRadius,
-  startAngle,
-  endAngle,
-  fill,
-  payload,
-  percent,
-  value,
-}: PieSectorDataItem) => {
+const renderActiveShape = (props: any) => {
+  const {
+    cx,
+    cy,
+    innerRadius,
+    outerRadius,
+    startAngle,
+    endAngle,
+    fill,
+    payload,
+    percent,
+    value,
+  } = props;
   return (
     <g>
       <Sector

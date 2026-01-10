@@ -18,6 +18,8 @@ function UpcomingEvents() {
       form_closing_date: "",
       form_closing_time: "",
       img_url: "",
+      deliveries_enabled: false,
+      deliveries_price: 0,
     },
   ]);
 
