@@ -17,6 +17,19 @@ export const createOrder = async (req, res) => {
       [req.body.name, req.body.firstname, req.body.phone, req.body.event_id]
     );
     const orderId = result.rows[0].id;
+
+    // Insert delivery info if delivery is requested
+    if (
+      req.body.is_delivery &&
+      req.body.delivery_address &&
+      req.body.delivery_time
+    ) {
+      await client.query(
+        "INSERT INTO order_delivery_info (order_id, delivery_address, delivery_time) VALUES ($1, $2, $3)",
+        [orderId, req.body.delivery_address, req.body.delivery_time]
+      );
+    }
+
     for (const item of req.body.items) {
       console.log(item);
       await client.query(
@@ -90,7 +103,22 @@ export const getOrdersByEventId = async (req, res) => {
   try {
     await client.query("BEGIN");
     let result = await client.query(
-      "select orders.id, orders.name, firstname, phone, event_id, created_at,  orders.prepared, delivered , (SELECT json_agg(json_build_object('item_id',item_id,'ordered_quantity',ordered_quantity)) from orders_items where order_id = orders.id) AS items from orders where deleted = False AND event_id = $1 ORDER BY created_at DESC",
+      `SELECT 
+        orders.id, 
+        orders.name, 
+        firstname, 
+        phone, 
+        event_id, 
+        created_at, 
+        orders.prepared, 
+        delivered,
+        (SELECT json_agg(json_build_object('item_id',item_id,'ordered_quantity',ordered_quantity)) 
+         FROM orders_items WHERE order_id = orders.id) AS items,
+        (SELECT json_build_object('delivery_address', delivery_address, 'delivery_time', delivery_time) 
+         FROM order_delivery_info WHERE order_id = orders.id) AS delivery_info
+      FROM orders 
+      WHERE deleted = False AND event_id = $1 
+      ORDER BY created_at DESC`,
       [event_id]
     );
     await client.query("COMMIT");

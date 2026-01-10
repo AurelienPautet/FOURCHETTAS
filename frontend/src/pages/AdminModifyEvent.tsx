@@ -38,6 +38,8 @@ function AdminModifyEvent() {
   const [success, setSuccess] = useState<boolean>(false);
 
   const [eventImgUrl, setEventImgUrl] = useState<string>("");
+  const [deliveryEnabled, setDeliveryEnabled] = useState<boolean>(false);
+  const [deliveryPrice, setDeliveryPrice] = useState<number>(0);
 
   const [removingBackground, setRemovingBackground] = useState<boolean>(false);
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
@@ -68,6 +70,8 @@ function AdminModifyEvent() {
       eventData?.form_closing_time.substring(0, 5) || ""
     );
     setEventImgUrl(eventData?.img_url || "");
+    setDeliveryEnabled(eventData?.deliveries_enabled || false);
+    setDeliveryPrice(eventData?.deliveries_price || 0);
   }, [eventData]);
 
   useEffect(() => {
@@ -95,6 +99,8 @@ function AdminModifyEvent() {
       items: itemsList,
       itemsToDelete: itemsToDelete,
       typesToDelete: typesToDelete,
+      deliveries_enabled: deliveryEnabled,
+      deliveries_price: deliveryPrice,
     };
     return jsonBody;
   }
@@ -382,6 +388,37 @@ function AdminModifyEvent() {
                   Doit être au format HH:MM
                 </p>
               </div>
+            </div>
+            <legend className="fieldset-legend">Livraisons</legend>
+            <div className="flex flex-row w-full h-full items-center justify-center gap-4">
+              <div className="flex flex-col w-1/2 items-center justify-center">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    checked={deliveryEnabled}
+                    onChange={(e) => setDeliveryEnabled(e.target.checked)}
+                  />
+                  Activer les livraisons
+                </div>
+              </div>
+              {deliveryEnabled && (
+                <div className="flex flex-col w-1/2 items-center justify-center">
+                  <legend className="fieldset-legend">
+                    Prix de la livraison
+                  </legend>
+                  <input
+                    type="number"
+                    className="input"
+                    placeholder="Prix de la livraison en €"
+                    value={deliveryPrice}
+                    onChange={(e) =>
+                      setDeliveryPrice(parseFloat(e.target.value))
+                    }
+                    step={0.1}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </CardImageGen>

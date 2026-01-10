@@ -68,6 +68,13 @@ function UserForm() {
 
   const [eventData, setEventData] = useState<Event>();
 
+  const [isDelivery, setIsDelivery] = useState<boolean | null>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState(() => {
+    const storedAddress = localStorage.getItem("deliveryAddress");
+    return storedAddress ? storedAddress : "";
+  });
+  const [deliveryTime, setDeliveryTime] = useState("");
+
   const mainDivRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const firstNameInputRef = useRef<HTMLInputElement>(null);
@@ -82,6 +89,9 @@ function UserForm() {
   useEffect(() => {
     localStorage.setItem("phone", phone);
   }, [phone]);
+  useEffect(() => {
+    localStorage.setItem("deliveryAddress", deliveryAddress);
+  }, [deliveryAddress]);
 
   useEffect(() => {
     getEventFromId(event_id, setEventData);
@@ -92,7 +102,7 @@ function UserForm() {
     getItemsFromEventId(event_id, setItems);
   }, []);
 
-  maxTabs = 1 + types.length;
+  maxTabs = 1 + types.length + (eventData?.deliveries_enabled ? 1 : 0);
 
   function densePostOrder() {
     postOrder({
@@ -101,6 +111,9 @@ function UserForm() {
       firstName: firstName,
       phone: phone,
       items: orderedItems,
+      is_delivery: eventData?.deliveries_enabled ? isDelivery || false : false,
+      delivery_address: isDelivery === true ? deliveryAddress : undefined,
+      delivery_time: isDelivery === true ? deliveryTime : undefined,
       onRequestStart: () => {
         setOrdering(true);
         setErrorIndicator({
@@ -171,6 +184,39 @@ function UserForm() {
             message: "Veuillez sélectionner un plat.",
           });
         }
+      } else if (
+        currentTab === 1 + types.length &&
+        eventData?.deliveries_enabled
+      ) {
+        // Validate delivery tab
+        if (isDelivery === null) {
+          isValid = false;
+          setErrorIndicator({
+            has: true,
+            message: "Veuillez choisir un mode de retrait.",
+          });
+        } else if (isDelivery === true) {
+          // Validate delivery details
+          if (!deliveryAddress.trim()) {
+            isValid = false;
+            setErrorIndicator({
+              has: true,
+              message: "Veuillez saisir votre adresse de livraison.",
+            });
+          } else if (!deliveryTime) {
+            isValid = false;
+            setErrorIndicator({
+              has: true,
+              message: "Veuillez saisir une heure de livraison.",
+            });
+          } else if (eventData?.time && deliveryTime < eventData.time) {
+            isValid = false;
+            setErrorIndicator({
+              has: true,
+              message: `L'heure de livraison doit être après ${eventData.time}.`,
+            });
+          }
+        }
       }
 
       if (!isValid) {
@@ -218,6 +264,9 @@ function UserForm() {
   /*   console.log("Name:", name);
   console.log("First Name:", firstName);
   console.log("Dish ID:", dishID); */
+
+  const resumeIndex =
+    1 + types.length + (eventData?.deliveries_enabled ? 1 : 0);
 
   if (
     eventData?.form_closing_date &&
@@ -373,9 +422,127 @@ function UserForm() {
           </TransitionDiv>
         ))}
 
+        {eventData?.deliveries_enabled && (
+          <TransitionDiv
+            state={transitionState[1 + types.length]}
+            show={currentTab === 1 + types.length}
+            classes={`flex-grow flex flex-col gap-3 w-full items-center justify-center`}
+          >
+            <h1 className="mb-3 w-full text-center text-3xl font-bold">
+              Mode de retrait
+            </h1>
+            <p className="text-center mb-2">
+              La livraison est disponible pour cet événement au prix de{" "}
+              <span className="font-bold">{eventData?.deliveries_price}€</span>.
+            </p>
+
+            <div className="flex flex-row flex-wrap justify-center gap-4">
+              {/* Delivery Card */}
+              <div
+                className={`card bg-base-200 ${
+                  isDelivery === true ? "border-accent border-2" : ""
+                } w-80 shadow-sm cursor-pointer hover:scale-105 transition-transform`}
+                onClick={() => {
+                  setIsDelivery(true);
+                  setErrorIndicator({ has: false, message: "" });
+                }}
+              >
+                <figure className="px-10 pt-10 h-40 w-full flex justify-center items-center">
+                  <div className="text-6xl">🚗</div>
+                </figure>
+                <div className="card-body items-center text-center">
+                  <h2 className="card-title font-bold">Livraison</h2>
+                  <p className="text-lg font-bold">
+                    +{eventData?.deliveries_price}€
+                  </p>
+                  <p>Je veux être livré(e)</p>
+                </div>
+              </div>
+
+              {/* Pickup Card */}
+              <div
+                className={`card bg-base-200 ${
+                  isDelivery === false ? "border-accent border-2" : ""
+                } w-80 shadow-sm cursor-pointer hover:scale-105 transition-transform`}
+                onClick={() => {
+                  setIsDelivery(false);
+                  setErrorIndicator({ has: false, message: "" });
+                }}
+              >
+                <figure className="px-10 pt-10 h-40 w-full flex justify-center items-center">
+                  <div className="text-6xl">🏪</div>
+                </figure>
+                <div className="card-body items-center text-center">
+                  <h2 className="card-title font-bold">Sur place</h2>
+                  <p className="text-lg font-bold">Gratuit</p>
+                  <p>Je viendrai chercher</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Delivery Details Section */}
+            {isDelivery === true && (
+              <div className="mt-6 w-full max-w-md">
+                <fieldset className="fieldset md:gap-0 bg-base-200 border-base-300 rounded-box border p-4 flex flex-col items-start justify-center gap-4">
+                  <legend className="text-xl font-bold">
+                    Détails de livraison
+                  </legend>
+
+                  <label className="form-control w-full">
+                    <div className="label">
+                      <span className="label-text font-semibold">
+                        Adresse de livraison
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Votre adresse complète"
+                      className="input input-bordered w-full"
+                      value={deliveryAddress}
+                      onChange={(e) => {
+                        setDeliveryAddress(e.target.value);
+                        if (e.target.value.trim().length >= 5) {
+                          setErrorIndicator({ has: false, message: "" });
+                        }
+                      }}
+                      required={isDelivery === true}
+                      minLength={5}
+                    />
+                  </label>
+
+                  <label className="form-control w-full">
+                    <div className="label">
+                      <span className="label-text font-semibold">
+                        Heure de livraison souhaitée
+                      </span>
+                    </div>
+                    <input
+                      type="time"
+                      className="input input-bordered w-full"
+                      value={deliveryTime}
+                      onChange={(e) => {
+                        setDeliveryTime(e.target.value);
+                        if (
+                          e.target.value &&
+                          (!eventData?.time || e.target.value >= eventData.time)
+                        ) {
+                          setErrorIndicator({ has: false, message: "" });
+                        }
+                      }}
+                      required={isDelivery === true}
+                      min={eventData?.time || "00:00"}
+                      max="23:59"
+                    />
+                  </label>
+                </fieldset>
+              </div>
+            )}
+          </TransitionDiv>
+        )}
+
         <TransitionDiv
-          state={transitionState[1 + types.length]}
-          show={currentTab === 1 + types.length}
+          state={transitionState[resumeIndex]}
+          show={currentTab === resumeIndex}
           classes={`flex-grow flex flex-col gap-3 w-full items-center justify-center`}
         >
           {eventData ? (
@@ -388,6 +555,9 @@ function UserForm() {
               orderedItems={orderedItems}
               onClick={() => densePostOrder()}
               ordering={ordering}
+              isDelivery={isDelivery === true}
+              deliveryAddress={deliveryAddress}
+              deliveryTime={deliveryTime}
             />
           ) : (
             <span className="loading loading-spinner loading-lg"></span>
@@ -424,20 +594,32 @@ function UserForm() {
           </div>
 
           <ul className="steps">
-            <li className={`step ${currentTab >= 0 && "step-accent"}`}>
+            <li className={`step ${currentTab >= 0 ? "step-accent" : ""}`}>
               C qui ?
             </li>
             {types.map((type, index) => (
               <li
                 key={"step-indicator-" + index}
-                className={`step ${currentTab >= 1 + index && "step-accent"}`}
+                className={`step ${
+                  currentTab >= 1 + index ? "step-accent" : ""
+                }`}
               >
                 {type.name}s
               </li>
             ))}
+            {eventData?.deliveries_enabled && (
+              <li
+                className={`step ${
+                  currentTab >= 1 + types.length ? "step-accent" : ""
+                }`}
+              >
+                Livraison
+              </li>
+            )}
+
             <li
               className={`step ${
-                currentTab >= 1 + types.length && "step-accent"
+                currentTab >= resumeIndex ? "step-accent" : ""
               }`}
             >
               Résumé

@@ -45,7 +45,9 @@ export const updateEvent = async (req, res) => {
     !body.time ||
     !body.form_closing_date ||
     !body.form_closing_time ||
-    !body.img_url
+    !body.img_url ||
+    body.deliveries_enabled === undefined ||
+    body.deliveries_price === undefined
   ) {
     return res.status(400).json({ error: "Missing required fields" });
   }
@@ -55,7 +57,7 @@ export const updateEvent = async (req, res) => {
     await client.query("BEGIN");
 
     await client.query(
-      "UPDATE events SET title=$1, description=$2, date=$3, time=$4, form_closing_date=$5, form_closing_time=$6, img_url=$7 WHERE id=$8 RETURNING *",
+      "UPDATE events SET title=$1, description=$2, date=$3, time=$4, form_closing_date=$5, form_closing_time=$6, img_url=$7, deliveries_enabled=$8, deliveries_price=$9 WHERE id=$10 RETURNING *",
       [
         body.title,
         body.description,
@@ -64,6 +66,8 @@ export const updateEvent = async (req, res) => {
         body.form_closing_date,
         body.form_closing_time,
         body.img_url,
+        body.deliveries_enabled,
+        body.deliveries_price,
         event_id,
       ]
     );
@@ -248,7 +252,9 @@ export const createEvent = async (req, res) => {
     !body.form_closing_time ||
     !body.img_url ||
     !body.items ||
-    !body.types
+    !body.types ||
+    body.deliveries_enabled === undefined ||
+    body.deliveries_price === undefined
   ) {
     return res.status(400).json({ error: "Missing required fields" });
   }
@@ -259,7 +265,7 @@ export const createEvent = async (req, res) => {
     await client.query("BEGIN");
     const eventImgId = await saveImageToDb(body.img_url);
     let result = await client.query(
-      "INSERT INTO events (title, description, date, time, form_closing_date, form_closing_time, img_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      "INSERT INTO events (title, description, date, time, form_closing_date, form_closing_time, img_url, deliveries_enabled, deliveries_price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
       [
         body.title,
         body.description,
@@ -268,6 +274,8 @@ export const createEvent = async (req, res) => {
         body.form_closing_date,
         body.form_closing_time,
         `${serverUrl}/api/images/${eventImgId.rows[0].id}`,
+        body.deliveries_enabled,
+        body.deliveries_price,
       ]
     );
     let eventId = result.rows[0].id;

@@ -10,4 +10,8 @@ export default interface Order {
   delivered: boolean;
   price?: number;
   deleted: boolean;
+  delivery_info?: {
+    delivery_address: string;
+    delivery_time: string;
+  } | null;
 }

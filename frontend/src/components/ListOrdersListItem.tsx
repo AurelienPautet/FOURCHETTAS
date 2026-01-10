@@ -111,6 +111,21 @@ function ListOrdersListItem({
           </>
         ))}
       </td>
+      <td>
+        {order.delivery_info ? (
+          <div>
+            <div className="font-semibold text-xs">Livraison</div>
+            <div className="text-xs">
+              {order.delivery_info.delivery_address}
+            </div>
+            <div className="text-xs opacity-50">
+              à {order.delivery_info.delivery_time}
+            </div>
+          </div>
+        ) : (
+          <div className="text-xs opacity-50">Sur place</div>
+        )}
+      </td>
       <td>{order.price}€</td>
       <td>
         <div>

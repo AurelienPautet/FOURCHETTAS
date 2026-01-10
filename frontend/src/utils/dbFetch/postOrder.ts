@@ -8,15 +8,30 @@ interface orderData {
   firstName: string;
   phone: string;
   items: Item[];
+  is_delivery?: boolean;
+  delivery_address?: string;
+  delivery_time?: string;
 }
 
-function orderJson({ event_id, name, firstName, phone, items }: orderData) {
-  let res_json = {
+function orderJson({
+  event_id,
+  name,
+  firstName,
+  phone,
+  items,
+  is_delivery,
+  delivery_address,
+  delivery_time,
+}: orderData) {
+  const res_json = {
     event_id: event_id,
     name: name,
     firstname: firstName,
     phone: phone,
     items,
+    is_delivery,
+    delivery_address,
+    delivery_time,
   };
 
   return res_json;
@@ -30,6 +45,9 @@ export default async function postOrder({
   firstName,
   phone,
   items,
+  is_delivery,
+  delivery_address,
+  delivery_time,
   onRequestStart = () => {},
   onRequestEnd = () => {},
   onSuccess = () => {},
@@ -48,6 +66,9 @@ export default async function postOrder({
         firstName,
         phone,
         items,
+        is_delivery,
+        delivery_address,
+        delivery_time,
       })
     ),
   })

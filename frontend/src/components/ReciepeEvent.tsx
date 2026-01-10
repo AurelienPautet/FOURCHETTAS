@@ -11,6 +11,9 @@ interface ReciepeEventProps {
   orderedItems: Item[];
   onClick: () => void;
   ordering: boolean;
+  isDelivery?: boolean;
+  deliveryAddress?: string;
+  deliveryTime?: string;
 }
 
 function ReciepeEvent({
@@ -20,14 +23,22 @@ function ReciepeEvent({
   orderedItems,
   onClick,
   ordering,
+  isDelivery,
+  deliveryAddress,
+  deliveryTime,
 }: ReciepeEventProps) {
   let totalPrice = 0;
   orderedItems.forEach((item) => {
     if (item.ordered_quantity) totalPrice += item.price * item.ordered_quantity;
   });
 
+  // Add delivery price if delivery is selected
+  if (isDelivery && event.deliveries_price) {
+    totalPrice += Number(event.deliveries_price);
+  }
+
   return (
-    <div className="flex w-full justify-center items-center flex-col gap-4 md:gap-1">
+    <div className="flex w-full justify-center items-center flex-col gap-4 ">
       <h1 className="mb-3 w-full text-center text-3xl font-bold">
         Résumé de ta commande pour{" "}
         <span className="font-extrabold animate-bounce animate-infinite animate-duration-1000 animate-ease-linear animate-normal">
@@ -64,6 +75,14 @@ function ReciepeEvent({
                 </tr>
               ))}
 
+              {isDelivery && event.deliveries_price && (
+                <tr>
+                  <td>Livraison</td>
+                  <td>1</td>
+                  <td>{event.deliveries_price} €</td>
+                </tr>
+              )}
+
               <tr className="font-bold h-full">
                 <td>TOTAL</td>
                 <td></td>
@@ -73,6 +92,22 @@ function ReciepeEvent({
           </table>
         </div>
       </fieldset>
+
+      {isDelivery && deliveryAddress && deliveryTime && (
+        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+          <h3 className="text-lg font-bold mb-3">Informations de livraison</h3>
+          <div className="flex flex-col gap-2">
+            <div>
+              <span className="font-semibold">Adresse : </span>
+              <span>{deliveryAddress}</span>
+            </div>
+            <div>
+              <span className="font-semibold">Heure souhaitée : </span>
+              <span>{deliveryTime}</span>
+            </div>
+          </div>
+        </fieldset>
+      )}
 
       <button
         onClick={onClick}

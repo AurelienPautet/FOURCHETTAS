@@ -8,4 +8,6 @@ export default interface Event {
   form_closing_time: string;
   img_url: string;
   deleting?: boolean;
+  deliveries_enabled: boolean;
+  deliveries_price: number;
 }

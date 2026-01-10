@@ -12,6 +12,7 @@ function OverviewOrder({
   types,
   orders,
   itemsMap,
+  event: eventData,
 }: AdminOrdersChildProps) {
   const emptyItem = {
     id: 0,
@@ -53,10 +54,24 @@ function OverviewOrder({
 
     return pieData;
   }
+
+  function generateDeliveryPieData() {
+    const deliveryCount = orders.filter(
+      (order) =>
+        order.delivery_info !== null && order.delivery_info !== undefined
+    ).length;
+    const pickupCount = orders.length - deliveryCount;
+
+    return [
+      { name: "Livraison", value: deliveryCount },
+      { name: "Sur place", value: pickupCount },
+    ].filter((item) => item.value > 0);
+  }
+
   const [CA, setCA] = useState<number>(0);
   const [CAreal, setCAreal] = useState<number>(0);
   useEffect(() => {
-    calculateCA({ orders, itemsMap, setCA });
+    calculateCA({ orders, itemsMap, event: eventData, setCA });
     let filteredOrders: Order[];
     filteredOrders = [];
     orders.map((order: Order) => {
@@ -65,8 +80,8 @@ function OverviewOrder({
       } else {
       }
     });
-    calculateCA({ orders: filteredOrders, itemsMap, setCA: setCAreal });
-  }, [orders, itemsMap]);
+    calculateCA({ orders: filteredOrders, itemsMap, event: eventData, setCA: setCAreal });
+  }, [orders, itemsMap, eventData]);
 
   console.log(orders);
 
@@ -85,7 +100,7 @@ function OverviewOrder({
           <div className="stat">
             <div className="stat-title">Prix moyen commande</div>
             <div className="stat-value">
-              {(CA / orders.length).toFixed(2)} €
+              {orders.length > 0 ? (Number(CA) / orders.length).toFixed(2) : "0.00"} €
             </div>
             <div className="stat-desc">les rats</div>
           </div>
@@ -93,14 +108,14 @@ function OverviewOrder({
         <div className="stats shadow h-30 w-50 bg-base-200">
           <div className="stat">
             <div className="stat-title">CA estimé</div>
-            <div className="stat-value">{CA.toFixed(2)} €</div>
+            <div className="stat-value">{Number(CA || 0).toFixed(2)} €</div>
             <div className="stat-desc">la moula</div>
           </div>
         </div>
         <div className="stats shadow h-30 w-50 bg-base-200">
           <div className="stat">
             <div className="stat-title">CA réel</div>
-            <div className="stat-value">{CAreal.toFixed(2)} €</div>
+            <div className="stat-value">{Number(CAreal || 0).toFixed(2)} €</div>
             <div className="stat-desc">shallah pareil que le CA</div>
           </div>
         </div>
@@ -108,6 +123,10 @@ function OverviewOrder({
       <h1 className="text-2xl font-bold">Résumé des commandes</h1>
       <div className="flex flex-col gap-4"></div>
       <div className="flex w-full h-full flex-row flex-wrap  justify-center items-start ">
+        <PieItems
+          data={generateDeliveryPieData()}
+          labelString="Mode de retrait"
+        />
         {types.map((type: Type) => {
           console.log("Generating pie for type:", type.name);
           const filteredItems = items.filter((item) => item.type === type.name);

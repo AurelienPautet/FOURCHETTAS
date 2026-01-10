@@ -7,10 +7,6 @@
         DROP TABLE IF EXISTS orders CASCADE;
         DROP TABLE IF EXISTS items CASCADE;
         DROP TABLE IF EXISTS events CASCADE;
-*/
-
-function initialQuery() {
-  return `
 
         CREATE TABLE IF NOT EXISTS events_backup AS
              SELECT * FROM events;
@@ -21,6 +17,12 @@ function initialQuery() {
         CREATE TABLE IF NOT EXISTS orders_backup AS
              SELECT * FROM orders;
     
+
+*/
+
+function initialQuery() {
+  return `
+
 
         CREATE TABLE IF NOT EXISTS events (
           	id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -33,6 +35,9 @@ function initialQuery() {
             img_url TEXT NOT NULL,
             deleted BOOLEAN DEFAULT FALSE
         );
+
+        ALTER TABLE events ADD COLUMN IF NOT EXISTS deliveries_enabled BOOLEAN DEFAULT FALSE;
+        ALTER TABLE events ADD COLUMN IF NOT EXISTS deliveries_price NUMERIC(10, 2) DEFAULT 0;
         CREATE TABLE IF NOT EXISTS items (
             id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
             name VARCHAR(50) NOT NULL,
@@ -57,6 +62,15 @@ function initialQuery() {
             deliveredAt TIMESTAMP,
             deleted BOOLEAN DEFAULT FALSE
         );
+
+        CREATE TABLE IF NOT EXISTS order_delivery_info (
+            id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+            order_id INT NOT NULL,
+            delivery_address TEXT NOT NULL,
+            delivery_time TIME NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+        );
+
 
         CREATE TABLE IF NOT EXISTS images (
             id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

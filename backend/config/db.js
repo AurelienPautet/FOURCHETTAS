@@ -25,6 +25,7 @@ if (process.env.DATABASE_URL == undefined) {
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
   });
+  pool.query(initialQuery());
 } else {
   console.log("Using production db");
   pool = new Pool({
@@ -47,6 +48,8 @@ pool
   .query("SELECT NOW()")
   .then(() => console.log("Connected to PostgreSQL database"))
   .catch((err) => console.error("Connection error", err.stack));
+
+// Run initial query to set up tables if they don't exist
 
 console.log("Database pool initialized");
 

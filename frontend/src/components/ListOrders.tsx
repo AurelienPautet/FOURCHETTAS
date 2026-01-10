@@ -3,15 +3,15 @@ import type AdminOrdersChildProps from "../types/AdminOrdersChild";
 import ListOrdersListItem from "./ListOrdersListItem";
 import calculatePriceOrder from "../utils/calculatePriceOrder";
 
-function ListOrders({ orders, itemsMap }: AdminOrdersChildProps) {
+function ListOrders({ orders, itemsMap, event }: AdminOrdersChildProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const ordersWithPrices = useMemo(() => {
     return orders.map((order) => ({
       ...order,
-      price: calculatePriceOrder(order, itemsMap),
+      price: calculatePriceOrder(order, itemsMap, event),
     }));
-  }, [orders, itemsMap]);
+  }, [orders, itemsMap, event]);
 
   const [filteredOrders, setFilteredOrders] = useState(ordersWithPrices);
 
@@ -87,6 +87,7 @@ function ListOrders({ orders, itemsMap }: AdminOrdersChildProps) {
               <th className="shrink-0 grow-0 pr-0">Livré?</th>
               <th> Qui est-ce ?</th>
               <th>Commande</th>
+              <th>Adresse de livraison</th>
               <th>Prix</th>
               <th>Date </th>
               <th></th>
