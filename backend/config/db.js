@@ -25,7 +25,6 @@ if (process.env.DATABASE_URL == undefined) {
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
   });
-  pool.query(initialQuery());
 } else {
   console.log("Using production db");
   pool = new Pool({
@@ -38,6 +37,7 @@ if (process.env.DATABASE_URL == undefined) {
     connectionTimeoutMillis: 10000,
     allowExitOnIdle: true,
   });
+  pool.query(initialQuery());
 }
 
 pool.on("error", (err, client) => {
