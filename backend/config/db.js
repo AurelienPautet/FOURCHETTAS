@@ -37,7 +37,6 @@ if (process.env.DATABASE_URL == undefined) {
     connectionTimeoutMillis: 10000,
     allowExitOnIdle: true,
   });
-  pool.query(initialQuery());
 }
 
 pool.on("error", (err, client) => {
