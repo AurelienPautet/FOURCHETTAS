@@ -27,7 +27,13 @@ function AdminLogin() {
   return (
     <div>
       <NavbarSpacer />
-      <div className="flex-grow h-full w-full flex flex-col items-center justify-center gap-4">
+      <form
+        className="flex-grow h-full w-full flex flex-col items-center justify-center gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin();
+        }}
+      >
         <Logo />
         <input
           className={`input text-2xl rounded-md ${error && "input-error"}`}
@@ -37,15 +43,14 @@ function AdminLogin() {
           placeholder="Mot de passe admin"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          onSubmit={handleLogin}
         />
         {error && (
           <div className="text-error">Mot de passe incorrect, réessayez.</div>
         )}
-        <button className="btn mr-4 btn-accent" onClick={handleLogin}>
+        <button className="btn mr-4 btn-accent" type="submit">
           Se connecter
         </button>
-      </div>
+      </form>
     </div>
   );
 }
