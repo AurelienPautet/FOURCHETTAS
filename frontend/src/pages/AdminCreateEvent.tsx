@@ -21,14 +21,14 @@ function AdminCreateEvent() {
 
   const [eventName, setEventName] = useState<string>(copiedEvent?.title || "");
   const [eventDescription, setEventDescription] = useState<string>(
-    copiedEvent?.description || ""
+    copiedEvent?.description || "",
   );
   const [eventDate, setEventDate] = useState<string>("");
   const [eventOrdersClosingDate, setEventOrdersClosingDate] =
     useState<string>("");
   const [eventTime, setEventTime] = useState<string>(copiedEvent?.time || "");
   const [eventOrdersClosingTime, setEventOrdersClosingTime] = useState<string>(
-    copiedEvent?.form_closing_time || ""
+    copiedEvent?.form_closing_time || "",
   );
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,13 +38,22 @@ function AdminCreateEvent() {
   const [success, setSuccess] = useState<boolean>(false);
 
   const [eventImgUrl, setEventImgUrl] = useState<string>(
-    copiedEvent?.img_url || ""
+    copiedEvent?.img_url || "",
   );
   const [deliveryEnabled, setDeliveryEnabled] = useState<boolean>(
-    copiedEvent?.deliveries_enabled || false
+    copiedEvent?.deliveries_enabled || false,
   );
   const [deliveryPrice, setDeliveryPrice] = useState<number>(
-    copiedEvent?.deliveries_price || 0
+    copiedEvent?.deliveries_price || 0,
+  );
+  const [deliveryStartTime, setDeliveryStartTime] = useState<string>(
+    copiedEvent?.deliveries_start_time?.substring(0, 5) || "",
+  );
+  const [deliveryEndTime, setDeliveryEndTime] = useState<string>(
+    copiedEvent?.deliveries_end_time?.substring(0, 5) || "",
+  );
+  const [deliveryInfo, setDeliveryInfo] = useState<string>(
+    copiedEvent?.deliveries_info || "",
   );
   const [removingBackground, setRemovingBackground] = useState<boolean>(false);
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
@@ -60,7 +69,7 @@ function AdminCreateEvent() {
           { name: "Plat", order_index: 1, is_required: true },
           { name: "Boisson", order_index: 3, is_required: false },
           { name: "Extra", order_index: 2, is_required: false },
-        ]
+        ],
   );
   const [itemsList, setItemsList] = useState<CreateItem[]>(
     copiedItems?.map((item) => ({
@@ -70,7 +79,7 @@ function AdminCreateEvent() {
       price: item.price,
       type: item.type,
       img_url: item.img_url,
-    })) || []
+    })) || [],
   );
   function createPostRequestBody(): object {
     const jsonBody = {
@@ -85,6 +94,9 @@ function AdminCreateEvent() {
       items: itemsList,
       deliveries_enabled: deliveryEnabled,
       deliveries_price: deliveryPrice,
+      deliveries_start_time: deliveryStartTime || null,
+      deliveries_end_time: deliveryEndTime || null,
+      deliveries_info: deliveryInfo || null,
     };
     return jsonBody;
   }
@@ -177,7 +189,7 @@ function AdminCreateEvent() {
   function setItemValue(
     index: number,
     field: keyof CreateItem,
-    value: string | number
+    value: string | number,
   ) {
     const updatedItems = [...itemsList];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
@@ -394,6 +406,59 @@ function AdminCreateEvent() {
                 </div>
               )}
             </div>
+            {deliveryEnabled && (
+              <div className="flex flex-col w-full items-center justify-center gap-4 mt-2">
+                <div className="flex flex-row w-full items-center justify-center gap-4">
+                  <div className="flex flex-col w-1/2 items-center justify-center">
+                    <legend className="fieldset-legend">
+                      Début des livraisons
+                    </legend>
+                    <label className="input validator">
+                      <input
+                        type="text"
+                        required
+                        placeholder="HH:MM"
+                        pattern="([0-2][0-3]|[0-1][0-9]):[0-5][0-9]"
+                        minLength={5}
+                        maxLength={5}
+                        value={deliveryStartTime}
+                        onChange={(e) => setDeliveryStartTime(e.target.value)}
+                      />
+                    </label>
+                    <p className="validator-hint h-0 p-0 mt-1">Format HH:MM</p>
+                  </div>
+                  <div className="flex flex-col w-1/2 items-center justify-center">
+                    <legend className="fieldset-legend">
+                      Fin des livraisons
+                    </legend>
+                    <label className="input validator">
+                      <input
+                        type="text"
+                        required
+                        placeholder="HH:MM"
+                        pattern="([0-2][0-3]|[0-1][0-9]):[0-5][0-9]"
+                        minLength={5}
+                        maxLength={5}
+                        value={deliveryEndTime}
+                        onChange={(e) => setDeliveryEndTime(e.target.value)}
+                      />
+                    </label>
+                    <p className="validator-hint h-0 p-0 mt-1">Format HH:MM</p>
+                  </div>
+                </div>
+                <div className="flex flex-col w-full items-center justify-center">
+                  <legend className="fieldset-legend">
+                    Informations de livraison
+                  </legend>
+                  <textarea
+                    className="textarea w-full"
+                    placeholder="Informations supplémentaires sur les livraisons (zone de livraison, instructions, etc.)"
+                    value={deliveryInfo}
+                    onChange={(e) => setDeliveryInfo(e.target.value)}
+                  ></textarea>
+                </div>
+              </div>
+            )}
           </div>
         </CardImageGen>
 

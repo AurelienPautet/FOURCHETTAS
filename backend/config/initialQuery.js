@@ -38,6 +38,9 @@ function initialQuery() {
 
         ALTER TABLE events ADD COLUMN IF NOT EXISTS deliveries_enabled BOOLEAN DEFAULT FALSE;
         ALTER TABLE events ADD COLUMN IF NOT EXISTS deliveries_price NUMERIC(10, 2) DEFAULT 0;
+        ALTER TABLE events ADD COLUMN IF NOT EXISTS deliveries_start_time TIME DEFAULT NULL;
+        ALTER TABLE events ADD COLUMN IF NOT EXISTS deliveries_end_time TIME DEFAULT NULL;
+        ALTER TABLE events ADD COLUMN IF NOT EXISTS deliveries_info TEXT DEFAULT NULL;
         CREATE TABLE IF NOT EXISTS items (
             id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
             name VARCHAR(50) NOT NULL,

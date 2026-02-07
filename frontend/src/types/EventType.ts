@@ -10,4 +10,7 @@ export default interface Event {
   deleting?: boolean;
   deliveries_enabled: boolean;
   deliveries_price: number;
+  deliveries_start_time?: string | null;
+  deliveries_end_time?: string | null;
+  deliveries_info?: string | null;
 }

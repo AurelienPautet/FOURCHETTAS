@@ -19,7 +19,7 @@ export const deleteEvent = async (req, res) => {
   try {
     const result = await pool.query(
       "UPDATE events SET deleted = TRUE WHERE id = $1 RETURNING *",
-      [event_id]
+      [event_id],
     );
 
     if (result.rows.length === 0) {
@@ -52,12 +52,23 @@ export const updateEvent = async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  // If deliveries are enabled, require the new delivery fields
+  if (body.deliveries_enabled) {
+    if (!body.deliveries_start_time || !body.deliveries_end_time) {
+      return res
+        .status(400)
+        .json({
+          error: "Missing delivery time fields when deliveries are enabled",
+        });
+    }
+  }
+
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
     await client.query(
-      "UPDATE events SET title=$1, description=$2, date=$3, time=$4, form_closing_date=$5, form_closing_time=$6, img_url=$7, deliveries_enabled=$8, deliveries_price=$9 WHERE id=$10 RETURNING *",
+      "UPDATE events SET title=$1, description=$2, date=$3, time=$4, form_closing_date=$5, form_closing_time=$6, img_url=$7, deliveries_enabled=$8, deliveries_price=$9, deliveries_start_time=$10, deliveries_end_time=$11, deliveries_info=$12 WHERE id=$13 RETURNING *",
       [
         body.title,
         body.description,
@@ -68,31 +79,34 @@ export const updateEvent = async (req, res) => {
         body.img_url,
         body.deliveries_enabled,
         body.deliveries_price,
+        body.deliveries_start_time || null,
+        body.deliveries_end_time || null,
+        body.deliveries_info || null,
         event_id,
-      ]
+      ],
     );
 
     if (body.types && Array.isArray(body.types)) {
       for (let type of body.types) {
         let typeId = await client.query(
           "INSERT INTO items_types (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
-          [type.name]
+          [type.name],
         );
 
         const linkExists = await client.query(
           "SELECT * FROM items_types_events WHERE type_id=$1 AND event_id=$2",
-          [typeId.rows[0].id, event_id]
+          [typeId.rows[0].id, event_id],
         );
 
         if (linkExists.rows.length === 0) {
           await client.query(
             "INSERT INTO items_types_events (type_id, event_id, order_index, is_required) VALUES ($1, $2, $3, $4)",
-            [typeId.rows[0].id, event_id, type.order_index, type.is_required]
+            [typeId.rows[0].id, event_id, type.order_index, type.is_required],
           );
         } else {
           await client.query(
             "UPDATE items_types_events SET order_index=$1, is_required=$2 WHERE type_id=$3 AND event_id=$4",
-            [type.order_index, type.is_required, typeId.rows[0].id, event_id]
+            [type.order_index, type.is_required, typeId.rows[0].id, event_id],
           );
         }
       }
@@ -101,7 +115,7 @@ export const updateEvent = async (req, res) => {
         for (let typeName of body.typesToDelete) {
           await client.query(
             "DELETE FROM items_types_events WHERE type_id=(SELECT id FROM items_types WHERE name=$1) AND event_id=$2",
-            [typeName, event_id]
+            [typeName, event_id],
           );
         }
       }
@@ -120,11 +134,11 @@ export const updateEvent = async (req, res) => {
               `${serverUrl}/api/images/${imageId.rows[0].id}`,
               item.type,
               item.quantity,
-            ]
+            ],
           );
           await client.query(
             "INSERT INTO items_events (item_id, event_id, type_id) VALUES ($1, $2, (SELECT id FROM items_types WHERE name=$3))",
-            [inserted_item.rows[0].id, event_id, item.type]
+            [inserted_item.rows[0].id, event_id, item.type],
           );
         } else if (item.modified && item.id) {
           let img_url = item.img_url;
@@ -142,11 +156,11 @@ export const updateEvent = async (req, res) => {
               item.type,
               item.quantity,
               item.id,
-            ]
+            ],
           );
           await client.query(
             "UPDATE items_events SET type_id=(SELECT id FROM items_types WHERE name=$1) WHERE item_id=$2 AND event_id=$3",
-            [item.type, item.id, event_id]
+            [item.type, item.id, event_id],
           );
         }
       }
@@ -176,7 +190,7 @@ export const updateEvent = async (req, res) => {
 export const getUpcomingEvents = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM events WHERE date >= CURRENT_DATE AND deleted = FALSE ORDER BY date ASC"
+      "SELECT * FROM events WHERE date >= CURRENT_DATE AND deleted = FALSE ORDER BY date ASC",
     );
     res.status(200).json(result.rows);
   } catch (err) {
@@ -202,7 +216,7 @@ export const getUpcomingEventsWithPhoneOrder = async (req, res) => {
        WHERE e.date >= CURRENT_DATE AND e.deleted = FALSE 
        GROUP BY e.id 
        ORDER BY e.date ASC`,
-      [phone]
+      [phone],
     );
     res.status(200).json(result.rows);
   } catch (err) {
@@ -214,7 +228,7 @@ export const getUpcomingEventsWithPhoneOrder = async (req, res) => {
 export const getOldEvents = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM events WHERE date < CURRENT_DATE AND deleted = FALSE ORDER BY date ASC"
+      "SELECT * FROM events WHERE date < CURRENT_DATE AND deleted = FALSE ORDER BY date ASC",
     );
     res.status(200).json(result.rows);
   } catch (err) {
@@ -228,7 +242,7 @@ export const getEventById = async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM events WHERE events.id = $1",
-      [event_id]
+      [event_id],
     );
 
     if (result.rows.length === 0) {
@@ -259,13 +273,24 @@ export const createEvent = async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  // If deliveries are enabled, require the new delivery fields
+  if (body.deliveries_enabled) {
+    if (!body.deliveries_start_time || !body.deliveries_end_time) {
+      return res
+        .status(400)
+        .json({
+          error: "Missing delivery time fields when deliveries are enabled",
+        });
+    }
+  }
+
   console.log("Creating event with body:", body);
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
     const eventImgId = await saveImageToDb(body.img_url);
     let result = await client.query(
-      "INSERT INTO events (title, description, date, time, form_closing_date, form_closing_time, img_url, deliveries_enabled, deliveries_price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+      "INSERT INTO events (title, description, date, time, form_closing_date, form_closing_time, img_url, deliveries_enabled, deliveries_price, deliveries_start_time, deliveries_end_time, deliveries_info) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
       [
         body.title,
         body.description,
@@ -276,7 +301,10 @@ export const createEvent = async (req, res) => {
         `${serverUrl}/api/images/${eventImgId.rows[0].id}`,
         body.deliveries_enabled,
         body.deliveries_price,
-      ]
+        body.deliveries_start_time || null,
+        body.deliveries_end_time || null,
+        body.deliveries_info || null,
+      ],
     );
     let eventId = result.rows[0].id;
     console.log("Created event with ID:", eventId);
@@ -285,12 +313,12 @@ export const createEvent = async (req, res) => {
       console.log("Processing type:", type);
       let typeId = await client.query(
         "INSERT INTO items_types (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id",
-        [type.name]
+        [type.name],
       );
       console.log("Inserted type:", typeId.rows[0]);
       await client.query(
         "INSERT INTO items_types_events (type_id, event_id,order_index,is_required) VALUES ($1, $2, $3, $4)",
-        [typeId.rows[0].id, eventId, type.order_index, type.is_required]
+        [typeId.rows[0].id, eventId, type.order_index, type.is_required],
       );
       console.log("Linked type to event:", typeId.rows[0].id, eventId);
     }
@@ -306,12 +334,12 @@ export const createEvent = async (req, res) => {
           `${serverUrl}/api/images/${imageId.rows[0].id}`,
           item.type,
           item.quantity,
-        ]
+        ],
       );
       console.log("Inserted item:", inserted_item.rows[0]);
       await client.query(
         "INSERT INTO items_events (item_id, event_id,type_id) VALUES ($1, $2, (SELECT id FROM items_types WHERE name=$3))",
-        [inserted_item.rows[0].id, eventId, item.type]
+        [inserted_item.rows[0].id, eventId, item.type],
       );
     }
     await client.query("COMMIT");

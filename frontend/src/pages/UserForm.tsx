@@ -153,7 +153,7 @@ function UserForm() {
         if (!nameInputRef.current?.reportValidity()) {
           console.log("Name input is invalid.");
           nameInputRef.current?.setCustomValidity(
-            "Dois être de 3 à 30 caractères"
+            "Dois être de 3 à 30 caractères",
           );
           isValid = false;
         }
@@ -161,7 +161,7 @@ function UserForm() {
         if (!firstNameInputRef.current?.reportValidity()) {
           console.log("First name input is invalid.");
           firstNameInputRef.current?.setCustomValidity(
-            "Dois être de 3 à 30 caractères"
+            "Dois être de 3 à 30 caractères",
           );
           isValid = false;
         }
@@ -175,7 +175,7 @@ function UserForm() {
         if (types[currentTab - 1].is_required) {
           isValid =
             orderedItems.filter(
-              (item) => item.type === types[currentTab - 1].name
+              (item) => item.type === types[currentTab - 1].name,
             ).length > 0;
         }
         if (!isValid) {
@@ -209,12 +209,24 @@ function UserForm() {
               has: true,
               message: "Veuillez saisir une heure de livraison.",
             });
-          } else if (eventData?.time && deliveryTime < eventData.time) {
-            isValid = false;
-            setErrorIndicator({
-              has: true,
-              message: `L'heure de livraison doit être après ${eventData.time}.`,
-            });
+          } else {
+            const minTime =
+              eventData?.deliveries_start_time?.substring(0, 5) ||
+              eventData?.time;
+            const maxTime = eventData?.deliveries_end_time?.substring(0, 5);
+            if (minTime && deliveryTime < minTime) {
+              isValid = false;
+              setErrorIndicator({
+                has: true,
+                message: `L'heure de livraison doit être après ${minTime}.`,
+              });
+            } else if (maxTime && deliveryTime > maxTime) {
+              isValid = false;
+              setErrorIndicator({
+                has: true,
+                message: `L'heure de livraison doit être avant ${maxTime}.`,
+              });
+            }
           }
         }
       }
@@ -414,7 +426,7 @@ function UserForm() {
                       });
                     }}
                     selected={orderedItems.some(
-                      (orderedItem) => orderedItem.id === dish.id
+                      (orderedItem) => orderedItem.id === dish.id,
                     )}
                   />
                 ))}
@@ -435,6 +447,21 @@ function UserForm() {
               La livraison est disponible pour cet événement au prix de{" "}
               <span className="font-bold">{eventData?.deliveries_price}€</span>.
             </p>
+            {eventData?.deliveries_start_time &&
+              eventData?.deliveries_end_time && (
+                <p className="text-center mb-2">
+                  Créneau de livraison :{" "}
+                  <span className="font-bold">
+                    {eventData.deliveries_start_time.substring(0, 5)} -{" "}
+                    {eventData.deliveries_end_time.substring(0, 5)}
+                  </span>
+                </p>
+              )}
+            {eventData?.deliveries_info && (
+              <p className="text-center mb-2 text-sm opacity-70">
+                {eventData.deliveries_info}
+              </p>
+            )}
 
             <div className="flex flex-row flex-wrap justify-center gap-4">
               {/* Delivery Card */}
@@ -488,6 +515,12 @@ function UserForm() {
                     Détails de livraison
                   </legend>
 
+                  {eventData?.deliveries_info && (
+                    <p className="text-sm w-full text-center">
+                      Info supplémentaire : {eventData.deliveries_info}
+                    </p>
+                  )}
+
                   <label className="form-control w-full">
                     <div className="label">
                       <span className="label-text font-semibold">
@@ -515,6 +548,14 @@ function UserForm() {
                       <span className="label-text font-semibold">
                         Heure de livraison souhaitée
                       </span>
+                      {eventData?.deliveries_start_time &&
+                        eventData?.deliveries_end_time && (
+                          <span className="label-text-alt">
+                            entre{" "}
+                            {eventData.deliveries_start_time.substring(0, 5)} et{" "}
+                            {eventData.deliveries_end_time.substring(0, 5)}
+                          </span>
+                        )}
                     </div>
                     <input
                       type="time"
@@ -522,16 +563,29 @@ function UserForm() {
                       value={deliveryTime}
                       onChange={(e) => {
                         setDeliveryTime(e.target.value);
+                        const minTime =
+                          eventData?.deliveries_start_time?.substring(0, 5) ||
+                          eventData?.time;
+                        const maxTime =
+                          eventData?.deliveries_end_time?.substring(0, 5);
                         if (
                           e.target.value &&
-                          (!eventData?.time || e.target.value >= eventData.time)
+                          (!minTime || e.target.value >= minTime) &&
+                          (!maxTime || e.target.value <= maxTime)
                         ) {
                           setErrorIndicator({ has: false, message: "" });
                         }
                       }}
                       required={isDelivery === true}
-                      min={eventData?.time || "00:00"}
-                      max="23:59"
+                      min={
+                        eventData?.deliveries_start_time?.substring(0, 5) ||
+                        eventData?.time ||
+                        "00:00"
+                      }
+                      max={
+                        eventData?.deliveries_end_time?.substring(0, 5) ||
+                        "23:59"
+                      }
                     />
                   </label>
                 </fieldset>

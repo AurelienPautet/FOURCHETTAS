@@ -40,6 +40,9 @@ function AdminModifyEvent() {
   const [eventImgUrl, setEventImgUrl] = useState<string>("");
   const [deliveryEnabled, setDeliveryEnabled] = useState<boolean>(false);
   const [deliveryPrice, setDeliveryPrice] = useState<number>(0);
+  const [deliveryStartTime, setDeliveryStartTime] = useState<string>("");
+  const [deliveryEndTime, setDeliveryEndTime] = useState<string>("");
+  const [deliveryInfo, setDeliveryInfo] = useState<string>("");
 
   const [removingBackground, setRemovingBackground] = useState<boolean>(false);
   const [activeBgRemovals, setActiveBgRemovals] = useState<number>(0);
@@ -67,11 +70,16 @@ function AdminModifyEvent() {
     setEventTime(eventData?.time?.substring(0, 5) || "");
     setEventOrdersClosingDate(correctDate(eventData?.form_closing_date || ""));
     setEventOrdersClosingTime(
-      eventData?.form_closing_time.substring(0, 5) || ""
+      eventData?.form_closing_time.substring(0, 5) || "",
     );
     setEventImgUrl(eventData?.img_url || "");
     setDeliveryEnabled(eventData?.deliveries_enabled || false);
     setDeliveryPrice(eventData?.deliveries_price || 0);
+    setDeliveryStartTime(
+      eventData?.deliveries_start_time?.substring(0, 5) || "",
+    );
+    setDeliveryEndTime(eventData?.deliveries_end_time?.substring(0, 5) || "");
+    setDeliveryInfo(eventData?.deliveries_info || "");
   }, [eventData]);
 
   useEffect(() => {
@@ -101,6 +109,9 @@ function AdminModifyEvent() {
       typesToDelete: typesToDelete,
       deliveries_enabled: deliveryEnabled,
       deliveries_price: deliveryPrice,
+      deliveries_start_time: deliveryStartTime || null,
+      deliveries_end_time: deliveryEndTime || null,
+      deliveries_info: deliveryInfo || null,
     };
     return jsonBody;
   }
@@ -201,7 +212,7 @@ function AdminModifyEvent() {
   function setItemValue(
     index: number,
     field: keyof ModifyItem,
-    value: string | number
+    value: string | number,
   ) {
     const updatedItems = [...itemsList];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
@@ -420,6 +431,59 @@ function AdminModifyEvent() {
                 </div>
               )}
             </div>
+            {deliveryEnabled && (
+              <div className="flex flex-col w-full items-center justify-center gap-4 mt-2">
+                <div className="flex flex-row w-full items-center justify-center gap-4">
+                  <div className="flex flex-col w-1/2 items-center justify-center">
+                    <legend className="fieldset-legend">
+                      Début des livraisons
+                    </legend>
+                    <label className="input validator">
+                      <input
+                        type="text"
+                        required
+                        placeholder="HH:MM"
+                        pattern="([0-2][0-3]|[0-1][0-9]):[0-5][0-9]"
+                        minLength={5}
+                        maxLength={5}
+                        value={deliveryStartTime}
+                        onChange={(e) => setDeliveryStartTime(e.target.value)}
+                      />
+                    </label>
+                    <p className="validator-hint h-0 p-0 mt-1">Format HH:MM</p>
+                  </div>
+                  <div className="flex flex-col w-1/2 items-center justify-center">
+                    <legend className="fieldset-legend">
+                      Fin des livraisons
+                    </legend>
+                    <label className="input validator">
+                      <input
+                        type="text"
+                        required
+                        placeholder="HH:MM"
+                        pattern="([0-2][0-3]|[0-1][0-9]):[0-5][0-9]"
+                        minLength={5}
+                        maxLength={5}
+                        value={deliveryEndTime}
+                        onChange={(e) => setDeliveryEndTime(e.target.value)}
+                      />
+                    </label>
+                    <p className="validator-hint h-0 p-0 mt-1">Format HH:MM</p>
+                  </div>
+                </div>
+                <div className="flex flex-col w-full items-center justify-center">
+                  <legend className="fieldset-legend">
+                    Informations de livraison
+                  </legend>
+                  <textarea
+                    className="textarea w-full"
+                    placeholder="Informations supplémentaires sur les livraisons (zone de livraison, instructions, etc.)"
+                    value={deliveryInfo}
+                    onChange={(e) => setDeliveryInfo(e.target.value)}
+                  ></textarea>
+                </div>
+              </div>
+            )}
           </div>
         </CardImageGen>
 

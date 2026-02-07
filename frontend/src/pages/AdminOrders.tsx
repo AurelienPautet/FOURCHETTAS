@@ -80,7 +80,8 @@ function AdminOrders() {
   const preparedCount = orders.filter((order) => order.prepared).length;
   const deliveredCount = orders.filter((order) => order.delivered).length;
   const deliveryOrders = orders.filter(
-    (order) => order.delivery_info !== null && order.delivery_info !== undefined
+    (order) =>
+      order.delivery_info !== null && order.delivery_info !== undefined,
   );
 
   return (
@@ -172,6 +173,25 @@ function AdminOrders() {
               />
               <div className="tab-content bg-base-100 border-base-200 border-t-0  border-1 p-6">
                 <div className="flex flex-col w-full h-full">
+                  {(eventData?.deliveries_start_time ||
+                    eventData?.deliveries_end_time ||
+                    eventData?.deliveries_info) && (
+                    <div className="mb-4 p-4 bg-base-200 rounded-box">
+                      {eventData?.deliveries_start_time &&
+                        eventData?.deliveries_end_time && (
+                          <p className="text-center font-semibold">
+                            Créneau de livraison :{" "}
+                            {eventData.deliveries_start_time.substring(0, 5)} -{" "}
+                            {eventData.deliveries_end_time.substring(0, 5)}
+                          </p>
+                        )}
+                      {eventData?.deliveries_info && (
+                        <p className="text-center text-sm opacity-70 mt-1">
+                          {eventData.deliveries_info}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <div className="grow-0 flex w-full h-full flex-row flex-wrap  justify-center items-start ">
                     <PieItems
                       data={[
@@ -185,7 +205,7 @@ function AdminOrders() {
                         {
                           name: "Préparé",
                           value: deliveryOrders.filter(
-                            (order) => order.prepared
+                            (order) => order.prepared,
                           ).length,
                         },
                       ]}
@@ -204,7 +224,7 @@ function AdminOrders() {
                         {
                           name: "Livré",
                           value: deliveryOrders.filter(
-                            (order) => order.delivered
+                            (order) => order.delivered,
                           ).length,
                         },
                       ]}

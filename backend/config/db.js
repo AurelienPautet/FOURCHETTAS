@@ -48,8 +48,6 @@ pool
   .then(() => console.log("Connected to PostgreSQL database"))
   .catch((err) => console.error("Connection error", err.stack));
 
-// Run initial query to set up tables if they don't exist
-
 console.log("Database pool initialized");
 
 export default pool;
